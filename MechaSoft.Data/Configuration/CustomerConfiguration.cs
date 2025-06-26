@@ -4,120 +4,136 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace MechaSoft.Data.Configuration;
 
-public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
+internal class CustomerConfiguration : IEntityTypeConfiguration<Customer>
 {
     public void Configure(EntityTypeBuilder<Customer> builder)
     {
-        builder.ToTable("Customers");
+        builder.ToTable("Customer");
 
-        // Chave primária
-        builder.HasKey(x => x.Id);
+        // Primary Key
+        builder.HasKey(c => c.Id);
 
-        builder.Property(x => x.Id)
-            .IsRequired()
-            .ValueGeneratedNever();
-
-        // Configuração do Value Object Name
-        builder.OwnsOne(x => x.Name, nameBuilder =>
+        // Name Value Object Configuration
+        builder.OwnsOne(c => c.Name, name =>
         {
-            nameBuilder.Property(n => n.FirstName)
-                .IsRequired()
+            name.Property(n => n.FirstName)
+                .HasColumnName("FirstName")
                 .HasMaxLength(100)
-                .HasColumnName("FirstName");
+                .IsRequired();
 
-            nameBuilder.Property(n => n.LastName)
-                .IsRequired()
+            name.Property(n => n.LastName)
+                .HasColumnName("LastName")
                 .HasMaxLength(100)
-                .HasColumnName("LastName");
-
-            nameBuilder.Ignore(n => n.FullName);
+                .IsRequired();
         });
 
-        // Propriedades básicas
-        builder.Property(x => x.Email)
-            .IsRequired()
-            .HasMaxLength(255);
+        // Basic Properties
+        builder.Property(c => c.Email)
+            .HasMaxLength(255)
+            .IsRequired();
 
-        builder.Property(x => x.Phone)
-            .IsRequired()
-            .HasMaxLength(20);
+        builder.Property(c => c.Phone)
+            .HasMaxLength(20)
+            .IsRequired();
 
-        builder.Property(x => x.CustomerType)
-            .IsRequired()
-            .HasConversion<string>();
+        builder.Property(c => c.Nif)
+            .HasMaxLength(9)
+            .IsRequired(false);
 
-        builder.Property(x => x.CompanyName)
-            .HasMaxLength(200);
+        builder.Property(c => c.CitizenCard)
+            .HasMaxLength(20)
+            .IsRequired(false);
 
-        builder.Property(x => x.IsActive)
-            .IsRequired()
-            .HasDefaultValue(true);
+        builder.Property(c => c.Notes)
+            .HasMaxLength(1000)
+            .IsRequired(false);
 
-        // Configuração do Value Object Address
-        builder.OwnsOne(x => x.Address, addressBuilder =>
+        // Enum Configuration
+        builder.Property(c => c.Type)
+            .HasConversion<string>()
+            .HasMaxLength(20)
+            .IsRequired();
+
+        // Address Value Object Configuration
+        builder.OwnsOne(c => c.Address, address =>
         {
-            addressBuilder.Property(a => a.Street)
+            address.Property(a => a.Street)
+                .HasColumnName("Street")
                 .HasMaxLength(200)
-                .HasColumnName("Address_Street");
+                .IsRequired();
 
-            addressBuilder.Property(a => a.City)
-                .HasMaxLength(100)
-                .HasColumnName("Address_City");
-
-            addressBuilder.Property(a => a.PostalCode)
+            address.Property(a => a.Number)
+                .HasColumnName("Number")
                 .HasMaxLength(20)
-                .HasColumnName("Address_PostalCode");
+                .IsRequired();
 
-            addressBuilder.Property(a => a.Country)
+            address.Property(a => a.Parish)
+                .HasColumnName("Parish")
                 .HasMaxLength(100)
-                .HasColumnName("Address_Country");
+                .IsRequired();
+
+            address.Property(a => a.Municipality)
+                .HasColumnName("Municipality")
+                .HasMaxLength(100)
+                .IsRequired();
+
+            address.Property(a => a.District)
+                .HasColumnName("District")
+                .HasMaxLength(100)
+                .IsRequired();
+
+            address.Property(a => a.PostalCode)
+                .HasColumnName("PostalCode")
+                .HasMaxLength(8) // XXXX-XXX format
+                .IsRequired();
+
+            address.Property(a => a.Complement)
+                .HasColumnName("Complement")
+                .HasMaxLength(100)
+                .IsRequired(false);
+
+            // Ignore computed property
+            address.Ignore(a => a.FullAddress);
         });
 
-        // Configuração do Value Object Money (CreditLimit)
-        builder.OwnsOne(x => x.CreditLimit, moneyBuilder =>
-        {
-            moneyBuilder.Property(m => m.Amount)
-                .HasColumnType("decimal(10,2)")
-                .HasColumnName("CreditLimit_Amount");
-
-            moneyBuilder.Property(m => m.Currency)
-                .HasMaxLength(3)
-                .HasColumnName("CreditLimit_Currency");
-        });
-
-        // Propriedades de auditoria
-        builder.Property(x => x.CreatedAt)
-            .IsRequired();
-
-        builder.Property(x => x.UpdatedAt)
-            .IsRequired();
-
-        builder.Property(x => x.CreatedBy)
-            .HasMaxLength(100);
-
-        builder.Property(x => x.UpdatedBy)
-            .HasMaxLength(100);
-
-        // Relacionamentos
-        builder.HasMany(x => x.Vehicles)
+        // Navigation Properties
+        builder.HasMany(c => c.Vehicles)
             .WithOne(v => v.Customer)
             .HasForeignKey(v => v.CustomerId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasMany(x => x.ServiceOrders)
+        builder.HasMany(c => c.ServiceOrders)
             .WithOne(so => so.Customer)
             .HasForeignKey(so => so.CustomerId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
 
-        // Índices
-        builder.HasIndex(x => x.Email)
+        // Indexes for better performance
+        builder.HasIndex(c => c.Email)
+            .IsUnique();
+
+        builder.HasIndex(c => c.Nif)
             .IsUnique()
-            .HasDatabaseName("IX_Customer_Email");
+            .HasFilter("[Nif] IS NOT NULL");
 
-        builder.HasIndex(x => x.CustomerType)
-            .HasDatabaseName("IX_Customer_CustomerType");
+        builder.HasIndex(c => c.Phone);
 
-        builder.HasIndex(x => x.IsActive)
-            .HasDatabaseName("IX_Customer_IsActive");
+        // Composite index for address search
+        builder.HasIndex("Municipality", "District")
+            .HasDatabaseName("IX_Customer_Location");
+
+        // Auditable Entity Configuration
+        builder.Property(c => c.CreatedAt)
+            .IsRequired();
+
+        builder.Property(c => c.UpdatedAt)
+            .IsRequired(false);
+
+        builder.Property(c => c.CreatedBy)
+            .HasMaxLength(100)
+            .IsRequired(false);
+
+        builder.Property(c => c.UpdatedBy)
+            .HasMaxLength(100)
+            .IsRequired(false);
     }
 }
