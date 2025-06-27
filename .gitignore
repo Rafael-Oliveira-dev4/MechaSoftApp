@@ -131,3 +131,14 @@ project.nuget.cache
 
 # StyleCop
 StyleCopReport.xml
+/MechaSoft.Domain.Core/obj/Debug/net8.0/MEchaSoft.Domain.Core.AssemblyInfoInputs.cache
+/MechaSoft.Domain.Core/obj/Debug/net8.0/MEchaSoft.Domain.Core.AssemblyInfo.cs
+/MechaSoft.Domain.Core/obj/Debug/net8.0/MEchaSoft.Domain.Core.assets.cache
+/.vs/ProjectEvaluation
+/MechaSoft.IoC/obj/Debug/net8.0/MEchaSoft.IoC.AssemblyInfo.cs
+/MechaSoft.IoC/obj/Debug/net8.0/MEchaSoft.IoC.AssemblyInfoInputs.cache
+/MechaSoft.IoC/obj/Debug/net8.0/MEchaSoft.IoC.assets.cache
+/MechaSoft.IoC/obj/Debug/net8.0/MEchaSoft.IoC.GeneratedMSBuildEditorConfig.editorconfig
+/MechaSoft.IoC/obj/MechaSoft.IoC.csproj.nuget.dgspec.json
+/MechaSoft.IoC/obj/project.assets.json
+/MechaSoft.IoC/obj/project.nuget.cache
