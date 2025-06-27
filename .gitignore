@@ -142,3 +142,7 @@ StyleCopReport.xml
 /MechaSoft.IoC/obj/MechaSoft.IoC.csproj.nuget.dgspec.json
 /MechaSoft.IoC/obj/project.assets.json
 /MechaSoft.IoC/obj/project.nuget.cache
+/MechaSoft.Data/obj/Debug/net8.0/MechaSoft.Data.AssemblyInfo.cs
+/MechaSoft.Data/obj/Debug/net8.0/MechaSoft.Data.AssemblyInfoInputs.cache
+/MechaSoft.Data/obj/Debug/net8.0/MechaSoft.Data.assets.cache
+/MechaSoft.Data/obj/Debug/net8.0/MechaSoft.Data.GeneratedMSBuildEditorConfig.editorconfig
