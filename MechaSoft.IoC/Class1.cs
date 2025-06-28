@@ -1,7 +1,6 @@
-﻿namespace MechaSoft.IoC
-{
-    public class Class1
-    {
+﻿namespace MechaSoft.IoC;
 
-    }
+public class Class1
+{
+
 }
