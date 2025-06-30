@@ -20,13 +20,12 @@ internal class ServiceItemConfiguration : IEntityTypeConfiguration<ServiceItem>
         builder.Property(si => si.ServiceId)
             .IsRequired();
 
-        builder.Property(si => si.EmployeeId)
+        builder.Property(si => si.MechanicId)
             .IsRequired(false);
 
         // Basic Properties
-        builder.Property(si => si.Description)
-            .HasMaxLength(500)
-            .IsRequired(false);
+        builder.Property(si => si.Quantity)
+            .IsRequired();
 
         builder.Property(si => si.EstimatedHours)
             .HasColumnType("decimal(5,2)")
@@ -38,6 +37,10 @@ internal class ServiceItemConfiguration : IEntityTypeConfiguration<ServiceItem>
 
         builder.Property(si => si.DiscountPercentage)
             .HasColumnType("decimal(5,2)")
+            .IsRequired(false);
+
+        builder.Property(si => si.Notes)
+            .HasMaxLength(500)
             .IsRequired(false);
 
         // Enum Configuration
@@ -77,15 +80,15 @@ internal class ServiceItemConfiguration : IEntityTypeConfiguration<ServiceItem>
         });
 
         // Date Properties
-        builder.Property(si => si.StartDate)
+        builder.Property(si => si.StartedAt)
             .IsRequired(false);
 
-        builder.Property(si => si.EndDate)
+        builder.Property(si => si.CompletedAt)
             .IsRequired(false);
 
         // Navigation Properties
         builder.HasOne(si => si.ServiceOrder)
-            .WithMany(so => so.Services)
+            .WithMany(so => so.Services) // ← Correto: ServiceOrder tem Services
             .HasForeignKey(si => si.ServiceOrderId)
             .OnDelete(DeleteBehavior.Cascade);
 
@@ -94,33 +97,26 @@ internal class ServiceItemConfiguration : IEntityTypeConfiguration<ServiceItem>
             .HasForeignKey(si => si.ServiceId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasOne(si => si.Employee)
+        builder.HasOne(si => si.Mechanic)
             .WithMany()
-            .HasForeignKey(si => si.EmployeeId)
+            .HasForeignKey(si => si.MechanicId)
             .OnDelete(DeleteBehavior.SetNull);
 
         // Indexes for better performance
         builder.HasIndex(si => si.ServiceOrderId);
-
         builder.HasIndex(si => si.ServiceId);
-
-        builder.HasIndex(si => si.EmployeeId)
-            .HasFilter("[EmployeeId] IS NOT NULL");
-
+        builder.HasIndex(si => si.MechanicId)
+            .HasFilter("[MechanicId] IS NOT NULL");
         builder.HasIndex(si => si.Status);
-
         builder.HasIndex(si => new { si.ServiceOrderId, si.Status })
             .HasDatabaseName("IX_ServiceItem_ServiceOrder_Status");
-
-        builder.HasIndex(si => si.StartDate)
-            .HasFilter("[StartDate] IS NOT NULL");
-
-        builder.HasIndex(si => si.EndDate)
-            .HasFilter("[EndDate] IS NOT NULL");
-
-        builder.HasIndex(si => new { si.EmployeeId, si.Status })
-            .HasDatabaseName("IX_ServiceItem_Employee_Status")
-            .HasFilter("[EmployeeId] IS NOT NULL");
+        builder.HasIndex(si => si.StartedAt)
+            .HasFilter("[StartedAt] IS NOT NULL");
+        builder.HasIndex(si => si.CompletedAt)
+            .HasFilter("[CompletedAt] IS NOT NULL");
+        builder.HasIndex(si => new { si.MechanicId, si.Status })
+            .HasDatabaseName("IX_ServiceItem_Mechanic_Status")
+            .HasFilter("[MechanicId] IS NOT NULL");
 
         // Auditable Entity Configuration
         builder.Property(si => si.CreatedAt)

@@ -1,7 +1,11 @@
-﻿namespace MechaSoft.Domain.Model;
+﻿using MechaSoft.Domain.Common;
+using MechaSoft.Domain.Interfaces;
 
-public class ServiceItem
+namespace MechaSoft.Domain.Model;
+
+public class ServiceItem : AuditableEntity, IEntity<Guid>
 {
+    public Guid Id { get; set; } // ← Propriedade necessária para IEntity<Guid>
     public Guid ServiceOrderId { get; set; }
     public Guid ServiceId { get; set; }
     public int Quantity { get; set; }
@@ -23,12 +27,14 @@ public class ServiceItem
 
     public ServiceItem()
     {
+        Id = Guid.NewGuid(); // ← Inicializar o Id
         Status = ServiceItemStatus.Pending;
     }
 
     public ServiceItem(Guid serviceOrderId, Guid serviceId, int quantity,
                       decimal estimatedHours, Money unitPrice, decimal? discountPercentage = null)
     {
+        Id = Guid.NewGuid(); // ← Inicializar o Id
         ServiceOrderId = serviceOrderId;
         ServiceId = serviceId;
         Quantity = quantity;
@@ -36,15 +42,14 @@ public class ServiceItem
         UnitPrice = unitPrice ?? throw new ArgumentNullException(nameof(unitPrice));
         DiscountPercentage = discountPercentage;
         Status = ServiceItemStatus.Pending;
-
         CalculateTotalPrice();
     }
 
+    // ... resto dos métodos permanecem iguais
     public void UpdateActualHours(decimal actualHours)
     {
         if (actualHours < 0)
             throw new ArgumentException("Actual hours cannot be negative", nameof(actualHours));
-
         ActualHours = actualHours;
         RecalculateTotalPrice();
     }
@@ -53,7 +58,6 @@ public class ServiceItem
     {
         if (Status != ServiceItemStatus.Pending)
             throw new InvalidOperationException($"Cannot start service in status {Status}");
-
         Status = ServiceItemStatus.InProgress;
         StartedAt = DateTime.UtcNow;
         MechanicId = mechanicId;
@@ -63,12 +67,10 @@ public class ServiceItem
     {
         if (Status != ServiceItemStatus.InProgress)
             throw new InvalidOperationException($"Cannot complete service in status {Status}");
-
         ActualHours = actualHours;
         Status = ServiceItemStatus.Completed;
         CompletedAt = DateTime.UtcNow;
         Notes = notes;
-
         RecalculateTotalPrice();
     }
 
@@ -76,7 +78,6 @@ public class ServiceItem
     {
         if (Status != ServiceItemStatus.InProgress)
             throw new InvalidOperationException($"Cannot pause service in status {Status}");
-
         Status = ServiceItemStatus.Paused;
         if (!string.IsNullOrWhiteSpace(reason))
         {
@@ -88,7 +89,6 @@ public class ServiceItem
     {
         if (Status != ServiceItemStatus.Paused)
             throw new InvalidOperationException($"Cannot resume service in status {Status}");
-
         Status = ServiceItemStatus.InProgress;
     }
 
@@ -96,7 +96,6 @@ public class ServiceItem
     {
         if (Status == ServiceItemStatus.Completed)
             throw new InvalidOperationException("Cannot cancel completed service");
-
         Status = ServiceItemStatus.Cancelled;
         if (!string.IsNullOrWhiteSpace(reason))
         {
@@ -108,7 +107,6 @@ public class ServiceItem
     {
         var hoursToUse = ActualHours ?? EstimatedHours;
         var subtotal = UnitPrice.Multiply(hoursToUse * Quantity);
-
         if (DiscountPercentage.HasValue && DiscountPercentage > 0)
         {
             var discount = subtotal.Multiply(DiscountPercentage.Value / 100);
@@ -129,7 +127,6 @@ public class ServiceItem
     {
         if (!ActualHours.HasValue)
             return 0;
-
         return ActualHours.Value - EstimatedHours;
     }
 
@@ -147,7 +144,6 @@ public class ServiceItem
     {
         if (!StartedAt.HasValue)
             return null;
-
         var endTime = CompletedAt ?? DateTime.UtcNow;
         return endTime - StartedAt.Value;
     }

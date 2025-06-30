@@ -161,3 +161,6 @@ StyleCopReport.xml
 /MechaSoft.Domain.Core/obj/MechaSoft.Domain.Core.csproj.nuget.dgspec.json
 /MechaSoft.Domain.Core/obj/project.assets.json
 /MechaSoft.Domain.Core/obj/project.nuget.cache
+/MechaSoft.Application/obj/MechaSoft.Application.csproj.nuget.dgspec.json
+/MechaSoft.Application/obj/project.assets.json
+/MechaSoft.Application/obj/project.nuget.cache

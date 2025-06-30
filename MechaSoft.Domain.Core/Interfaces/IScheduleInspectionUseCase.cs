@@ -2,7 +2,7 @@
 
 namespace MechaSoft.Domain.Core.Interfaces;
 
-public interface IScheduleInspectionUseCase
+public interface IScheduleInspectionUseCase : IRepository<Inspection>
 {
     Task<Inspection> ExecuteAsync(ScheduleInspectionRequest request);
 }
