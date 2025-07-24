@@ -1,9 +1,8 @@
-﻿
-
-using MechaSoft.Data.Context;
+﻿using MechaSoft.Data.Context;
 using MechaSoft.Domain.Core.Interfaces;
 using MechaSoft.Domain.Model;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
+
 
 namespace MechaSoft.Data.Repositories;
 
@@ -245,5 +244,15 @@ public class EmployeeRepository : Repository<Employee>, IEmployeeRepository
                 throw new InvalidOperationException("There can only be one active owner.");
             }
         }
+    }
+
+    public async Task<Employee?> GetByEmailAsync(string email)
+    {
+        if (string.IsNullOrWhiteSpace(email))
+            throw new ArgumentException("Email cannot be null or empty", nameof(email));
+
+        return await _dbSet
+            .Include(e => e.ServiceOrders)
+            .FirstOrDefaultAsync(e => e.Email == email);
     }
 }

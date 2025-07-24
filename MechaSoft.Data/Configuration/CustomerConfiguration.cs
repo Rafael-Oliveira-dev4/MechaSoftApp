@@ -118,8 +118,8 @@ internal class CustomerConfiguration : IEntityTypeConfiguration<Customer>
         builder.HasIndex(c => c.Phone);
 
         // Composite index for address search
-        builder.HasIndex("Municipality", "District")
-            .HasDatabaseName("IX_Customer_Location");
+        //builder.HasIndex("Municipality", "District")
+        //    .HasDatabaseName("IX_Customer_Location");
 
         // Auditable Entity Configuration
         builder.Property(c => c.CreatedAt)

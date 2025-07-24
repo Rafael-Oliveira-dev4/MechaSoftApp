@@ -84,12 +84,7 @@ public class CustumerRepository : Repository<Customer>, ICustomerRepository
 
         return await query.AnyAsync();
     }
-    public async Task<IEnumerable<Customer>> GetAtiveCustomersAsync()
-    {
-        return await _dbSet
-            .Where(c => c.IsActive)
-            .ToListAsync();
-    }
+
     public async Task<(IEnumerable<Customer> Itens, int TotalCount)> GetPagedCustomerAsync(
         int pageNumber,
         int pageSize,
@@ -110,10 +105,7 @@ public class CustumerRepository : Repository<Customer>, ICustomerRepository
                                      c.Email.Contains(searchTerm) ||
                                      c.Phone.Contains(searchTerm));
         }
-        if (isActive.HasValue)
-        {
-            query = query.Where(c => c.IsActive == isActive.Value);
-        }
+
 
         var totalCount = await query.CountAsync();
 
@@ -126,7 +118,7 @@ public class CustumerRepository : Repository<Customer>, ICustomerRepository
     }
     private async Task ValidateCustomerAsync(Customer customer, bool isUpdate = false)
     {
-        // Validação de telefone único
+        /* Validação de telefone único
         if (!string.IsNullOrWhiteSpace(customer.Phone))
         {
             var phoneExists = await PhoneExistsAsync(customer.Phone, isUpdate ? customer.Id : null);
@@ -140,6 +132,6 @@ public class CustumerRepository : Repository<Customer>, ICustomerRepository
             var nifExists = await NifExistsAsync(customer.Nif, isUpdate ? customer.Id : null);
             if (nifExists)
                 throw new InvalidOperationException($"A customer with NIF '{customer.Nif}' already exists.");
-        }
+        }*/
     }
 }

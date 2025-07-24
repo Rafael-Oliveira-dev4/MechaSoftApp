@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\rafae\\Source\\Repos\\MechaSoftApp\\MechaSoft.Data\\MechaSoft.Data.csproj": {}
+    "C:\\Users\\rafae\\source\\repos\\MechaSoftApp\\MechaSoft.Data\\MechaSoft.Data.csproj": {}
   },
   "projects": {
-    "C:\\Users\\rafae\\Source\\Repos\\MechaSoftApp\\MechaSoft.Data\\MechaSoft.Data.csproj": {
+    "C:\\Users\\rafae\\source\\repos\\MechaSoftApp\\MechaSoft.Data\\MechaSoft.Data.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\rafae\\Source\\Repos\\MechaSoftApp\\MechaSoft.Data\\MechaSoft.Data.csproj",
+        "projectUniqueName": "C:\\Users\\rafae\\source\\repos\\MechaSoftApp\\MechaSoft.Data\\MechaSoft.Data.csproj",
         "projectName": "MechaSoft.Data",
-        "projectPath": "C:\\Users\\rafae\\Source\\Repos\\MechaSoftApp\\MechaSoft.Data\\MechaSoft.Data.csproj",
+        "projectPath": "C:\\Users\\rafae\\source\\repos\\MechaSoftApp\\MechaSoft.Data\\MechaSoft.Data.csproj",
         "packagesPath": "C:\\Users\\rafae\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\rafae\\Source\\Repos\\MechaSoftApp\\MechaSoft.Data\\obj\\",
+        "outputPath": "C:\\Users\\rafae\\source\\repos\\MechaSoftApp\\MechaSoft.Data\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -32,8 +32,11 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\rafae\\Source\\Repos\\MechaSoftApp\\MechaSoft.Domain\\MechaSoft.Domain.csproj": {
-                "projectPath": "C:\\Users\\rafae\\Source\\Repos\\MechaSoftApp\\MechaSoft.Domain\\MechaSoft.Domain.csproj"
+              "C:\\Users\\rafae\\source\\repos\\MechaSoftApp\\MEchaSoft.Domain.Core\\MechaSoft.Domain.Core.csproj": {
+                "projectPath": "C:\\Users\\rafae\\source\\repos\\MechaSoftApp\\MEchaSoft.Domain.Core\\MechaSoft.Domain.Core.csproj"
+              },
+              "C:\\Users\\rafae\\source\\repos\\MechaSoftApp\\MechaSoft.Domain\\MechaSoft.Domain.csproj": {
+                "projectPath": "C:\\Users\\rafae\\source\\repos\\MechaSoftApp\\MechaSoft.Domain\\MechaSoft.Domain.csproj"
               }
             }
           }
@@ -54,25 +57,49 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
+            "Microsoft.AspNetCore.Authentication.JwtBearer": {
+              "target": "Package",
+              "version": "[8.0.8, )"
+            },
+            "Microsoft.AspNetCore.Http.Abstractions": {
+              "target": "Package",
+              "version": "[2.3.0, )"
+            },
+            "Microsoft.AspNetCore.OpenApi": {
+              "target": "Package",
+              "version": "[8.0.8, )"
+            },
             "Microsoft.EntityFrameworkCore": {
               "target": "Package",
-              "version": "[9.0.6, )"
+              "version": "[9.0.7, )"
             },
             "Microsoft.EntityFrameworkCore.Design": {
               "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
               "suppressParent": "All",
               "target": "Package",
-              "version": "[9.0.6, )"
+              "version": "[9.0.7, )"
             },
             "Microsoft.EntityFrameworkCore.SqlServer": {
               "target": "Package",
-              "version": "[9.0.6, )"
+              "version": "[9.0.7, )"
+            },
+            "Microsoft.EntityFrameworkCore.SqlServer.Abstractions": {
+              "target": "Package",
+              "version": "[9.0.7, )"
+            },
+            "Microsoft.EntityFrameworkCore.SqlServer.Design": {
+              "target": "Package",
+              "version": "[1.1.6, )"
             },
             "Microsoft.EntityFrameworkCore.Tools": {
               "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
               "suppressParent": "All",
               "target": "Package",
-              "version": "[9.0.6, )"
+              "version": "[9.0.7, )"
+            },
+            "Microsoft.SqlServer.Server": {
+              "target": "Package",
+              "version": "[1.0.0, )"
             }
           },
           "imports": [
@@ -91,18 +118,111 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.301/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.302/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\rafae\\Source\\Repos\\MechaSoftApp\\MechaSoft.Domain\\MechaSoft.Domain.csproj": {
+    "C:\\Users\\rafae\\source\\repos\\MechaSoftApp\\MEchaSoft.Domain.Core\\MechaSoft.Domain.Core.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\rafae\\Source\\Repos\\MechaSoftApp\\MechaSoft.Domain\\MechaSoft.Domain.csproj",
-        "projectName": "MechaSoft.Domain",
-        "projectPath": "C:\\Users\\rafae\\Source\\Repos\\MechaSoftApp\\MechaSoft.Domain\\MechaSoft.Domain.csproj",
+        "projectUniqueName": "C:\\Users\\rafae\\source\\repos\\MechaSoftApp\\MEchaSoft.Domain.Core\\MechaSoft.Domain.Core.csproj",
+        "projectName": "MechaSoft.Domain.Core",
+        "projectPath": "C:\\Users\\rafae\\source\\repos\\MechaSoftApp\\MEchaSoft.Domain.Core\\MechaSoft.Domain.Core.csproj",
         "packagesPath": "C:\\Users\\rafae\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\rafae\\Source\\Repos\\MechaSoftApp\\MechaSoft.Domain\\obj\\",
+        "outputPath": "C:\\Users\\rafae\\source\\repos\\MechaSoftApp\\MEchaSoft.Domain.Core\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\rafae\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "C:\\Users\\rafae\\source\\repos\\MechaSoftApp\\MechaSoft.Domain\\MechaSoft.Domain.csproj": {
+                "projectPath": "C:\\Users\\rafae\\source\\repos\\MechaSoftApp\\MechaSoft.Domain\\MechaSoft.Domain.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "9.0.300"
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "Microsoft.AspNetCore.Authentication.JwtBearer": {
+              "target": "Package",
+              "version": "[8.0.8, )"
+            },
+            "Microsoft.AspNetCore.OpenApi": {
+              "target": "Package",
+              "version": "[8.0.8, )"
+            },
+            "Microsoft.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[9.0.7, )"
+            },
+            "Microsoft.EntityFrameworkCore.Design": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[9.0.7, )"
+            },
+            "Microsoft.EntityFrameworkCore.SqlServer": {
+              "target": "Package",
+              "version": "[9.0.7, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.302/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "C:\\Users\\rafae\\source\\repos\\MechaSoftApp\\MechaSoft.Domain\\MechaSoft.Domain.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\rafae\\source\\repos\\MechaSoftApp\\MechaSoft.Domain\\MechaSoft.Domain.csproj",
+        "projectName": "MechaSoft.Domain",
+        "projectPath": "C:\\Users\\rafae\\source\\repos\\MechaSoftApp\\MechaSoft.Domain\\MechaSoft.Domain.csproj",
+        "packagesPath": "C:\\Users\\rafae\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\rafae\\source\\repos\\MechaSoftApp\\MechaSoft.Domain\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -140,6 +260,34 @@
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
+          "dependencies": {
+            "DelegateDecompiler": {
+              "target": "Package",
+              "version": "[0.34.2, )"
+            },
+            "Microsoft.AspNetCore.Authentication.JwtBearer": {
+              "target": "Package",
+              "version": "[8.0.8, )"
+            },
+            "Microsoft.AspNetCore.OpenApi": {
+              "target": "Package",
+              "version": "[8.0.8, )"
+            },
+            "Microsoft.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[9.0.7, )"
+            },
+            "Microsoft.EntityFrameworkCore.Design": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[9.0.7, )"
+            },
+            "Microsoft.EntityFrameworkCore.SqlServer": {
+              "target": "Package",
+              "version": "[9.0.7, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",
@@ -156,7 +304,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.301/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.302/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

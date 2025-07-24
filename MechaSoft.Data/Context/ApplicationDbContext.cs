@@ -1,6 +1,8 @@
 ﻿using MechaSoft.Data.Configuration;
+using MechaSoft.Domain.Interfaces;
 using MechaSoft.Domain.Model;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace MechaSoft.Data.Context;
 
@@ -28,8 +30,8 @@ public class ApplicationDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        // Aplicar configurações
         modelBuilder.ApplyConfigurationsFromAssembly(System.Reflection.Assembly.GetExecutingAssembly());
-
         modelBuilder.ApplyConfiguration(new CustomerConfiguration());
         modelBuilder.ApplyConfiguration(new VehicleConfiguration());
         modelBuilder.ApplyConfiguration(new EmployeeConfiguration());
@@ -40,8 +42,41 @@ public class ApplicationDbContext : DbContext
         modelBuilder.ApplyConfiguration(new PartItemConfiguration());
         modelBuilder.ApplyConfiguration(new InspectionConfiguration());
 
-        modelBuilder.HasDefaultSchema("MechaSoft");
+        // Configurar soft delete global para entidades auditáveis
+        ConfigureSoftDeleteFilter(modelBuilder);
+
+        // Schema padrão
+        modelBuilder.HasDefaultSchema("MechaSoftCS");
 
         base.OnModelCreating(modelBuilder);
+    }
+
+    private static void ConfigureSoftDeleteFilter(ModelBuilder modelBuilder)
+    {
+        // Aplicar query filter para soft delete em todas as entidades que implementam IAuditable
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        {
+            if (typeof(IAuditable).IsAssignableFrom(entityType.ClrType))
+            {
+                var parameter = Expression.Parameter(entityType.ClrType, "e");
+                var property = Expression.Property(parameter, nameof(IAuditable.IsDeleted));
+                var condition = Expression.Equal(property, Expression.Constant(false));
+                var lambda = Expression.Lambda(condition, parameter);
+
+                modelBuilder.Entity(entityType.ClrType).HasQueryFilter(lambda);
+            }
+        }
+    }
+
+    // Método para incluir entidades deletadas nas consultas (quando necessário)
+    public IQueryable<T> IncludeDeleted<T>() where T : class, IAuditable
+    {
+        return Set<T>().IgnoreQueryFilters();
+    }
+
+    // Método para obter apenas entidades deletadas
+    public IQueryable<T> OnlyDeleted<T>() where T : class, IAuditable
+    {
+        return Set<T>().IgnoreQueryFilters().Where(e => e.IsDeleted);
     }
 }
