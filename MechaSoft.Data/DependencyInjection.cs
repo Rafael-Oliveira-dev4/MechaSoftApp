@@ -4,8 +4,11 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Text.Json.Serialization;
-using Microsoft.EntityFrameworkCore.SqlServer;
 using Microsoft.EntityFrameworkCore;
+using MechaSoft.Domain.Core.Uow;
+using MechaSoft.Domain.Core.Interfaces;
+using MechaSoft.Data.Repositories;
+using MechaSoft.Data.Uow;
 
 namespace MechaSoft.Data;
 
@@ -33,22 +36,23 @@ public static class DependencyInjection
             });
 
         // Repository
-        //services.AddScoped<IUnitOfWork, UnitOfWork>();
-        //services.AddScoped<ICustomerRepository, CustomerRepository>();
-        //services.AddScoped<IEmployeeRepository, EmployeeRepository>();
-        //services.AddScoped<IInspectionRepository, InspectionRepository>();
-        //services.AddScoped<IPartRepository, PartRepository>();
-        //services.AddScoped<IServiceOrderRepository, ServiceOrderRepository>();
-        //services.AddScoped<IServiceRepository, ServiceRepository>();
-        //services.AddScoped<IVehicleRepository, VehicleRepository>();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-        // Use Cases
-        //services.AddScoped<ICreateServiceOrderUseCase, CreateServiceOrderUseCase>();
-        //services.AddScoped<IScheduleInspectionUseCase, ScheduleInspectionUseCase>();
+        services.AddScoped<ICustomerRepository, CustomerRepository>();
+        services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+        services.AddScoped<IInspectionRepository, InspectionRepository>();
+        services.AddScoped<IPartRepository, PartRepository>();
+        services.AddScoped<IServiceOrderRepository, ServiceOrderRepository>();
+        services.AddScoped<IServiceRepository, ServiceRepository>();
+        services.AddScoped<IVehicleRepository, VehicleRepository>();
 
-        // Services (adicione conforme necessário)
+        //Use Cases
+        services.AddScoped<ICreateServiceOrderUseCase, CreateServiceOrderUseCaseRepository>();
+        services.AddScoped<IScheduleInspectionUseCase, ScheduleInspectionRepository>();
+
+        //Services(adicione conforme necessário)
         // services.AddScoped<IFileStorageService, FileStorageService>();
-        // services.AddScoped<INotificationService, NotificationService>();
+        //services.AddScoped<INotificationService, NotificationService>();
 
         return services;
     }

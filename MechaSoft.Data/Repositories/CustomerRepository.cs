@@ -6,9 +6,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MechaSoft.Data.Repositories;
 
-public class CustumerRepository : Repository<Customer>, ICustomerRepository
+public class CustomerRepository : Repository<Customer>, ICustomerRepository
 {
-    public CustumerRepository(ApplicationDbContext context) : base(context)
+    public CustomerRepository(ApplicationDbContext context) : base(context)
     {
     }
     public override async Task<Customer> SaveAsync(Customer customer)
