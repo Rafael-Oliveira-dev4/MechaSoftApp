@@ -3,17 +3,20 @@
 ## ✅ Dependências Instaladas
 
 ### .NET 8.0 SDK
+
 - **Versão**: 8.0.407
 - **Instalado via**: Snap
 - **Comando**: `sudo snap install dotnet-sdk --classic`
 
 ### Node.js e npm
+
 - **npm versão**: 10.9.3
 - **Status**: ✅ Já instalado
 
 ## 📦 Pacotes Restaurados
 
 ### Backend (.NET)
+
 - ✅ Todos os pacotes NuGet foram restaurados com sucesso
 - ✅ Projeto compila sem erros
 - ✅ Dependências principais:
@@ -23,6 +26,7 @@
   - ASP.NET Core 8.0
 
 ### Frontend (Angular)
+
 - ✅ Dependências npm instaladas
 - ✅ Angular 20.1.0
 - ✅ TypeScript 5.8.2
@@ -31,36 +35,44 @@
 ## 🔧 Configurações do VS Code
 
 ### Extensões Recomendadas
+
 As seguintes extensões foram configuradas no arquivo `.vscode/extensions.json`:
 
 #### .NET e C# Development
+
 - `ms-dotnettools.csharp` - Suporte completo para C#
 - `ms-dotnettools.csdevkit` - Kit de desenvolvimento C#
 - `ms-dotnettools.vscode-dotnet-runtime` - Runtime .NET
 
 #### Angular Development
+
 - `angular.ng-template` - Suporte para templates Angular
 - `johnpapa.angular2` - Snippets e ferramentas Angular
 - `cyrilletuzi.angular-schematics` - Angular Schematics
 
 #### File Explorer e Visualização
+
 - `alefragnani.project-manager` - Gerenciamento de projetos
 - `pkief.material-icon-theme` - Ícones para arquivos e pastas
 - `zhuangtongfa.material-theme` - Tema Material
 
 #### Database e Entity Framework
+
 - `ms-mssql.mssql` - Suporte para SQL Server
 - `ms-dotnettools.dotnet-interactive-vscode` - .NET Interactive
 
 #### Git e Version Control
+
 - `eamodio.gitlens` - Git supercharged
 - `github.vscode-pull-request-github` - Pull requests do GitHub
 
 #### Code Quality e Formatting
+
 - `esbenp.prettier-vscode` - Formatador de código
 - `ms-vscode.vscode-eslint` - Linter JavaScript/TypeScript
 
 ### Configurações do Workspace
+
 - ✅ Formatação automática ao salvar
 - ✅ Organização automática de imports
 - ✅ File nesting configurado para .NET e Angular
@@ -68,6 +80,7 @@ As seguintes extensões foram configuradas no arquivo `.vscode/extensions.json`:
 - ✅ Configurações de terminal otimizadas
 
 ### Tarefas Configuradas
+
 - ✅ Build Solution
 - ✅ Restore NuGet Packages
 - ✅ Run WebAPI
@@ -77,6 +90,7 @@ As seguintes extensões foram configuradas no arquivo `.vscode/extensions.json`:
 - ✅ Clean Solution
 
 ### Debug Configurado
+
 - ✅ Launch WebAPI
 - ✅ Launch Angular
 - ✅ Launch Full Stack (ambos simultaneamente)
@@ -84,6 +98,7 @@ As seguintes extensões foram configuradas no arquivo `.vscode/extensions.json`:
 ## 🚀 Como Executar o Projeto
 
 ### Backend (WebAPI)
+
 ```bash
 # Navegar para o diretório raiz
 cd /home/rick/Documentos/Github/MechaSoftApp
@@ -93,6 +108,7 @@ dotnet run --project MechaSoft.WebAPI
 ```
 
 ### Frontend (Angular)
+
 ```bash
 # Navegar para o diretório Angular
 cd Presentation/MechaSoft.Angular
@@ -102,6 +118,7 @@ npm start
 ```
 
 ### Usando VS Code
+
 1. Abrir o projeto no VS Code
 2. Pressionar `Ctrl+Shift+P`
 3. Digitar "Tasks: Run Task"
@@ -124,6 +141,7 @@ MechaSoftApp/
 ## 🛠️ Comandos Úteis
 
 ### .NET
+
 ```bash
 # Restaurar pacotes
 dotnet restore
@@ -142,6 +160,7 @@ dotnet ef database update --project MechaSoft.Data --startup-project MechaSoft.W
 ```
 
 ### Angular
+
 ```bash
 # Instalar dependências
 npm install
