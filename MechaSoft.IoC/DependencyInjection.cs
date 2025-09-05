@@ -1,4 +1,5 @@
-﻿using MechaSoft.Data;
+﻿using MechaSoft.Application;
+using MechaSoft.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 

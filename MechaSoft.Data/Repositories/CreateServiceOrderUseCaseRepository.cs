@@ -18,13 +18,16 @@ public class CreateServiceOrderUseCaseRepository : Repository<ServiceOrder>, ICr
 
         var serviceOrder = new ServiceOrder
         {
+            Id = Guid.NewGuid(),
+            OrderNumber = $"SO-{DateTime.UtcNow:yyyyMMdd-HHmmss}",
             CustomerId = request.CustomerId,
             VehicleId = request.VehicleId,
             Description = request.Description,
-            Priority = request.Priority,
             Status = ServiceOrderStatus.Pending,
-            MechanicId = request.MechanicId,
+            Priority = request.Priority,
+            EstimatedCost = new Money(0, "EUR"), // TODO: Calcular custo estimado baseado nos serviços e peças
             EstimatedDelivery = request.EstimatedDelivery,
+            MechanicId = request.MechanicId,
             CreatedAt = DateTime.UtcNow
         };
 

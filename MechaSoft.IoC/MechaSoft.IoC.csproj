@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MechaSoft.Application\MechaSoft.Application.csproj" />
     <ProjectReference Include="..\MechaSoft.Data\MechaSoft.Data.csproj" />
   </ItemGroup>
 

@@ -53,8 +53,8 @@ public sealed class Result<TResult, TOk, TError>
         return new Result<TResult, TOk, TError>(error);
     }
 }
+
 public sealed record Success
 {
     public static readonly Success Ok = new();
-
 }

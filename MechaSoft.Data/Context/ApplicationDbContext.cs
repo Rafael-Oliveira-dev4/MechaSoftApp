@@ -11,6 +11,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Customer> Customers { get; set; }
     public DbSet<Vehicle> Vehicles { get; set; }
     public DbSet<Employee> Employees { get; set; }
+    public DbSet<User> Users { get; set; }
     public DbSet<Service> Services { get; set; }
     public DbSet<Part> Parts { get; set; }
     public DbSet<ServiceOrder> ServiceOrders { get; set; }
@@ -35,6 +36,7 @@ public class ApplicationDbContext : DbContext
         modelBuilder.ApplyConfiguration(new CustomerConfiguration());
         modelBuilder.ApplyConfiguration(new VehicleConfiguration());
         modelBuilder.ApplyConfiguration(new EmployeeConfiguration());
+        modelBuilder.ApplyConfiguration(new UserConfiguration());
         modelBuilder.ApplyConfiguration(new ServiceConfiguration());
         modelBuilder.ApplyConfiguration(new PartConfiguration());
         modelBuilder.ApplyConfiguration(new ServiceOrderConfiguration());

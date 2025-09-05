@@ -9,6 +9,8 @@ using MechaSoft.Domain.Core.Uow;
 using MechaSoft.Domain.Core.Interfaces;
 using MechaSoft.Data.Repositories;
 using MechaSoft.Data.Uow;
+using MechaSoft.Security.Interfaces;
+using MechaSoft.Security.Services;
 
 namespace MechaSoft.Data;
 
@@ -40,6 +42,7 @@ public static class DependencyInjection
 
         services.AddScoped<ICustomerRepository, CustomerRepository>();
         services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IInspectionRepository, InspectionRepository>();
         services.AddScoped<IPartRepository, PartRepository>();
         services.AddScoped<IServiceOrderRepository, ServiceOrderRepository>();
@@ -50,7 +53,8 @@ public static class DependencyInjection
         services.AddScoped<ICreateServiceOrderUseCase, CreateServiceOrderUseCaseRepository>();
         services.AddScoped<IScheduleInspectionUseCase, ScheduleInspectionRepository>();
 
-        //Services(adicione conforme necessário)
+        //Services
+        services.AddScoped<ITokenService, TokenService>();
         // services.AddScoped<IFileStorageService, FileStorageService>();
         //services.AddScoped<INotificationService, NotificationService>();
 

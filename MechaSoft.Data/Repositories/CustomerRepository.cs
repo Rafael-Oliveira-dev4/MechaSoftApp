@@ -118,10 +118,10 @@ public class CustomerRepository : Repository<Customer>, ICustomerRepository
     }
     private async Task ValidateCustomerAsync(Customer customer, bool isUpdate = false)
     {
-        /* Validação de telefone único
+        // Validação de telefone único
         if (!string.IsNullOrWhiteSpace(customer.Phone))
         {
-            var phoneExists = await PhoneExistsAsync(customer.Phone, isUpdate ? customer.Id : null);
+            var phoneExists = await PhoneExistAsync(customer.Phone, isUpdate ? customer.Id : null);
             if (phoneExists)
                 throw new InvalidOperationException($"A customer with phone '{customer.Phone}' already exists.");
         }
@@ -129,9 +129,9 @@ public class CustomerRepository : Repository<Customer>, ICustomerRepository
         // Validação de NIF único
         if (!string.IsNullOrWhiteSpace(customer.Nif))
         {
-            var nifExists = await NifExistsAsync(customer.Nif, isUpdate ? customer.Id : null);
+            var nifExists = await NifExistAsync(customer.Nif, isUpdate ? customer.Id : null);
             if (nifExists)
                 throw new InvalidOperationException($"A customer with NIF '{customer.Nif}' already exists.");
-        }*/
+        }
     }
 }

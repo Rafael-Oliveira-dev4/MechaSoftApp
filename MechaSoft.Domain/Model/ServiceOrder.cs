@@ -6,13 +6,13 @@ namespace MechaSoft.Domain.Model;
 public class ServiceOrder : AuditableEntity, IEntity<Guid>
 {
     public Guid Id { get; set; }
-    public string OrderNumber { get; set; }
+    public required string OrderNumber { get; set; }
     public Guid CustomerId { get; set; }
     public Guid VehicleId { get; set; }
-    public string Description { get; set; }
+    public required string Description { get; set; }
     public ServiceOrderStatus Status { get; set; }
     public Priority Priority { get; set; }
-    public Money EstimatedCost { get; set; }
+    public required Money EstimatedCost { get; set; }
     public Money? FinalCost { get; set; }
     public DateTime? EstimatedDelivery { get; set; }
     public DateTime? ActualDelivery { get; set; }
@@ -22,8 +22,8 @@ public class ServiceOrder : AuditableEntity, IEntity<Guid>
     public string? InternalNotes { get; set; } // Notas internas da oficina
 
     // Navigation Properties
-    public Customer Customer { get; set; }
-    public Vehicle Vehicle { get; set; }
+    public Customer? Customer { get; set; }
+    public Vehicle? Vehicle { get; set; }
     public Employee? Mechanic { get; set; }
     public List<ServiceItem> Services { get; set; }
     public List<PartItem> Parts { get; set; }

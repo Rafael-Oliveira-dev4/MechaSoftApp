@@ -1,6 +1,7 @@
 ﻿using MechaSoft.Data.Context;
 using MechaSoft.Domain.Core.Interfaces;
 using MechaSoft.Domain.Core.Uow;
+using MechaSoft.Security.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using System.Data.Common;
@@ -19,10 +20,9 @@ internal class UnitOfWork(
     IScheduleInspectionUseCase scheduleInspectionUseCase,
     IServiceOrderRepository serviceOrderRepository,
     IServiceRepository serviceRepository,
-    IVehicleRepository vehicleRepository
-    // Adicione outros serviços conforme necessário
-    // ITokenService tokenService,
-    // IDataProtectionService dataProtectionService
+    IVehicleRepository vehicleRepository,
+    IUserRepository userRepository,
+    ITokenService tokenService
     ) : IUnitOfWork
 {
     private IDbContextTransaction? _transaction;
@@ -38,10 +38,10 @@ internal class UnitOfWork(
     public IServiceOrderRepository ServiceOrderRepository => serviceOrderRepository;
     public IServiceRepository ServiceRepository => serviceRepository;
     public IVehicleRepository VehicleRepository => vehicleRepository;
+    public IUserRepository UserRepository => userRepository;
 
-    // Service Properties (descomente se necessário)
-    // public ITokenService TokenService => tokenService;
-    // public IDataProtectionService DataProtectionService => dataProtectionService;
+    // Service Properties
+    public ITokenService TokenService => tokenService;
 
     public bool Commit()
     {
