@@ -6,12 +6,12 @@ namespace MechaSoft.Domain.Model;
 public class Customer : AuditableEntity, IEntity<Guid>
 {
     public Guid Id { get; set; }
-    public Name Name { get; set; }
-    public string Email { get; set; }
-    public string Phone { get; set; }
+    public required Name Name { get; set; }
+    public required string Email { get; set; }
+    public required string Phone { get; set; }
     public string? Nif { get; set; } // Número de Identificação Fiscal
     public string? CitizenCard { get; set; } // Cartão de Cidadão
-    public Address Address { get; set; }
+    public required Address Address { get; set; }
     public CustomerType Type { get; set; }
     public string? Notes { get; set; } // Notas sobre o cliente
 

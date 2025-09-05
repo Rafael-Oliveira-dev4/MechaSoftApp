@@ -1,8 +1,6 @@
-﻿
-
+﻿using MechaSoft.Application.Common.Exceptions;
 using FluentValidation;
 using MediatR;
-using System.ComponentModel.DataAnnotations;
 
 namespace MechaSoft.Application.Common.Behaviours;
 
@@ -21,21 +19,25 @@ internal class ValidationBehaviour<TRequest, TResponse> : IPipelineBehavior<TReq
         RequestHandlerDelegate<TResponse> next,
         CancellationToken cancellationToken)
     {
-        if (_validators.Any())
+        if (!_validators.Any())
         {
-            var context = new ValidationContext<TRequest>(request);
+            return await next();
+        }
 
-            var validationResults = await Task.WhenAll(
-                _validators.Select(v => v.ValidateAsync(context, cancellationToken))
-            );
+        var context = new ValidationContext<TRequest>(request);
 
-            var failures = validationResults
-                .SelectMany(r => r.Errors)
-                .Where(f => f != null)
-                .ToList();
+        var validationResults = await Task.WhenAll(
+            _validators.Select(v => v.ValidateAsync(context, cancellationToken))
+        );
 
-            if (failures.Count != 0)
-                throw new FluentValidation.ValidationException(failures);
+        var failures = validationResults
+            .Where(x => x.Errors.Any())
+            .SelectMany(x => x.Errors)
+            .ToList();
+
+        if (failures.Count != 0)
+        {
+            throw new ApplicationValidationException(failures);
         }
 
         return await next();

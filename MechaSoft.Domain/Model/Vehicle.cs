@@ -14,11 +14,11 @@ public class Vehicle : AuditableEntity, IEntity<Guid>
 {
     public Guid Id { get; set; }
     public Guid CustomerId { get; set; }
-    public string Brand { get; set; }
-    public string Model { get; set; }
+    public required string Brand { get; set; }
+    public required string Model { get; set; }
     public int Year { get; set; }
-    public string LicensePlate { get; set; } // Matrícula portuguesa
-    public string Color { get; set; }
+    public required string LicensePlate { get; set; } // Matrícula portuguesa
+    public required string Color { get; set; }
     public int? Mileage { get; set; } // Quilometragem
     public string? ChassisNumber { get; set; }
     public string? EngineNumber { get; set; }
@@ -30,7 +30,7 @@ public class Vehicle : AuditableEntity, IEntity<Guid>
     public DateTime? InspectionExpiryDate { get; set; } // Validade da Inspeção
 
     // Navigation Properties
-    public Customer Customer { get; set; }
+    public required Customer Customer { get; set; }
     public List<ServiceOrder> ServiceOrders { get; set; }
     public List<Inspection> Inspections { get; set; }
 

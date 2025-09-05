@@ -15,15 +15,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation", "Presentatio
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Service", "Service", "{5505DEC6-CA5A-45F9-86F1-EC3777D9C19E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MechaSoft.Domain.Core", "MEchaSoft.Domain.Core\MechaSoft.Domain.Core.csproj", "{4D4DDEDF-D643-477E-A9A2-D5931E864C00}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MechaSoft.Domain.Core", "MechaSoft.Domain.Core\MechaSoft.Domain.Core.csproj", "{4D4DDEDF-D643-477E-A9A2-D5931E864C00}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MechaSoft.Application", "MechaSoft.Application\MechaSoft.Application.csproj", "{4E673D25-675E-42FA-8770-5C2500786841}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MechaSoft.Data", "MechaSoft.Data\MechaSoft.Data.csproj", "{F21732E7-0484-4660-BB61-65498142D2D8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MechaSoft.IoC", "MEchaSoft.IoC\MechaSoft.IoC.csproj", "{BB361698-C9C0-446E-B3B8-B1EB406FCBDF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MechaSoft.IoC", "MechaSoft.IoC\MechaSoft.IoC.csproj", "{BB361698-C9C0-446E-B3B8-B1EB406FCBDF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MechaSoft.WebAPI", "MechaSoft.WebAPI\MechaSoft.WebAPI.csproj", "{433FAE1F-E961-44C2-B9F4-826A7E7D3938}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MechaSoft.Security", "MechaSoft.Security\MechaSoft.Security.csproj", "{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -55,6 +57,10 @@ Global
 		{433FAE1F-E961-44C2-B9F4-826A7E7D3938}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{433FAE1F-E961-44C2-B9F4-826A7E7D3938}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{433FAE1F-E961-44C2-B9F4-826A7E7D3938}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

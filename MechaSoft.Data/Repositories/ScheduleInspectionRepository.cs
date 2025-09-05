@@ -95,4 +95,3 @@ public class ScheduleInspectionRepository : IScheduleInspectionUseCase
         return await _dbSet.CountAsync(predicate);
     }
 }
-}

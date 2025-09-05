@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MechaSoft.Domain\MechaSoft.Domain.csproj" />
+    <ProjectReference Include="..\MechaSoft.Security\MechaSoft.Security.csproj" />
   </ItemGroup>
 
 </Project>

@@ -23,7 +23,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MechaSoft.IoC\MechaSoft.IoC.csproj" />
     <ProjectReference Include="..\MechaSoft.Data\MechaSoft.Data.csproj" />
+    <ProjectReference Include="..\MechaSoft.Security\MechaSoft.Security.csproj" />
   </ItemGroup>
 
 </Project>

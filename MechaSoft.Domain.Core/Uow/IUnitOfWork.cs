@@ -1,4 +1,5 @@
 ﻿using MechaSoft.Domain.Core.Interfaces;
+using MechaSoft.Security.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -22,9 +23,9 @@ public interface IUnitOfWork : IDisposable
     IVehicleRepository VehicleRepository { get; }
     
 
-    // Service Properties (descomente se necessário)
-    // ITokenService TokenService { get; }
-    // IDataProtectionService DataProtectionService { get; }
+    // Service Properties
+    IUserRepository UserRepository { get; }
+    ITokenService TokenService { get; }
 
     // Commit Operations
     bool Commit();
