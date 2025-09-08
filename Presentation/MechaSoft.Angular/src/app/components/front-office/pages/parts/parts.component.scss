@@ -1,0 +1,13 @@
+:host {
+	display: block;
+	@apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6;
+}
+
+.section { padding: 1rem; display: grid; gap: 1rem; }
+.section__header { display: flex; align-items: center; justify-content: space-between; }
+.btn { padding: .5rem 1rem; border: 1px solid #ddd; border-radius: .5rem; background: #f7f7f7; cursor: pointer; }
+.btn:hover { background: #eee; }
+.table { border: 1px solid #e5e5e5; border-radius: .75rem; overflow: hidden; }
+.table__row { display: grid; grid-template-columns: 1fr 2fr 1fr; padding: .5rem .75rem; }
+.table__row:nth-child(odd) { background: #fafafa; }
+.table__row--head { background: #f0f0f0; font-weight: 600; }
