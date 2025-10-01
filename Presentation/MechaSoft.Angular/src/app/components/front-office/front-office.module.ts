@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FrontOfficeRoutingModule } from './front-office-routing.module';
 import { SharedModule } from '../../shared.module';
+import { FrontOfficeLayoutComponent } from './layout/front-office-layout.component';
 import { FrontHomeComponent } from './pages/home/home.component';
 import { PageHeaderComponent } from './components/page-header/page-header.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
@@ -17,6 +18,7 @@ import { ServiceOrdersComponent } from './pages/service-orders/service-orders.co
     CommonModule,
     SharedModule,
     FrontOfficeRoutingModule,
+    FrontOfficeLayoutComponent,
     FrontHomeComponent,
     PageHeaderComponent,
     DashboardComponent,

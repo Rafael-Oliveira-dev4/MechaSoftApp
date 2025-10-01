@@ -19,7 +19,6 @@ public class CustomerRepository : Repository<Customer>, ICustomerRepository
         //Validate customer data
         await ValidateCustomerAsync(customer);
         await _dbSet.AddAsync(customer);
-        await _context.SaveChangesAsync();
         return customer;
     }
     public async Task<Customer?> GetByPhoneAsync(string phone)
@@ -55,7 +54,6 @@ public class CustomerRepository : Repository<Customer>, ICustomerRepository
         await ValidateCustomerAsync(customer, isUpdate: true);
 
         _dbSet.Update(customer);
-        await _context.SaveChangesAsync();
         return customer;
     }
     public async Task<bool> PhoneExistAsync(string phone, Guid? excludeCustomerId = null)

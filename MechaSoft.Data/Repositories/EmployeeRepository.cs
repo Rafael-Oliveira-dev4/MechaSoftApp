@@ -19,7 +19,6 @@ public class EmployeeRepository : Repository<Employee>, IEmployeeRepository
         await ValidateEmployeeAsync(employee);
 
         await _dbSet.AddAsync(employee);
-        await _context.SaveChangesAsync();
         return employee;
     }
     public async Task<IEnumerable<Employee>> GetByRoleAsync(EmployeeRole role)
@@ -61,7 +60,6 @@ public class EmployeeRepository : Repository<Employee>, IEmployeeRepository
         await ValidateEmployeeAsync(employee, isUpdate: true);
 
         _dbSet.Update(employee);
-        await _context.SaveChangesAsync();
         return employee;
     }
 
