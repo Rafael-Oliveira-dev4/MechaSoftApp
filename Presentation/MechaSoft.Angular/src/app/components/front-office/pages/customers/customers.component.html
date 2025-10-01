@@ -1,59 +1,247 @@
-<div class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950">
-  <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
-    <div class="mb-8">
-      <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 class="text-4xl font-bold text-white mb-2">Clientes</h1>
-          <p class="text-zinc-300">Gestão de clientes da oficina</p>
-        </div>
-        <div class="flex gap-3">
-          <input type="text" placeholder="Pesquisar clientes..." class="w-64 rounded-xl border border-slate-700 bg-slate-800/50 px-4 py-3 text-sm text-white placeholder-zinc-400 shadow-sm focus:border-cyan-500 focus:outline-none backdrop-blur-sm" />
-          <button class="inline-flex items-center rounded-xl bg-gradient-to-r from-cyan-600 to-blue-700 px-6 py-3 text-sm font-semibold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:shadow-cyan-500/25 hover:from-cyan-500 hover:to-blue-600">
-            <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+<div class="customers-container">
+  <app-error-message [error]="error" (onClose)="error = null"></app-error-message>
+
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="title">Clientes</h1>
+      <p class="subtitle">Gestão de clientes e contactos</p>
+    </div>
+    <button (click)="openCreateModal()" class="btn-primary">
+      <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+      </svg>
+      Novo Cliente
+    </button>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="search-bar">
+    <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+    </svg>
+    <input 
+      type="text" 
+      [(ngModel)]="searchTerm"
+      (keyup.enter)="onSearch(searchTerm)"
+      placeholder="Pesquisar por nome, email ou NIF..."
+      class="search-input"
+    />
+  </div>
+
+  <!-- Customers Table -->
+  <div class="table-card">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Email</th>
+          <th>Telefone</th>
+          <th>NIF</th>
+          <th>Localidade</th>
+          <th>Estado</th>
+          <th class="text-right">Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        @if (customers.length === 0) {
+          <tr>
+            <td colspan="7" class="text-center py-8 text-gray-500">
+              Nenhum cliente encontrado
+            </td>
+          </tr>
+        }
+        
+        @for (customer of customers; track customer.id) {
+          <tr [class.row-inactive]="!customer.isActive">
+            <td class="font-medium">{{ customer.name }}</td>
+            <td>{{ customer.email }}</td>
+            <td>{{ customer.phone }}</td>
+            <td class="font-mono">{{ customer.nif || '-' }}</td>
+            <td>{{ customer.city }}</td>
+            <td>
+              <span [class]="customer.isActive ? 'badge badge-green' : 'badge badge-gray'">
+                {{ customer.isActive ? 'Ativo' : 'Inativo' }}
+              </span>
+            </td>
+            <td class="text-right">
+              <div class="action-buttons">
+                <button (click)="openEditModal(customer)" class="btn-icon btn-edit" title="Editar">
+                  <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                  </svg>
+                </button>
+                <button (click)="toggleActive(customer)" [class]="customer.isActive ? 'btn-icon btn-delete' : 'btn-icon btn-success'" [title]="customer.isActive ? 'Desativar' : 'Ativar'">
+                  <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    @if (customer.isActive) {
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    } @else {
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    }
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    <!-- Pagination -->
+    @if (totalPages > 1) {
+      <div class="pagination">
+        <button 
+          (click)="onPageChange(currentPage - 1)" 
+          [disabled]="currentPage === 1"
+          class="btn-pagination"
+        >
+          Anterior
+        </button>
+        
+        <span class="pagination-info">
+          Página {{ currentPage }} de {{ totalPages }} ({{ totalCount }} clientes)
+        </span>
+        
+        <button 
+          (click)="onPageChange(currentPage + 1)" 
+          [disabled]="currentPage === totalPages"
+          class="btn-pagination"
+        >
+          Próxima
+        </button>
+      </div>
+    }
+  </div>
+
+  <!-- Modal Create/Edit -->
+  @if (showModal) {
+    <div class="modal-overlay" (click)="closeModal()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2 class="modal-title">
+            {{ isEditMode ? 'Editar Cliente' : 'Novo Cliente' }}
+          </h2>
+          <button (click)="closeModal()" class="btn-close">
+            <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
             </svg>
-            Novo cliente
           </button>
         </div>
+
+        <form [formGroup]="customerForm" (ngSubmit)="onSubmit()" class="modal-body">
+          <!-- Informações Pessoais -->
+          <div class="form-section">
+            <h3 class="form-section-title">Informações Pessoais</h3>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Nome Completo *</label>
+                <input type="text" formControlName="name" class="form-input" [class.input-error]="isFieldInvalid('name')" />
+                @if (isFieldInvalid('name')) {
+                  <span class="error-text">{{ getFieldError('name') }}</span>
+                }
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Email *</label>
+                <input type="email" formControlName="email" class="form-input" [class.input-error]="isFieldInvalid('email')" />
+                @if (isFieldInvalid('email')) {
+                  <span class="error-text">{{ getFieldError('email') }}</span>
+                }
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">Telefone *</label>
+                <input type="tel" formControlName="phone" placeholder="912345678" class="form-input" [class.input-error]="isFieldInvalid('phone')" />
+                @if (isFieldInvalid('phone')) {
+                  <span class="error-text">{{ getFieldError('phone') }}</span>
+                }
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">NIF</label>
+                <input type="text" formControlName="nif" placeholder="123456789" class="form-input" [class.input-error]="isFieldInvalid('nif')" />
+                @if (isFieldInvalid('nif')) {
+                  <span class="error-text">{{ getFieldError('nif') }}</span>
+                }
+              </div>
+            </div>
+          </div>
+
+          <!-- Morada -->
+          <div class="form-section">
+            <h3 class="form-section-title">Morada</h3>
+            
+            <div class="form-row">
+              <div class="form-group flex-grow">
+                <label class="form-label">Rua *</label>
+                <input type="text" formControlName="street" class="form-input" [class.input-error]="isFieldInvalid('street')" />
+                @if (isFieldInvalid('street')) {
+                  <span class="error-text">{{ getFieldError('street') }}</span>
+                }
+              </div>
+              
+              <div class="form-group w-32">
+                <label class="form-label">Número *</label>
+                <input type="text" formControlName="number" class="form-input" [class.input-error]="isFieldInvalid('number')" />
+                @if (isFieldInvalid('number')) {
+                  <span class="error-text">{{ getFieldError('number') }}</span>
+                }
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Freguesia *</label>
+                <input type="text" formControlName="parish" class="form-input" [class.input-error]="isFieldInvalid('parish')" />
+                @if (isFieldInvalid('parish')) {
+                  <span class="error-text">{{ getFieldError('parish') }}</span>
+                }
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">Cidade *</label>
+                <input type="text" formControlName="city" class="form-input" [class.input-error]="isFieldInvalid('city')" />
+                @if (isFieldInvalid('city')) {
+                  <span class="error-text">{{ getFieldError('city') }}</span>
+                }
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Código Postal *</label>
+                <input type="text" formControlName="postalCode" placeholder="1234-567" class="form-input" [class.input-error]="isFieldInvalid('postalCode')" />
+                @if (isFieldInvalid('postalCode')) {
+                  <span class="error-text">{{ getFieldError('postalCode') }}</span>
+                }
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">País *</label>
+                <input type="text" formControlName="country" class="form-input" [class.input-error]="isFieldInvalid('country')" />
+                @if (isFieldInvalid('country')) {
+                  <span class="error-text">{{ getFieldError('country') }}</span>
+                }
+              </div>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="modal-footer">
+            <button type="button" (click)="closeModal()" class="btn-secondary">
+              Cancelar
+            </button>
+            <button type="submit" [disabled]="customerForm.invalid" class="btn-primary">
+              {{ isEditMode ? 'Guardar' : 'Criar' }}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
-    
-    <div class="overflow-hidden rounded-2xl border border-slate-800/50 bg-slate-900/50 backdrop-blur-sm shadow-lg glass-enhanced">
-      <table class="min-w-full divide-y divide-slate-800/50">
-        <thead class="bg-slate-800/50">
-          <tr>
-            <th class="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-zinc-400">Nome</th>
-            <th class="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-zinc-400">Email</th>
-            <th class="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-zinc-400">Telefone</th>
-            <th class="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-zinc-400">NIF</th>
-            <th class="px-6 py-4"></th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-slate-800/50 bg-slate-900/30">
-          <tr class="hover:bg-slate-800/30 transition-colors">
-            <td class="px-6 py-4 text-white font-medium">João Silva</td>
-            <td class="px-6 py-4 text-zinc-300">joao@example.com</td>
-            <td class="px-6 py-4 text-zinc-300">912345678</td>
-            <td class="px-6 py-4 text-zinc-300">123456789</td>
-            <td class="px-6 py-4 text-right">
-              <button class="rounded-xl border border-slate-700 bg-slate-800/50 px-4 py-2 text-sm text-white hover:bg-slate-700/50 transition-colors backdrop-blur-sm">
-                Detalhes
-              </button>
-            </td>
-          </tr>
-          <tr class="hover:bg-slate-800/30 transition-colors">
-            <td class="px-6 py-4 text-white font-medium">Maria Santos</td>
-            <td class="px-6 py-4 text-zinc-300">maria@example.com</td>
-            <td class="px-6 py-4 text-zinc-300">987654321</td>
-            <td class="px-6 py-4 text-zinc-300">987654321</td>
-            <td class="px-6 py-4 text-right">
-              <button class="rounded-xl border border-slate-700 bg-slate-800/50 px-4 py-2 text-sm text-white hover:bg-slate-700/50 transition-colors backdrop-blur-sm">
-                Detalhes
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
+  }
 </div>

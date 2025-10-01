@@ -1,8 +1,15 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 import { ApiConfigService } from './api-config.service';
-import { Customer, CreateCustomerRequest, PaginatedResponse } from '../models/api.models';
+import { 
+  Customer, 
+  CreateCustomerRequest, 
+  PaginationParams,
+  PaginatedResponse 
+} from '../models/api.models';
+import { Result, success, failure, CommonErrors } from '../models/result.model';
 
 @Injectable({
   providedIn: 'root'
@@ -14,50 +21,68 @@ export class CustomerService {
     private http: HttpClient,
     private apiConfig: ApiConfigService
   ) {
-    this.apiUrl = this.apiConfig.getApiUrl();
+    this.apiUrl = `${this.apiConfig.getApiUrl()}/customers`;
   }
 
-  // Get all customers with pagination
-  getCustomers(
-    pageNumber: number = 1,
-    pageSize: number = 10,
-    searchTerm?: string
-  ): Observable<PaginatedResponse<Customer>> {
-    let params = new HttpParams()
-      .set('pageNumber', pageNumber.toString())
-      .set('pageSize', pageSize.toString());
-
-    if (searchTerm) {
-      params = params.set('searchTerm', searchTerm);
+  // Listar clientes com paginação
+  getAll(params?: PaginationParams): Observable<Result<PaginatedResponse<Customer>>> {
+    let httpParams = new HttpParams();
+    
+    if (params) {
+      if (params.pageNumber) httpParams = httpParams.set('pageNumber', params.pageNumber.toString());
+      if (params.pageSize) httpParams = httpParams.set('pageSize', params.pageSize.toString());
+      if (params.searchTerm) httpParams = httpParams.set('searchTerm', params.searchTerm);
+      if (params.sortBy) httpParams = httpParams.set('sortBy', params.sortBy);
+      if (params.sortDescending !== undefined) httpParams = httpParams.set('sortDescending', params.sortDescending.toString());
     }
 
-    return this.http.get<PaginatedResponse<Customer>>(`${this.apiUrl}/customers`, { params });
+    return this.http.get<PaginatedResponse<Customer>>(this.apiUrl, { params: httpParams }).pipe(
+      map(response => success(response)),
+      catchError(error => of(failure<PaginatedResponse<Customer>>(error)))
+    );
   }
 
-  // Get customer by ID
-  getCustomerById(id: string): Observable<Customer> {
-    return this.http.get<Customer>(`${this.apiUrl}/customers/${id}`);
+  // Buscar cliente por ID
+  getById(id: string): Observable<Result<Customer>> {
+    return this.http.get<Customer>(`${this.apiUrl}/${id}`).pipe(
+      map(customer => success(customer)),
+      catchError(error => of(failure<Customer>(error || CommonErrors.NotFound('Cliente'))))
+    );
   }
 
-  // Create new customer
-  createCustomer(customer: CreateCustomerRequest): Observable<Customer> {
-    return this.http.post<Customer>(`${this.apiUrl}/customers`, customer);
+  // Criar novo cliente
+  create(request: CreateCustomerRequest): Observable<Result<Customer>> {
+    return this.http.post<Customer>(this.apiUrl, request).pipe(
+      map(customer => success(customer)),
+      catchError(error => of(failure<Customer>(error)))
+    );
   }
 
-  // Update customer
-  updateCustomer(id: string, customer: Partial<CreateCustomerRequest>): Observable<Customer> {
-    return this.http.put<Customer>(`${this.apiUrl}/customers/${id}`, customer);
+  // Atualizar cliente existente
+  update(id: string, request: CreateCustomerRequest): Observable<Result<Customer>> {
+    return this.http.put<Customer>(`${this.apiUrl}/${id}`, request).pipe(
+      map(customer => success(customer)),
+      catchError(error => of(failure<Customer>(error)))
+    );
   }
 
-  // Delete customer
-  deleteCustomer(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/customers/${id}`);
+  // Soft-delete (ativar/desativar cliente)
+  toggleActive(id: string): Observable<Result<void>> {
+    return this.http.patch<void>(`${this.apiUrl}/${id}/toggle-active`, {}).pipe(
+      map(() => success(undefined)),
+      catchError(error => of(failure<void>(error)))
+    );
   }
 
-  // Search customers by name or email
-  searchCustomers(searchTerm: string): Observable<Customer[]> {
-    return this.http.get<Customer[]>(`${this.apiUrl}/customers/search`, {
-      params: { searchTerm }
-    });
+  // Buscar clientes por termo de pesquisa
+  search(searchTerm: string): Observable<Result<Customer[]>> {
+    return this.getAll({ searchTerm, pageSize: 50 }).pipe(
+      map(result => {
+        if (result.isSuccess && result.value) {
+          return success(result.value.items);
+        }
+        return failure(result.error || CommonErrors.ServerError());
+      })
+    );
   }
 }

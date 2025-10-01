@@ -1,9 +1,11 @@
 import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { BehaviorSubject, Observable, of } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 import { isPlatformBrowser } from '@angular/common';
 import { ApiConfigService } from './api-config.service';
 import { LoginRequest, LoginResponse, RegisterRequest, User } from '../models/api.models';
+import { Result, success, failure } from '../models/result.model';
 
 @Injectable({
   providedIn: 'root'
@@ -24,23 +26,29 @@ export class AuthService {
     }
   }
 
-  // Login
-  login(credentials: LoginRequest): Observable<LoginResponse> {
+  // Autenticar usuário
+  login(credentials: LoginRequest): Observable<Result<LoginResponse>> {
     return this.http.post<LoginResponse>(`${this.apiUrl}/accounts/login`, credentials)
       .pipe(
-        tap(response => {
+        map(response => {
           this.setTokens(response.token, response.refreshToken);
           this.currentUserSubject.next(response.user);
-        })
+          return success(response);
+        }),
+        catchError(error => of(failure<LoginResponse>(error)))
       );
   }
 
-  // Register
-  register(userData: RegisterRequest): Observable<any> {
-    return this.http.post(`${this.apiUrl}/accounts/register`, userData);
+  // Registar novo usuário
+  register(userData: RegisterRequest): Observable<Result<void>> {
+    return this.http.post<void>(`${this.apiUrl}/accounts/register`, userData)
+      .pipe(
+        map(() => success(undefined)),
+        catchError(error => of(failure<void>(error)))
+      );
   }
 
-  // Logout
+  // Terminar sessão
   logout(): void {
     if (isPlatformBrowser(this.platformId)) {
       localStorage.removeItem('access_token');
@@ -49,18 +57,18 @@ export class AuthService {
     this.currentUserSubject.next(null);
   }
 
-  // Get current user
+  // Obter usuário atual
   getCurrentUser(): User | null {
     return this.currentUserSubject.value;
   }
 
-  // Check if user is authenticated
+  // Verificar se está autenticado
   isAuthenticated(): boolean {
     const token = this.getAccessToken();
     return !!token && !this.isTokenExpired(token);
   }
 
-  // Get access token
+  // Obter access token
   getAccessToken(): string | null {
     if (isPlatformBrowser(this.platformId)) {
       return localStorage.getItem('access_token');
@@ -68,7 +76,7 @@ export class AuthService {
     return null;
   }
 
-  // Get refresh token
+  // Obter refresh token
   getRefreshToken(): string | null {
     if (isPlatformBrowser(this.platformId)) {
       return localStorage.getItem('refresh_token');
@@ -76,7 +84,20 @@ export class AuthService {
     return null;
   }
 
-  // Set tokens
+  // Renovar access token
+  refreshAccessToken(): Observable<Result<LoginResponse>> {
+    const refreshToken = this.getRefreshToken();
+    return this.http.post<LoginResponse>(`${this.apiUrl}/accounts/refresh-token`, { refreshToken })
+      .pipe(
+        map(response => {
+          this.setTokens(response.token, response.refreshToken);
+          this.currentUserSubject.next(response.user);
+          return success(response);
+        }),
+        catchError(error => of(failure<LoginResponse>(error)))
+      );
+  }
+
   private setTokens(accessToken: string, refreshToken: string): void {
     if (isPlatformBrowser(this.platformId)) {
       localStorage.setItem('access_token', accessToken);
@@ -84,11 +105,9 @@ export class AuthService {
     }
   }
 
-  // Load user from storage
   private loadUserFromStorage(): void {
     const token = this.getAccessToken();
     if (token && !this.isTokenExpired(token)) {
-      // Decode token to get user info (simplified)
       const userInfo = this.decodeToken(token);
       if (userInfo) {
         this.currentUserSubject.next(userInfo);
@@ -96,7 +115,6 @@ export class AuthService {
     }
   }
 
-  // Check if token is expired
   private isTokenExpired(token: string): boolean {
     try {
       const decoded = this.decodeToken(token);
@@ -109,7 +127,6 @@ export class AuthService {
     }
   }
 
-  // Decode JWT token (simplified)
   private decodeToken(token: string): any {
     try {
       const base64Url = token.split('.')[1];
@@ -121,17 +138,5 @@ export class AuthService {
     } catch {
       return null;
     }
-  }
-
-  // Refresh token
-  refreshAccessToken(): Observable<LoginResponse> {
-    const refreshToken = this.getRefreshToken();
-    return this.http.post<LoginResponse>(`${this.apiUrl}/accounts/refresh-token`, { refreshToken })
-      .pipe(
-        tap(response => {
-          this.setTokens(response.token, response.refreshToken);
-          this.currentUserSubject.next(response.user);
-        })
-      );
   }
 }

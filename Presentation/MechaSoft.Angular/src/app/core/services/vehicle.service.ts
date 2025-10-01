@@ -1,8 +1,15 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 import { ApiConfigService } from './api-config.service';
-import { Vehicle, CreateVehicleRequest, PaginatedResponse } from '../models/api.models';
+import { 
+  Vehicle, 
+  CreateVehicleRequest,
+  PaginationParams,
+  PaginatedResponse 
+} from '../models/api.models';
+import { Result, success, failure, CommonErrors } from '../models/result.model';
 
 @Injectable({
   providedIn: 'root'
@@ -14,60 +21,70 @@ export class VehicleService {
     private http: HttpClient,
     private apiConfig: ApiConfigService
   ) {
-    this.apiUrl = this.apiConfig.getApiUrl();
+    this.apiUrl = `${this.apiConfig.getApiUrl()}/vehicles`;
   }
 
-  // Get all vehicles with pagination
-  getVehicles(
-    pageNumber: number = 1,
-    pageSize: number = 10,
-    customerId?: string,
-    searchTerm?: string
-  ): Observable<PaginatedResponse<Vehicle>> {
-    let params = new HttpParams()
-      .set('pageNumber', pageNumber.toString())
-      .set('pageSize', pageSize.toString());
-
-    if (customerId) {
-      params = params.set('customerId', customerId);
+  // Listar veículos com paginação
+  getAll(params?: PaginationParams): Observable<Result<PaginatedResponse<Vehicle>>> {
+    let httpParams = new HttpParams();
+    
+    if (params) {
+      if (params.pageNumber) httpParams = httpParams.set('pageNumber', params.pageNumber.toString());
+      if (params.pageSize) httpParams = httpParams.set('pageSize', params.pageSize.toString());
+      if (params.searchTerm) httpParams = httpParams.set('searchTerm', params.searchTerm);
     }
 
-    if (searchTerm) {
-      params = params.set('searchTerm', searchTerm);
-    }
-
-    return this.http.get<PaginatedResponse<Vehicle>>(`${this.apiUrl}/vehicles`, { params });
+    return this.http.get<PaginatedResponse<Vehicle>>(this.apiUrl, { params: httpParams }).pipe(
+      map(response => success(response)),
+      catchError(error => of(failure<PaginatedResponse<Vehicle>>(error)))
+    );
   }
 
-  // Get vehicle by ID
-  getVehicleById(id: string): Observable<Vehicle> {
-    return this.http.get<Vehicle>(`${this.apiUrl}/vehicles/${id}`);
+  // Buscar veículo por ID
+  getById(id: string): Observable<Result<Vehicle>> {
+    return this.http.get<Vehicle>(`${this.apiUrl}/${id}`).pipe(
+      map(vehicle => success(vehicle)),
+      catchError(error => of(failure<Vehicle>(error || CommonErrors.NotFound('Veículo'))))
+    );
   }
 
-  // Get vehicles by customer ID
-  getVehiclesByCustomer(customerId: string): Observable<Vehicle[]> {
-    return this.http.get<Vehicle[]>(`${this.apiUrl}/vehicles/customer/${customerId}`);
+  // Listar veículos de um cliente
+  getByCustomer(customerId: string): Observable<Result<Vehicle[]>> {
+    return this.http.get<Vehicle[]>(`${this.apiUrl}/customer/${customerId}`).pipe(
+      map(vehicles => success(vehicles)),
+      catchError(error => of(failure<Vehicle[]>(error)))
+    );
   }
 
-  // Create new vehicle
-  createVehicle(vehicle: CreateVehicleRequest): Observable<Vehicle> {
-    return this.http.post<Vehicle>(`${this.apiUrl}/vehicles`, vehicle);
+  // Buscar veículo por matrícula
+  getByLicensePlate(licensePlate: string): Observable<Result<Vehicle>> {
+    return this.http.get<Vehicle>(`${this.apiUrl}/plate/${licensePlate}`).pipe(
+      map(vehicle => success(vehicle)),
+      catchError(error => of(failure<Vehicle>(error || CommonErrors.NotFound('Veículo'))))
+    );
   }
 
-  // Update vehicle
-  updateVehicle(id: string, vehicle: Partial<CreateVehicleRequest>): Observable<Vehicle> {
-    return this.http.put<Vehicle>(`${this.apiUrl}/vehicles/${id}`, vehicle);
+  // Criar novo veículo
+  create(request: CreateVehicleRequest): Observable<Result<Vehicle>> {
+    return this.http.post<Vehicle>(this.apiUrl, request).pipe(
+      map(vehicle => success(vehicle)),
+      catchError(error => of(failure<Vehicle>(error)))
+    );
   }
 
-  // Delete vehicle
-  deleteVehicle(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/vehicles/${id}`);
+  // Atualizar veículo existente
+  update(id: string, request: CreateVehicleRequest): Observable<Result<Vehicle>> {
+    return this.http.put<Vehicle>(`${this.apiUrl}/${id}`, request).pipe(
+      map(vehicle => success(vehicle)),
+      catchError(error => of(failure<Vehicle>(error)))
+    );
   }
 
-  // Search vehicles by license plate or model
-  searchVehicles(searchTerm: string): Observable<Vehicle[]> {
-    return this.http.get<Vehicle[]>(`${this.apiUrl}/vehicles/search`, {
-      params: { searchTerm }
-    });
+  // Listar veículos com inspeção vencida
+  getExpiredInspections(): Observable<Result<Vehicle[]>> {
+    return this.http.get<Vehicle[]>(`${this.apiUrl}/expired-inspections`).pipe(
+      map(vehicles => success(vehicles)),
+      catchError(error => of(failure<Vehicle[]>(error)))
+    );
   }
 }

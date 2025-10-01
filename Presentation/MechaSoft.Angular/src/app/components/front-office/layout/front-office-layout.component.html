@@ -44,13 +44,23 @@
       </a>
     </div>
     
-    <!-- Check-up Button -->
-    <a routerLink="/inspections" class="group inline-flex items-center rounded-lg bg-gradient-to-r from-cyan-600 to-blue-700 px-4 py-2 text-sm font-semibold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:shadow-cyan-500/25 hover:from-cyan-500 hover:to-blue-600">
-      <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-      </svg>
-      Check‑up
-    </a>
+    <!-- User Info & Logout -->
+    <div class="hidden sm:flex items-center gap-4">
+      @if (currentUser) {
+        <div class="flex items-center gap-3">
+          <div class="text-right">
+            <p class="text-sm font-medium text-white">{{ currentUser.username }}</p>
+            <p class="text-xs text-cyan-400">{{ currentUser.role }}</p>
+          </div>
+          <button (click)="logout()" class="group inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-red-600/20 border border-red-500/30 text-red-400 hover:bg-red-600 hover:text-white transition-all">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+            </svg>
+            <span class="text-sm font-medium">Sair</span>
+          </button>
+        </div>
+      }
+    </div>
     
     <!-- Mobile Menu Button -->
     <button class="sm:hidden text-zinc-300 hover:text-white transition-colors" (click)="toggleMobileMenu()">
@@ -72,6 +82,21 @@
         <a routerLink="/services" routerLinkActive="is-active" class="block px-3 py-2 text-sm text-zinc-300 hover:text-white hover:bg-slate-800/50 rounded-lg transition-colors" (click)="closeMobileMenu()">Services</a>
         <a routerLink="/parts" routerLinkActive="is-active" class="block px-3 py-2 text-sm text-zinc-300 hover:text-white hover:bg-slate-800/50 rounded-lg transition-colors" (click)="closeMobileMenu()">Parts</a>
         <a routerLink="/inspections" routerLinkActive="is-active" class="block px-3 py-2 text-sm text-zinc-300 hover:text-white hover:bg-slate-800/50 rounded-lg transition-colors" (click)="closeMobileMenu()">Check-up</a>
+        
+        @if (currentUser) {
+          <div class="border-t border-slate-800 pt-2 mt-2">
+            <div class="px-3 py-2 text-xs text-zinc-400">
+              <p class="font-medium text-white">{{ currentUser.username }}</p>
+              <p class="text-cyan-400">{{ currentUser.role }}</p>
+            </div>
+            <button (click)="logout()" class="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-400 hover:text-white hover:bg-red-600/20 rounded-lg transition-colors">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+              </svg>
+              <span>Sair</span>
+            </button>
+          </div>
+        }
       </div>
     </div>
   </div>
