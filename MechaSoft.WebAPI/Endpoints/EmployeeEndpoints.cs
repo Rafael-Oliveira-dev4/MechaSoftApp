@@ -17,14 +17,22 @@ public static class EmployeeEndpoints
         var employees = routes.MapGroup("api/employees").WithTags("Employees");
 
         // GET /api/employees - List employees with pagination
-        employees.MapGet("/", Queries.GetEmployees);
+        employees.MapGet("/", Queries.GetEmployees)
+                 .WithName("GetEmployees")
+                 .Produces<GetEmployeesResponse>(200)
+                 .Produces<Error>(400);
 
         // GET /api/employees/{id} - Get employee by ID
         employees.MapGet("/{id:guid}", Queries.GetEmployeeById)
-                 .WithName("GetEmployeeById");
+                 .WithName("GetEmployeeById")
+                 .Produces<EmployeeResponse>(200)
+                 .Produces<Error>(404);
 
         // POST /api/employees - Create new employee
-        employees.MapPost("/", Commands.CreateEmployee);
+        employees.MapPost("/", Commands.CreateEmployee)
+                 .WithName("CreateEmployee")
+                 .Produces<CreateEmployeeResponse>(201)
+                 .Produces<Error>(400);
     }
 
     private static class Commands

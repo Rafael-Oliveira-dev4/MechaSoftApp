@@ -6,6 +6,7 @@ using MechaSoft.Application.CQ.Vehicles.Queries.GetVehicles;
 using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using MechaSoft.Application.CQ.Vehicles.Common;
 
 namespace MechaSoft.WebAPI.Endpoints;
 
@@ -13,7 +14,7 @@ public static class VehicleEndpoints
 {
     public static void RegisterVehicleEndpoints(this IEndpointRouteBuilder routes)
     {
-        var vehicles = routes.MapGroup("api/vehicles");
+        var vehicles = routes.MapGroup("api/vehicles").WithTags("Vehicles");
 
         // GET /api/vehicles - Listar veículos com paginação
         vehicles.MapGet("/", Queries.GetVehicles)
@@ -24,7 +25,7 @@ public static class VehicleEndpoints
         // GET /api/vehicles/{id} - Obter veículo por ID
         vehicles.MapGet("/{id:guid}", Queries.GetVehicleById)
             .WithName("GetVehicleById")
-            .Produces<VehicleResponse>(200)
+            .Produces<MechaSoft.Application.CQ.Vehicles.Queries.GetVehicleById.VehicleResponse>(200)
             .Produces<Error>(404);
 
         // GET /api/vehicles/customer/{customerId} - Obter veículos de um cliente
@@ -50,9 +51,21 @@ public static class VehicleEndpoints
     {
         public static async Task<Results<CreatedAtRoute<CreateVehicleResponse>, BadRequest<Error>>> CreateVehicle(
             [FromServices] ISender sender,
-            [FromBody] CreateVehicleCommand command,
+            [FromBody] CreateVehicleRequest request,
             CancellationToken cancellationToken = default)
         {
+            var command = new CreateVehicleCommand
+            {
+                CustomerId = request.CustomerId,
+                Brand = request.Brand,
+                Model = request.Model,
+                LicensePlate = request.LicensePlate,
+                Color = request.Color,
+                Year = request.Year,
+                VIN = request.VIN,
+                EngineType = request.EngineType,
+                FuelType = Enum.Parse<MechaSoft.Domain.Model.FuelType>(request.FuelType, true)
+            };
             var result = await sender.Send(command, cancellationToken);
             
             return result.IsSuccess
@@ -116,7 +129,7 @@ public static class VehicleEndpoints
                 : TypedResults.BadRequest(result.Error);
         }
 
-        public static async Task<Results<Ok<VehicleResponse>, NotFound<Error>>> GetVehicleById(
+        public static async Task<Results<Ok<MechaSoft.Application.CQ.Vehicles.Queries.GetVehicleById.VehicleResponse>, NotFound<Error>>> GetVehicleById(
             [FromServices] ISender sender,
             [FromRoute] Guid id,
             CancellationToken cancellationToken = default)
@@ -149,16 +162,3 @@ public static class VehicleEndpoints
         }
     }
 }
-
-// DTOs for Vehicle Endpoints
-public record UpdateVehicleRequest(
-    string Brand,
-    string Model,
-    int Year,
-    string LicensePlate,
-    string Color,
-    string FuelType,
-    int? Mileage,
-    string? ChassisNumber,
-    string? EngineNumber
-);

@@ -11,4 +11,12 @@ public interface IEmployeeRepository : IRepository<Employee>
     Task<IEnumerable<Employee>> GetActiveEmployeesAsync();
     Task<Employee> UpdateAsync(Employee employee);
 
+    Task<(IEnumerable<Employee> Items, int TotalCount)> GetPagedEmployeesAsync(
+        int pageNumber,
+        int pageSize,
+        string? searchTerm = null,
+        EmployeeRole? role = null,
+        bool? isActive = null,
+        ServiceCategory? specialty = null);
+
 }

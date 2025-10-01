@@ -14,7 +14,7 @@ public static class CustomerEndpoints
 {
     public static void RegisterCustomerEndpoints(this IEndpointRouteBuilder routes)
     {
-        var customers = routes.MapGroup("api/customers");
+        var customers = routes.MapGroup("api/customers").WithTags("Customers");
 
         // GET /api/customers - Listar clientes com paginação
         customers.MapGet("/", Queries.GetCustomers)
@@ -48,17 +48,19 @@ public static class CustomerEndpoints
             [FromBody] CreateCustomerRequest request,
             CancellationToken cancellationToken = default)
         {
-            var command = new CreateCustomerCommand(
-                request.Name,
-                request.Email,
-                request.Phone,
-                request.Nif,
-                request.Street,
-                request.Number,
-                request.Parish,
-                request.City,
-                request.PostalCode
-            );
+            var command = new CreateCustomerCommand
+            {
+                Name = request.Name,
+                Email = request.Email,
+                Phone = request.Phone,
+                Nif = request.Nif,
+                Street = request.Street,
+                Number = request.Number,
+                Parish = request.Parish,
+                City = request.City,
+                PostalCode = request.PostalCode,
+                Country = "Portugal" // Default country
+            };
             var result = await sender.Send(command, cancellationToken);
             
             return result.IsSuccess
