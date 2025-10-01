@@ -1,0 +1,11 @@
+@if (show) {
+  <div class="loading-overlay">
+    <div class="loading-card">
+      <div class="spinner"></div>
+      
+      @if (message) {
+        <p class="loading-message">{{ message }}</p>
+      }
+    </div>
+  </div>
+}
