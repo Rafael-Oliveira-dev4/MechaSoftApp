@@ -3,9 +3,9 @@ using MediatR;
 
 namespace MechaSoft.Application.CQ.Vehicles.Queries.GetVehicleById;
 
-public record GetVehicleByIdQuery(Guid Id) : IRequest<Result<VehicleResponse, Success, Error>>;
+public record GetVehicleByIdQuery(Guid Id) : IRequest<Result<VehicleDetailsResponse, Success, Error>>;
 
-public record VehicleResponse(
+public record VehicleDetailsResponse(
     Guid Id,
     Guid CustomerId,
     string CustomerName,

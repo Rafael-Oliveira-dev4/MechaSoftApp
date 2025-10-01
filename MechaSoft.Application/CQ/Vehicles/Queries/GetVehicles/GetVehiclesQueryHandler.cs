@@ -46,7 +46,7 @@ public class GetVehiclesQueryHandler : IRequestHandler<GetVehiclesQuery, Result<
             .Take(request.PageSize);
 
         // Map to Response objects
-        var vehicleResponses = pagedVehicles.Select(v => new VehicleResponse
+        var vehicleResponses = pagedVehicles.Select(v => new VehicleListItemResponse
         {
             Id = v.Id,
             CustomerId = v.CustomerId,

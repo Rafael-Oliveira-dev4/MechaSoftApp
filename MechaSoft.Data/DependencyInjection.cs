@@ -16,12 +16,16 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddDataServices(this IServiceCollection services, IConfiguration configuration)
     {
+        // Infra - HttpContext for interceptors/auditing
+        services.AddHttpContextAccessor();
+
         // Get connection string from configuration
         var connectionString = configuration.GetConnectionString("MechaSoftCS") 
             ?? throw new InvalidOperationException("Connection string 'MechaSoftCS' not found.");
 
         // Interceptors and Context
-        services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
+        // Temporarily disabled to unblock startup; will re-enable after IHttpContextAccessor handling in interceptor
+        // services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
         services.AddDbContext<ApplicationDbContext>((sp, options) =>
         {
             options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
