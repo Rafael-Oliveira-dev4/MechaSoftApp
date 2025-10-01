@@ -21,29 +21,52 @@ public static class AccountEndpoints
         var accounts = routes.MapGroup("api/accounts");
 
         // POST /api/accounts/register - Registrar novo usuário
-        accounts.MapPost("/register", Commands.RegisterUser);
+        accounts.MapPost("/register", Commands.RegisterUser)
+                .WithName("RegisterUser")
+                .Produces<RegisterUserResponse>(201)
+                .Produces<Error>(400);
 
         // POST /api/accounts/login - Fazer login
-        accounts.MapPost("/login", Commands.LoginUser);
+        accounts.MapPost("/login", Commands.LoginUser)
+                .WithName("LoginUser")
+                .Produces<LoginUserResponse>(200)
+                .Produces<Error>(400);
 
         // PUT /api/accounts/change-password - Alterar senha
-        accounts.MapPut("/change-password", Commands.ChangePassword);
+        accounts.MapPut("/change-password", Commands.ChangePassword)
+                .WithName("ChangePassword")
+                .Produces<ChangePasswordResponse>(200)
+                .Produces<Error>(400);
 
         // POST /api/accounts/forgot-password - Solicitar reset de senha
-        accounts.MapPost("/forgot-password", Commands.ForgotPassword);
+        accounts.MapPost("/forgot-password", Commands.ForgotPassword)
+                .WithName("ForgotPassword")
+                .Produces<ForgotPasswordResponse>(200)
+                .Produces<Error>(400);
 
         // POST /api/accounts/reset-password - Resetar senha
-        accounts.MapPost("/reset-password", Commands.ResetPassword);
+        accounts.MapPost("/reset-password", Commands.ResetPassword)
+                .WithName("ResetPassword")
+                .Produces<ResetPasswordResponse>(200)
+                .Produces<Error>(400);
 
         // POST /api/accounts/refresh-token - Renovar tokens
-        accounts.MapPost("/refresh-token", Commands.RefreshToken);
+        accounts.MapPost("/refresh-token", Commands.RefreshToken)
+                .WithName("RefreshToken")
+                .Produces<RefreshTokenResponse>(200)
+                .Produces<Error>(400);
 
         // GET /api/accounts/profile/{userId} - Obter perfil do usuário
         accounts.MapGet("/profile/{userId:guid}", Queries.GetUserProfile)
-                .WithName("GetUserProfile");
+                .WithName("GetUserProfile")
+                .Produces<GetUserProfileResponse>(200)
+                .Produces<Error>(404);
 
         // GET /api/accounts/users - Listar usuários com paginação
-        accounts.MapGet("/users", Queries.GetUsers);
+        accounts.MapGet("/users", Queries.GetUsers)
+                .WithName("GetUsers")
+                .Produces<GetUsersResponse>(200)
+                .Produces<Error>(400);
     }
 
     private static class Commands

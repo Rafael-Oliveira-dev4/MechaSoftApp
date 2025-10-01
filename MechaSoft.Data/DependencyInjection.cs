@@ -63,12 +63,8 @@ public static class DependencyInjection
         // services.AddScoped<IFileStorageService, FileStorageService>();
         //services.AddScoped<INotificationService, NotificationService>();
 
-        // Health Checks
-        services.AddHealthChecks()
-            .AddSqlServer(
-                connectionString,
-                name: "sqlserver",
-                tags: new[] { "db", "sql", "sqlserver" });
+        // Health Checks (registered in WebAPI Program)
+        services.AddHealthChecks();
 
         return services;
     }

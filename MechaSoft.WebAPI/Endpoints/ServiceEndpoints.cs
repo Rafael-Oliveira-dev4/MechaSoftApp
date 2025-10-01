@@ -18,14 +18,21 @@ public static class ServiceEndpoints
 
         // GET /api/services - List services with pagination
         services.MapGet("/", Queries.GetServices)
-                .WithName("GetServices");
+                .WithName("GetServices")
+                .Produces<GetServicesResponse>(200)
+                .Produces<Error>(400);
 
         // GET /api/services/{id} - Get service by ID
         services.MapGet("/{id:guid}", Queries.GetServiceById)
-                .WithName("GetServiceById");
+                .WithName("GetServiceById")
+                .Produces<ServiceResponse>(200)
+                .Produces<Error>(404);
 
         // POST /api/services - Create new service
-        services.MapPost("/", Commands.CreateService);
+        services.MapPost("/", Commands.CreateService)
+                .WithName("CreateService")
+                .Produces<CreateServiceResponse>(201)
+                .Produces<Error>(400);
     }
 
     private static class Commands

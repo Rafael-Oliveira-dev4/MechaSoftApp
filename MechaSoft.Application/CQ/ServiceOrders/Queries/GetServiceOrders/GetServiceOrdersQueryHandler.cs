@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace MechaSoft.Application.CQ.ServiceOrders.Queries.GetServiceOrders;
 
-public class GetServiceOrdersQueryHandler : IRequestHandler<GetServicesOrdersQuery, Result<GetServiceOrdersResponse, Success, Error>>
+public class GetServiceOrdersQueryHandler : IRequestHandler<GetServiceOrdersQuery, Result<GetServiceOrdersResponse, Success, Error>>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<GetServiceOrdersQueryHandler> _logger;

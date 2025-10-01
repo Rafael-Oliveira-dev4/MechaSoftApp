@@ -10,4 +10,7 @@ public class CreateServiceOrderRequest
     public List<PartItemRequest> Parts { get; set; } = [];
     public Guid? MechanicId { get; set; }
     public DateTime? EstimatedDelivery { get; set; }
+    public decimal EstimatedCost { get; set; }
+    public bool RequiresInspection { get; set; }
+    public string? InternalNotes { get; set; }
 }

@@ -29,6 +29,7 @@ public class ServiceOrder : AuditableEntity, IEntity<Guid>
     public List<PartItem> Parts { get; set; }
     public List<Inspection> Inspections { get; set; }
 
+    [System.Diagnostics.CodeAnalysis.SetsRequiredMembers]
     public ServiceOrder()
     {
         Id = Guid.NewGuid();
@@ -39,6 +40,7 @@ public class ServiceOrder : AuditableEntity, IEntity<Guid>
         Status = ServiceOrderStatus.Pending;
     }
 
+    [System.Diagnostics.CodeAnalysis.SetsRequiredMembers]
     public ServiceOrder(Guid customerId, Guid vehicleId, string description,
                        Priority priority, Money estimatedCost, DateTime? estimatedDelivery = null)
     {

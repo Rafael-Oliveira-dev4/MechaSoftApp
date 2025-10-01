@@ -18,17 +18,27 @@ public static class InspectionEndpoints
 
         // GET /api/inspections - List inspections with pagination
         inspections.MapGet("/", Queries.GetInspections)
-                    .WithName("GetInspections");
+                    .WithName("GetInspections")
+                    .Produces<GetInspectionsResponse>(200)
+                    .Produces<Error>(400);
 
         // GET /api/inspections/{id} - Get inspection by ID
         inspections.MapGet("/{id:guid}", Queries.GetInspectionById)
-                    .WithName("GetInspectionById");
+                    .WithName("GetInspectionById")
+                    .Produces<InspectionResponse>(200)
+                    .Produces<Error>(404);
 
         // POST /api/inspections - Create new inspection
-        inspections.MapPost("/", Commands.CreateInspection);
+        inspections.MapPost("/", Commands.CreateInspection)
+                    .WithName("CreateInspection")
+                    .Produces<CreateInspectionResponse>(201)
+                    .Produces<Error>(400);
 
         // PUT /api/inspections/{id}/result - Update inspection result
-        inspections.MapPut("/{id:guid}/result", Commands.UpdateInspectionResult);
+        inspections.MapPut("/{id:guid}/result", Commands.UpdateInspectionResult)
+                    .WithName("UpdateInspectionResult")
+                    .Produces<UpdateInspectionResultResponse>(200)
+                    .Produces<Error>(400);
     }
 
     private static class Commands

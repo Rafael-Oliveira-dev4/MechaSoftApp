@@ -25,9 +25,11 @@ public class CreateServiceOrderUseCaseRepository : Repository<ServiceOrder>, ICr
             Description = request.Description,
             Status = ServiceOrderStatus.Pending,
             Priority = request.Priority,
-            EstimatedCost = new Money(0, "EUR"), // TODO: Calcular custo estimado baseado nos serviços e peças
+            EstimatedCost = new Money(request.EstimatedCost, "EUR"),
             EstimatedDelivery = request.EstimatedDelivery,
             MechanicId = request.MechanicId,
+            RequiresInspection = request.RequiresInspection,
+            InternalNotes = request.InternalNotes,
             CreatedAt = DateTime.UtcNow
         };
 

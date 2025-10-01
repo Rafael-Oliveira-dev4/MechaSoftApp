@@ -1,36 +1,42 @@
 {
   "format": 1,
   "restore": {
-    "/home/rick/Documentos/Github/MechaSoftApp/MechaSoft.Data/MechaSoft.Data.csproj": {}
+    "C:\\Users\\rafae\\Documents\\GitHub\\MechaSoftApp\\MechaSoft.Data\\MechaSoft.Data.csproj": {}
   },
   "projects": {
-    "/home/rick/Documentos/Github/MechaSoftApp/MechaSoft.Data/MechaSoft.Data.csproj": {
+    "C:\\Users\\rafae\\Documents\\GitHub\\MechaSoftApp\\MechaSoft.Data\\MechaSoft.Data.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/rick/Documentos/Github/MechaSoftApp/MechaSoft.Data/MechaSoft.Data.csproj",
+        "projectUniqueName": "C:\\Users\\rafae\\Documents\\GitHub\\MechaSoftApp\\MechaSoft.Data\\MechaSoft.Data.csproj",
         "projectName": "MechaSoft.Data",
-        "projectPath": "/home/rick/Documentos/Github/MechaSoftApp/MechaSoft.Data/MechaSoft.Data.csproj",
-        "packagesPath": "/home/rick/.nuget/packages/",
-        "outputPath": "/home/rick/Documentos/Github/MechaSoftApp/MechaSoft.Data/obj/",
+        "projectPath": "C:\\Users\\rafae\\Documents\\GitHub\\MechaSoftApp\\MechaSoft.Data\\MechaSoft.Data.csproj",
+        "packagesPath": "C:\\Users\\rafae\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\rafae\\Documents\\GitHub\\MechaSoftApp\\MechaSoft.Data\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "/home/rick/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\rafae\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "/home/rick/Documentos/Github/MechaSoftApp/MechaSoft.Domain.Core/MechaSoft.Domain.Core.csproj": {
-                "projectPath": "/home/rick/Documentos/Github/MechaSoftApp/MechaSoft.Domain.Core/MechaSoft.Domain.Core.csproj"
+              "C:\\Users\\rafae\\Documents\\GitHub\\MechaSoftApp\\MechaSoft.Domain.Core\\MechaSoft.Domain.Core.csproj": {
+                "projectPath": "C:\\Users\\rafae\\Documents\\GitHub\\MechaSoftApp\\MechaSoft.Domain.Core\\MechaSoft.Domain.Core.csproj"
               },
-              "/home/rick/Documentos/Github/MechaSoftApp/MechaSoft.Domain/MechaSoft.Domain.csproj": {
-                "projectPath": "/home/rick/Documentos/Github/MechaSoftApp/MechaSoft.Domain/MechaSoft.Domain.csproj"
+              "C:\\Users\\rafae\\Documents\\GitHub\\MechaSoftApp\\MechaSoft.Domain\\MechaSoft.Domain.csproj": {
+                "projectPath": "C:\\Users\\rafae\\Documents\\GitHub\\MechaSoftApp\\MechaSoft.Domain\\MechaSoft.Domain.csproj"
               }
             }
           }
@@ -44,7 +50,8 @@
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
-        }
+        },
+        "SdkAnalysisLevel": "9.0.300"
       },
       "frameworks": {
         "net8.0": {
@@ -111,37 +118,43 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/snap/dotnet-sdk/256/sdk/8.0.407/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.305/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "/home/rick/Documentos/Github/MechaSoftApp/MechaSoft.Domain.Core/MechaSoft.Domain.Core.csproj": {
+    "C:\\Users\\rafae\\Documents\\GitHub\\MechaSoftApp\\MechaSoft.Domain.Core\\MechaSoft.Domain.Core.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/rick/Documentos/Github/MechaSoftApp/MechaSoft.Domain.Core/MechaSoft.Domain.Core.csproj",
+        "projectUniqueName": "C:\\Users\\rafae\\Documents\\GitHub\\MechaSoftApp\\MechaSoft.Domain.Core\\MechaSoft.Domain.Core.csproj",
         "projectName": "MechaSoft.Domain.Core",
-        "projectPath": "/home/rick/Documentos/Github/MechaSoftApp/MechaSoft.Domain.Core/MechaSoft.Domain.Core.csproj",
-        "packagesPath": "/home/rick/.nuget/packages/",
-        "outputPath": "/home/rick/Documentos/Github/MechaSoftApp/MechaSoft.Domain.Core/obj/",
+        "projectPath": "C:\\Users\\rafae\\Documents\\GitHub\\MechaSoftApp\\MechaSoft.Domain.Core\\MechaSoft.Domain.Core.csproj",
+        "packagesPath": "C:\\Users\\rafae\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\rafae\\Documents\\GitHub\\MechaSoftApp\\MechaSoft.Domain.Core\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "/home/rick/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\rafae\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "/home/rick/Documentos/Github/MechaSoftApp/MechaSoft.Domain/MechaSoft.Domain.csproj": {
-                "projectPath": "/home/rick/Documentos/Github/MechaSoftApp/MechaSoft.Domain/MechaSoft.Domain.csproj"
+              "C:\\Users\\rafae\\Documents\\GitHub\\MechaSoftApp\\MechaSoft.Domain\\MechaSoft.Domain.csproj": {
+                "projectPath": "C:\\Users\\rafae\\Documents\\GitHub\\MechaSoftApp\\MechaSoft.Domain\\MechaSoft.Domain.csproj"
               },
-              "/home/rick/Documentos/Github/MechaSoftApp/MechaSoft.Security/MechaSoft.Security.csproj": {
-                "projectPath": "/home/rick/Documentos/Github/MechaSoftApp/MechaSoft.Security/MechaSoft.Security.csproj"
+              "C:\\Users\\rafae\\Documents\\GitHub\\MechaSoftApp\\MechaSoft.Security\\MechaSoft.Security.csproj": {
+                "projectPath": "C:\\Users\\rafae\\Documents\\GitHub\\MechaSoftApp\\MechaSoft.Security\\MechaSoft.Security.csproj"
               }
             }
           }
@@ -155,7 +168,8 @@
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
-        }
+        },
+        "SdkAnalysisLevel": "9.0.300"
       },
       "frameworks": {
         "net8.0": {
@@ -200,26 +214,32 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/snap/dotnet-sdk/256/sdk/8.0.407/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.305/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "/home/rick/Documentos/Github/MechaSoftApp/MechaSoft.Domain/MechaSoft.Domain.csproj": {
+    "C:\\Users\\rafae\\Documents\\GitHub\\MechaSoftApp\\MechaSoft.Domain\\MechaSoft.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/rick/Documentos/Github/MechaSoftApp/MechaSoft.Domain/MechaSoft.Domain.csproj",
+        "projectUniqueName": "C:\\Users\\rafae\\Documents\\GitHub\\MechaSoftApp\\MechaSoft.Domain\\MechaSoft.Domain.csproj",
         "projectName": "MechaSoft.Domain",
-        "projectPath": "/home/rick/Documentos/Github/MechaSoftApp/MechaSoft.Domain/MechaSoft.Domain.csproj",
-        "packagesPath": "/home/rick/.nuget/packages/",
-        "outputPath": "/home/rick/Documentos/Github/MechaSoftApp/MechaSoft.Domain/obj/",
+        "projectPath": "C:\\Users\\rafae\\Documents\\GitHub\\MechaSoftApp\\MechaSoft.Domain\\MechaSoft.Domain.csproj",
+        "packagesPath": "C:\\Users\\rafae\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\rafae\\Documents\\GitHub\\MechaSoftApp\\MechaSoft.Domain\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "/home/rick/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\rafae\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -237,7 +257,8 @@
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
-        }
+        },
+        "SdkAnalysisLevel": "9.0.300"
       },
       "frameworks": {
         "net8.0": {
@@ -286,34 +307,40 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/snap/dotnet-sdk/256/sdk/8.0.407/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.305/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "/home/rick/Documentos/Github/MechaSoftApp/MechaSoft.Security/MechaSoft.Security.csproj": {
+    "C:\\Users\\rafae\\Documents\\GitHub\\MechaSoftApp\\MechaSoft.Security\\MechaSoft.Security.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/rick/Documentos/Github/MechaSoftApp/MechaSoft.Security/MechaSoft.Security.csproj",
+        "projectUniqueName": "C:\\Users\\rafae\\Documents\\GitHub\\MechaSoftApp\\MechaSoft.Security\\MechaSoft.Security.csproj",
         "projectName": "MechaSoft.Security",
-        "projectPath": "/home/rick/Documentos/Github/MechaSoftApp/MechaSoft.Security/MechaSoft.Security.csproj",
-        "packagesPath": "/home/rick/.nuget/packages/",
-        "outputPath": "/home/rick/Documentos/Github/MechaSoftApp/MechaSoft.Security/obj/",
+        "projectPath": "C:\\Users\\rafae\\Documents\\GitHub\\MechaSoftApp\\MechaSoft.Security\\MechaSoft.Security.csproj",
+        "packagesPath": "C:\\Users\\rafae\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\rafae\\Documents\\GitHub\\MechaSoftApp\\MechaSoft.Security\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "/home/rick/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\rafae\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "/home/rick/Documentos/Github/MechaSoftApp/MechaSoft.Domain/MechaSoft.Domain.csproj": {
-                "projectPath": "/home/rick/Documentos/Github/MechaSoftApp/MechaSoft.Domain/MechaSoft.Domain.csproj"
+              "C:\\Users\\rafae\\Documents\\GitHub\\MechaSoftApp\\MechaSoft.Domain\\MechaSoft.Domain.csproj": {
+                "projectPath": "C:\\Users\\rafae\\Documents\\GitHub\\MechaSoftApp\\MechaSoft.Domain\\MechaSoft.Domain.csproj"
               }
             }
           }
@@ -327,12 +354,17 @@
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
-        }
+        },
+        "SdkAnalysisLevel": "9.0.300"
       },
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
+            "BCrypt.Net-Next": {
+              "target": "Package",
+              "version": "[4.0.3, )"
+            },
             "Microsoft.AspNetCore.Authentication.JwtBearer": {
               "target": "Package",
               "version": "[8.0.8, )"
@@ -366,7 +398,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/snap/dotnet-sdk/256/sdk/8.0.407/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.305/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

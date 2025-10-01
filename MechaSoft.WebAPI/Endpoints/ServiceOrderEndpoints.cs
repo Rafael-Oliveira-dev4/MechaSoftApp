@@ -50,7 +50,7 @@ public static class ServiceOrderEndpoints
     {
         public static async Task<Results<CreatedAtRoute<CreateServiceOrderResponse>, BadRequest<Error>>> CreateServiceOrder(
             [FromServices] ISender sender,
-            [FromBody] CreateServiceOrderRequest request)
+            [FromBody] MechaSoft.Application.CQ.ServiceOrders.Common.CreateServiceOrderRequest request)
         {
             if (request == null)
             {

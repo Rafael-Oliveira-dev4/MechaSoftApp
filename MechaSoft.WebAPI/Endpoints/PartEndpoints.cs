@@ -19,17 +19,27 @@ public static class PartEndpoints
 
         // GET /api/parts - List parts with pagination
         parts.MapGet("/", Queries.GetParts)
-             .WithName("GetParts");
+             .WithName("GetParts")
+             .Produces<GetPartsResponse>(200)
+             .Produces<Error>(400);
 
         // GET /api/parts/{id} - Get part by ID
         parts.MapGet("/{id:guid}", Queries.GetPartById)
-             .WithName("GetPartById");
+             .WithName("GetPartById")
+             .Produces<PartResponse>(200)
+             .Produces<Error>(404);
 
         // POST /api/parts - Create new part
-        parts.MapPost("/", Commands.CreatePart);
+        parts.MapPost("/", Commands.CreatePart)
+             .WithName("CreatePart")
+             .Produces<CreatePartResponse>(201)
+             .Produces<Error>(400);
 
         // PUT /api/parts/{id}/stock - Update part stock
-        parts.MapPut("/{id:guid}/stock", Commands.UpdateStock);
+        parts.MapPut("/{id:guid}/stock", Commands.UpdateStock)
+             .WithName("UpdatePartStock")
+             .Produces<UpdateStockResponse>(200)
+             .Produces<Error>(400);
     }
 
     private static class Commands
