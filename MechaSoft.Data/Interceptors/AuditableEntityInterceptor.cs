@@ -10,9 +10,9 @@ namespace MechaSoft.Data.Interceptors;
 
 public class AuditableEntityInterceptor : SaveChangesInterceptor
 {
-    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IHttpContextAccessor? _httpContextAccessor;
 
-    public AuditableEntityInterceptor(IHttpContextAccessor httpContextAccessor)
+    public AuditableEntityInterceptor(IHttpContextAccessor? httpContextAccessor = null)
     {
         _httpContextAccessor = httpContextAccessor;
     }
@@ -79,7 +79,7 @@ public class AuditableEntityInterceptor : SaveChangesInterceptor
 
     private string GetCurrentUser()
     {
-        var httpContext = _httpContextAccessor.HttpContext;
+        var httpContext = _httpContextAccessor?.HttpContext;
         if (httpContext?.User?.Identity?.IsAuthenticated == true)
         {
             return httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value

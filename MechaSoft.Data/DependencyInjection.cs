@@ -24,8 +24,8 @@ public static class DependencyInjection
             ?? throw new InvalidOperationException("Connection string 'MechaSoftCS' not found.");
 
         // Interceptors and Context
-        // Temporarily disabled to unblock startup; will re-enable after IHttpContextAccessor handling in interceptor
-        // services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
+        // Re-enabled with optional IHttpContextAccessor
+        services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
         services.AddDbContext<ApplicationDbContext>((sp, options) =>
         {
             options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
