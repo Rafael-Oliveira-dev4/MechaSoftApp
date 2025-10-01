@@ -17,7 +17,6 @@ public class ServiceOrderRepository : Repository<ServiceOrder>, IServiceOrderRep
             throw new ArgumentNullException(nameof(serviceOrder));
         // Validações específicas podem ser adicionadas aqui
         await _dbSet.AddAsync(serviceOrder);
-        await _context.SaveChangesAsync();
         return serviceOrder;
     }
 
@@ -74,7 +73,6 @@ public class ServiceOrderRepository : Repository<ServiceOrder>, IServiceOrderRep
             throw new ArgumentNullException(nameof(serviceOrder));
         // Validações específicas podem ser adicionadas aqui
         _dbSet.Update(serviceOrder);
-        await _context.SaveChangesAsync();
         return serviceOrder;
     }
 }
