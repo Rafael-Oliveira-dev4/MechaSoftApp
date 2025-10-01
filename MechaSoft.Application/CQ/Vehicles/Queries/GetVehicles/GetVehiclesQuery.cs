@@ -13,14 +13,14 @@ public class GetVehiclesQuery : IRequest<Result<GetVehiclesResponse, Success, Er
 
 public class GetVehiclesResponse
 {
-    public required IEnumerable<VehicleResponse> Vehicles { get; init; }
+    public required IEnumerable<VehicleListItemResponse> Vehicles { get; init; }
     public int TotalCount { get; init; }
     public int PageNumber { get; init; }
     public int PageSize { get; init; }
     public int TotalPages { get; init; }
 }
 
-public class VehicleResponse
+public class VehicleListItemResponse
 {
     public Guid Id { get; set; }
     public Guid CustomerId { get; set; }

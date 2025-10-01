@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace MechaSoft.Application.CQ.Vehicles.Queries.GetVehicleById;
 
-public class GetVehicleByIdQueryHandler : IRequestHandler<GetVehicleByIdQuery, Result<VehicleResponse, Success, Error>>
+public class GetVehicleByIdQueryHandler : IRequestHandler<GetVehicleByIdQuery, Result<VehicleDetailsResponse, Success, Error>>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<GetVehicleByIdQueryHandler> _logger;
@@ -16,7 +16,7 @@ public class GetVehicleByIdQueryHandler : IRequestHandler<GetVehicleByIdQuery, R
         _logger = logger;
     }
 
-    public async Task<Result<VehicleResponse, Success, Error>> Handle(GetVehicleByIdQuery request, CancellationToken cancellationToken)
+    public async Task<Result<VehicleDetailsResponse, Success, Error>> Handle(GetVehicleByIdQuery request, CancellationToken cancellationToken)
     {
         var vehicle = await _unitOfWork.VehicleRepository.GetByIdAsync(request.Id);
         if (vehicle == null)
@@ -29,7 +29,7 @@ public class GetVehicleByIdQueryHandler : IRequestHandler<GetVehicleByIdQuery, R
         var customer = await _unitOfWork.CustomerRepository.GetByIdAsync(vehicle.CustomerId);
         var customerName = customer?.Name.FullName ?? "Unknown";
 
-        var response = new VehicleResponse(
+        var response = new VehicleDetailsResponse(
             vehicle.Id,
             vehicle.CustomerId,
             customerName,

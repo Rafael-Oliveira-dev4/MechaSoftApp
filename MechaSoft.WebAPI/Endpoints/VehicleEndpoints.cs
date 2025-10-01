@@ -25,7 +25,7 @@ public static class VehicleEndpoints
         // GET /api/vehicles/{id} - Obter veículo por ID
         vehicles.MapGet("/{id:guid}", Queries.GetVehicleById)
             .WithName("GetVehicleById")
-            .Produces<MechaSoft.Application.CQ.Vehicles.Queries.GetVehicleById.VehicleResponse>(200)
+            .Produces<MechaSoft.Application.CQ.Vehicles.Queries.GetVehicleById.VehicleDetailsResponse>(200)
             .Produces<Error>(404);
 
         // GET /api/vehicles/customer/{customerId} - Obter veículos de um cliente
@@ -129,7 +129,7 @@ public static class VehicleEndpoints
                 : TypedResults.BadRequest(result.Error);
         }
 
-        public static async Task<Results<Ok<MechaSoft.Application.CQ.Vehicles.Queries.GetVehicleById.VehicleResponse>, NotFound<Error>>> GetVehicleById(
+        public static async Task<Results<Ok<MechaSoft.Application.CQ.Vehicles.Queries.GetVehicleById.VehicleDetailsResponse>, NotFound<Error>>> GetVehicleById(
             [FromServices] ISender sender,
             [FromRoute] Guid id,
             CancellationToken cancellationToken = default)

@@ -9,7 +9,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    // Evita conflitos de nomes de schemas (ex.: VehicleResponse duplicado em queries diferentes)
+    c.CustomSchemaIds(type => type.FullName);
+});
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
     options.SerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
@@ -42,6 +46,7 @@ builder.Services.AddAuthentication(options =>
 });
 builder.Services.AddAuthorization();
 builder.Services.AddHealthChecks();
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 
