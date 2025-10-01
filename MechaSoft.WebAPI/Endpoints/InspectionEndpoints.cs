@@ -17,10 +17,12 @@ public static class InspectionEndpoints
         var inspections = routes.MapGroup("api/inspections").WithTags("Inspections");
 
         // GET /api/inspections - List inspections with pagination
-        inspections.MapGet("/", Queries.GetInspections);
+        inspections.MapGet("/", Queries.GetInspections)
+                    .WithName("GetInspections");
 
         // GET /api/inspections/{id} - Get inspection by ID
-        inspections.MapGet("/{id:guid}", Queries.GetInspectionById);
+        inspections.MapGet("/{id:guid}", Queries.GetInspectionById)
+                    .WithName("GetInspectionById");
 
         // POST /api/inspections - Create new inspection
         inspections.MapPost("/", Commands.CreateInspection);

@@ -52,12 +52,13 @@ public class CreateServiceOrderCommandHandler : IRequestHandler<CreateServiceOrd
             request.VehicleId,
             request.Description,
             request.Priority,
-            new Money(0, "EUR"), // Will be calculated when services/parts are added
+            new Money(request.EstimatedCost, "EUR"),
             request.EstimatedDelivery
         );
 
         serviceOrder.MechanicId = request.MechanicId;
         serviceOrder.RequiresInspection = request.RequiresInspection;
+        serviceOrder.InternalNotes = request.InternalNotes;
 
         var savedOrder = await _unitOfWork.ServiceOrderRepository.SaveAsync(serviceOrder);
         await _unitOfWork.CommitAsync(cancellationToken);

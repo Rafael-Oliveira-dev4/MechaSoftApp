@@ -45,9 +45,20 @@ public static class CustomerEndpoints
     {
         public static async Task<Results<CreatedAtRoute<CreateCustomerResponse>, BadRequest<Error>>> CreateCustomer(
             [FromServices] ISender sender,
-            [FromBody] CreateCustomerCommand command,
+            [FromBody] CreateCustomerRequest request,
             CancellationToken cancellationToken = default)
         {
+            var command = new CreateCustomerCommand(
+                request.Name,
+                request.Email,
+                request.Phone,
+                request.Nif,
+                request.Street,
+                request.Number,
+                request.Parish,
+                request.City,
+                request.PostalCode
+            );
             var result = await sender.Send(command, cancellationToken);
             
             return result.IsSuccess
@@ -123,16 +134,3 @@ public static class CustomerEndpoints
         }
     }
 }
-
-// DTOs for Customer Endpoints
-public record UpdateCustomerRequest(
-    string Name,
-    string Email,
-    string Phone,
-    string? Nif,
-    string Street,
-    string Number,
-    string Parish,
-    string City,
-    string PostalCode
-);

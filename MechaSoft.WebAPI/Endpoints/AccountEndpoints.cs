@@ -39,7 +39,8 @@ public static class AccountEndpoints
         accounts.MapPost("/refresh-token", Commands.RefreshToken);
 
         // GET /api/accounts/profile/{userId} - Obter perfil do usuário
-        accounts.MapGet("/profile/{userId:guid}", Queries.GetUserProfile);
+        accounts.MapGet("/profile/{userId:guid}", Queries.GetUserProfile)
+                .WithName("GetUserProfile");
 
         // GET /api/accounts/users - Listar usuários com paginação
         accounts.MapGet("/users", Queries.GetUsers);

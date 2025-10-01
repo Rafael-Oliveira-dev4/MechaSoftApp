@@ -22,6 +22,13 @@ public class CreateServiceOrderCommandValidator : AbstractValidator<CreateServic
         RuleFor(x => x.EstimatedDelivery)
             .GreaterThan(DateTime.UtcNow).WithMessage("Estimated delivery must be in the future.")
             .When(x => x.EstimatedDelivery.HasValue);
+
+        RuleFor(x => x.EstimatedCost)
+            .GreaterThanOrEqualTo(0).WithMessage("Estimated cost cannot be negative.");
+
+        RuleFor(x => x.InternalNotes)
+            .MaximumLength(1000)
+            .When(x => !string.IsNullOrWhiteSpace(x.InternalNotes));
     }
 }
 

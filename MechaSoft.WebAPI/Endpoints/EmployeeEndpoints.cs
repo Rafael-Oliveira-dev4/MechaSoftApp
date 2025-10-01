@@ -6,6 +6,7 @@ using MechaSoft.Domain.Model;
 using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using MechaSoft.Application.CQ.Employees.Common;
 
 namespace MechaSoft.WebAPI.Endpoints;
 
@@ -19,7 +20,8 @@ public static class EmployeeEndpoints
         employees.MapGet("/", Queries.GetEmployees);
 
         // GET /api/employees/{id} - Get employee by ID
-        employees.MapGet("/{id:guid}", Queries.GetEmployeeById);
+        employees.MapGet("/{id:guid}", Queries.GetEmployeeById)
+                 .WithName("GetEmployeeById");
 
         // POST /api/employees - Create new employee
         employees.MapPost("/", Commands.CreateEmployee);
@@ -87,17 +89,4 @@ public static class EmployeeEndpoints
         }
     }
 }
-
-// DTOs for Employee Endpoints
-public record CreateEmployeeRequest(
-    string FirstName,
-    string LastName,
-    string Email,
-    string Phone,
-    EmployeeRole Role,
-    decimal? HourlyRate,
-    List<ServiceCategory>? Specialties,
-    bool CanPerformInspections,
-    string? InspectionLicenseNumber
-);
 
