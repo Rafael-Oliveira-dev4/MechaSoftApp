@@ -1,31 +1,96 @@
-<section class="space-y-6">
-  <header class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-    <h2 class="text-2xl font-semibold text-gray-900">Veículos</h2>
-    <div class="flex gap-2">
-      <input type="text" placeholder="Pesquisar veículos..." class="w-64 rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-gray-900 focus:outline-none" />
-      <button class="inline-flex items-center rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800">Novo veículo</button>
+<div class="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <div class="mb-8">
+      <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 class="text-4xl font-bold text-white mb-2">Veículos</h1>
+          <p class="text-zinc-300">Gestão de veículos da oficina</p>
+        </div>
+        <div class="flex gap-3">
+          <input 
+            type="text" 
+            placeholder="Pesquisar veículos..." 
+            [(ngModel)]="searchTerm"
+            (keyup.enter)="onSearch()"
+            class="w-64 rounded-xl border border-slate-700 bg-slate-800/50 px-4 py-3 text-sm text-white placeholder-zinc-400 shadow-sm focus:border-cyan-500 focus:outline-none backdrop-blur-sm" />
+          <button 
+            (click)="onSearch()"
+            class="inline-flex items-center rounded-xl bg-gradient-to-r from-cyan-600 to-blue-700 px-6 py-3 text-sm font-semibold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:shadow-cyan-500/25 hover:from-cyan-500 hover:to-blue-600">
+            <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+            </svg>
+            Novo veículo
+          </button>
+        </div>
+      </div>
     </div>
-  </header>
-  <div class="overflow-hidden rounded-lg border border-gray-200">
-    <table class="min-w-full divide-y divide-gray-200">
-      <thead class="bg-gray-50">
-        <tr>
-          <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Matrícula</th>
-          <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Modelo</th>
-          <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Cliente</th>
-          <th class="px-4 py-3"></th>
-        </tr>
-      </thead>
-      <tbody class="divide-y divide-gray-200 bg-white">
-        <tr>
-          <td class="px-4 py-3">AA-00-BB</td>
-          <td class="px-4 py-3">Volkswagen Golf</td>
-          <td class="px-4 py-3">João Silva</td>
-          <td class="px-4 py-3 text-right">
-            <button class="rounded-md border border-gray-300 px-3 py-1.5 text-sm hover:bg-gray-50">Detalhes</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</section>
+    
+    <!-- Error Message -->
+    <div *ngIf="error" class="mb-6 rounded-2xl border border-red-800/50 bg-red-900/50 backdrop-blur-sm p-6 shadow-lg">
+      <div class="flex items-center">
+        <svg class="h-5 w-5 text-red-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 19.5c-.77.833.192 2.5 1.732 2.5z"></path>
+        </svg>
+        <p class="text-red-300">{{ error }}</p>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="overflow-hidden rounded-2xl border border-slate-800/50 bg-slate-900/50 backdrop-blur-sm shadow-lg glass-enhanced p-8">
+      <div class="flex items-center justify-center">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-500"></div>
+        <span class="ml-3 text-zinc-300">Carregando veículos...</span>
+      </div>
+    </div>
+
+    <!-- Vehicles Table -->
+    <div *ngIf="!loading && !error" class="overflow-hidden rounded-2xl border border-slate-800/50 bg-slate-900/50 backdrop-blur-sm shadow-lg glass-enhanced">
+      <table class="min-w-full divide-y divide-slate-800/50">
+        <thead class="bg-slate-800/50">
+          <tr>
+            <th class="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-zinc-400">Matrícula</th>
+            <th class="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-zinc-400">Modelo</th>
+            <th class="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-zinc-400">Cliente</th>
+            <th class="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-zinc-400">Ano</th>
+            <th class="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-zinc-400">Combustível</th>
+            <th class="px-6 py-4"></th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-800/50 bg-slate-900/30">
+          <tr *ngFor="let vehicle of vehicles" class="hover:bg-slate-800/30 transition-colors">
+            <td class="px-6 py-4 text-white font-medium">{{ vehicle.licensePlate }}</td>
+            <td class="px-6 py-4 text-zinc-300">{{ vehicle.brand }} {{ vehicle.model }}</td>
+            <td class="px-6 py-4 text-zinc-300">{{ vehicle.customerName }}</td>
+            <td class="px-6 py-4 text-zinc-300">{{ vehicle.year }}</td>
+            <td class="px-6 py-4 text-zinc-300">{{ vehicle.fuelType }}</td>
+            <td class="px-6 py-4 text-right">
+              <button class="rounded-xl border border-slate-700 bg-slate-800/50 px-4 py-2 text-sm text-white hover:bg-slate-700/50 transition-colors backdrop-blur-sm">
+                Detalhes
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="vehicles.length === 0">
+            <td colspan="6" class="px-6 py-8 text-center text-zinc-400">
+              Nenhum veículo encontrado
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div *ngIf="!loading && !error && totalPages > 1" class="mt-6 flex items-center justify-between">
+      <div class="text-sm text-zinc-400">
+        Mostrando {{ (currentPage - 1) * pageSize + 1 }} a {{ Math.min(currentPage * pageSize, totalCount) }} de {{ totalCount }} veículos
+      </div>
+      <div class="flex gap-2">
+        <button 
+          *ngFor="let page of getPageNumbers()"
+          (click)="onPageChange(page)"
+          [class]="page === currentPage ? 
+            'px-3 py-2 text-sm font-medium text-white bg-cyan-600 rounded-lg' : 
+            'px-3 py-2 text-sm font-medium text-zinc-400 hover:text-white hover:bg-slate-800/50 rounded-lg transition-colors'">
+          {{ page }}
+        </button>
+      </div>
+    </div>
+</div>

@@ -1,10 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { ApiConfigService } from '../core/services/api-config.service';
-import { Vehicle, CreateVehicleRequest, PaginatedResponse } from '../core/models/api.models';
+import { ApiConfigService } from './api-config.service';
+import { Vehicle, CreateVehicleRequest, PaginatedResponse } from '../models/api.models';
 
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: 'root'
+})
 export class VehicleService {
   private readonly apiUrl: string;
 
@@ -16,7 +18,7 @@ export class VehicleService {
   }
 
   // Get all vehicles with pagination
-  getAll(
+  getVehicles(
     pageNumber: number = 1,
     pageSize: number = 10,
     customerId?: string,
@@ -69,5 +71,3 @@ export class VehicleService {
     });
   }
 }
-
-
