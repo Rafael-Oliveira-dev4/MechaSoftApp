@@ -6,6 +6,7 @@ using MechaSoft.Application.CQ.ServiceOrders.Commands.UpdateServiceOrderStatus;
 using MechaSoft.Application.CQ.ServiceOrders.Queries.GetServiceOrderById;
 using MechaSoft.Application.CQ.ServiceOrders.Queries.GetServiceOrders;
 using MechaSoft.Application.Common.Responses;
+using MechaSoft.Application.CQ.ServiceOrders.Common;
 using MechaSoft.Domain.Model;
 using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -23,7 +24,8 @@ public static class ServiceOrderEndpoints
         serviceOrders.MapGet("/", Queries.GetServiceOrders);
 
         // GET /api/service-orders/{id} - Obter ordem de serviço por ID
-        serviceOrders.MapGet("/{id:guid}", Queries.GetServiceOrderById);
+        serviceOrders.MapGet("/{id:guid}", Queries.GetServiceOrderById)
+                      .WithName("GetServiceOrderById");
 
         // GET /api/service-orders/customer/{customerId} - Obter ordens de um cliente
         serviceOrders.MapGet("/customer/{customerId:guid}", Queries.GetServiceOrdersByCustomer);
@@ -60,9 +62,11 @@ public static class ServiceOrderEndpoints
                 request.VehicleId,
                 request.Description,
                 request.Priority,
+                request.EstimatedCost,
                 request.EstimatedDelivery,
                 request.MechanicId,
-                request.RequiresInspection
+                request.RequiresInspection,
+                request.InternalNotes
             );
 
             var result = await sender.Send(command);
@@ -196,37 +200,3 @@ public static class ServiceOrderEndpoints
         }
     }
 }
-
-// DTOs for ServiceOrder Endpoints
-public record CreateServiceOrderRequest(
-    Guid CustomerId,
-    Guid VehicleId,
-    string Description,
-    Priority Priority,
-    DateTime? EstimatedDelivery,
-    Guid? MechanicId,
-    bool RequiresInspection
-);
-
-public record UpdateStatusRequest(
-    ServiceOrderStatus Status,
-    string? Notes
-);
-
-public record AssignMechanicRequest(
-    Guid MechanicId
-);
-
-public record AddServiceRequest(
-    Guid ServiceId,
-    int Quantity,
-    decimal EstimatedHours,
-    decimal? DiscountPercentage,
-    Guid? MechanicId
-);
-
-public record AddPartRequest(
-    Guid PartId,
-    int Quantity,
-    decimal? DiscountPercentage
-);

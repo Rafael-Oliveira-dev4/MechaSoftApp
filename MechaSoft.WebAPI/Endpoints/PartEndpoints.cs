@@ -7,6 +7,7 @@ using MechaSoft.Domain.Model;
 using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using MechaSoft.Application.CQ.Parts.Common;
 
 namespace MechaSoft.WebAPI.Endpoints;
 
@@ -17,10 +18,12 @@ public static class PartEndpoints
         var parts = routes.MapGroup("api/parts").WithTags("Parts");
 
         // GET /api/parts - List parts with pagination
-        parts.MapGet("/", Queries.GetParts);
+        parts.MapGet("/", Queries.GetParts)
+             .WithName("GetParts");
 
         // GET /api/parts/{id} - Get part by ID
-        parts.MapGet("/{id:guid}", Queries.GetPartById);
+        parts.MapGet("/{id:guid}", Queries.GetPartById)
+             .WithName("GetPartById");
 
         // POST /api/parts - Create new part
         parts.MapPost("/", Commands.CreatePart);
@@ -113,26 +116,4 @@ public static class PartEndpoints
         }
     }
 }
-
-// DTOs for Part Endpoints
-public record CreatePartRequest(
-    string Code,
-    string Name,
-    string Description,
-    string Category,
-    string? Brand,
-    decimal UnitCost,
-    decimal SalePrice,
-    int StockQuantity,
-    int MinStockLevel,
-    string? SupplierName,
-    string? SupplierContact,
-    string? Location
-);
-
-public record UpdateStockRequest(
-    int Quantity,
-    StockMovementType MovementType,
-    string? Reason
-);
 
