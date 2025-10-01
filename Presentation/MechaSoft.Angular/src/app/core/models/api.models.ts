@@ -1,8 +1,13 @@
-// Base interfaces
+import { Result } from './result.model';
+
 export interface ApiResponse<T> {
-  data: T;
-  success: boolean;
-  message?: string;
+  isSuccess: boolean;
+  value?: T;
+  error?: {
+    code: string;
+    message: string;
+    details?: string;
+  };
 }
 
 export interface PaginatedResponse<T> {
@@ -11,6 +16,14 @@ export interface PaginatedResponse<T> {
   pageNumber: number;
   pageSize: number;
   totalPages: number;
+}
+
+export interface PaginationParams {
+  pageNumber?: number;
+  pageSize?: number;
+  searchTerm?: string;
+  sortBy?: string;
+  sortDescending?: boolean;
 }
 
 export interface ApiError {
@@ -31,6 +44,7 @@ export interface Customer {
   city: string;
   postalCode: string;
   country: string;
+  isActive: boolean;
   createdAt?: Date;
   updatedAt?: Date;
 }

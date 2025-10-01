@@ -1,78 +1,297 @@
-<div class="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
-    <div class="mb-8">
-      <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 class="text-4xl font-bold text-white mb-2">Ordens de Serviço</h1>
-          <p class="text-zinc-300">Gestão de ordens de serviço da oficina</p>
-        </div>
-        <div class="flex gap-3">
-          <input type="text" placeholder="Pesquisar ordens..." class="w-64 rounded-xl border border-slate-700 bg-slate-800/50 px-4 py-3 text-sm text-white placeholder-zinc-400 shadow-sm focus:border-cyan-500 focus:outline-none backdrop-blur-sm" />
-          <button class="inline-flex items-center rounded-xl bg-gradient-to-r from-cyan-600 to-blue-700 px-6 py-3 text-sm font-semibold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:shadow-cyan-500/25 hover:from-cyan-500 hover:to-blue-600">
-            <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+<div class="orders-container">
+  <app-error-message [error]="error" (onClose)="error = null"></app-error-message>
+
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="title">Ordens de Serviço</h1>
+      <p class="subtitle">Gestão de ordens e workflow da oficina</p>
+    </div>
+    <button (click)="openCreateModal()" class="btn-primary">
+      <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+      </svg>
+      Nova Ordem
+    </button>
+  </div>
+
+  <!-- Status Filters -->
+  <div class="status-filters">
+    <button (click)="filterByStatus('')" [class.active]="statusFilter === ''" class="filter-btn">
+      Todas
+    </button>
+    @for (status of statuses; track status.value) {
+      <button 
+        (click)="filterByStatus(status.value)" 
+        [class.active]="statusFilter === status.value"
+        class="filter-btn"
+      >
+        <span [class]="'badge badge-' + status.color">{{ status.label }}</span>
+      </button>
+    }
+  </div>
+
+  <!-- Orders Table -->
+  <div class="table-card">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Nº Ordem</th>
+          <th>Cliente</th>
+          <th>Veículo</th>
+          <th>Descrição</th>
+          <th>Prioridade</th>
+          <th>Estado</th>
+          <th>Valor Estimado</th>
+          <th class="text-right">Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        @if (orders.length === 0) {
+          <tr>
+            <td colspan="8" class="text-center py-8 text-gray-500">
+              Nenhuma ordem encontrada
+            </td>
+          </tr>
+        }
+        
+        @for (order of orders; track order.id) {
+          <tr [class.row-urgent]="order.priority === 'Urgent'">
+            <td class="font-mono font-bold">{{ order.orderNumber }}</td>
+            <td>{{ order.customerId }}</td>
+            <td>{{ order.vehicleId }}</td>
+            <td class="max-w-xs truncate">{{ order.description }}</td>
+            <td>
+              <span [class]="'badge badge-' + (order.priority === 'Urgent' ? 'red' : order.priority === 'High' ? 'orange' : 'gray')">
+                {{ getPriorityLabel(order.priority) }}
+              </span>
+            </td>
+            <td>
+              <span [class]="'badge badge-' + getStatusColor(order.status)">
+                {{ getStatusLabel(order.status) }}
+              </span>
+            </td>
+            <td class="font-medium">{{ formatCurrency(order.estimatedCost) }}</td>
+            <td class="text-right">
+              <button (click)="viewDetails(order)" class="btn-icon btn-view" title="Ver Detalhes">
+                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                </svg>
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    <!-- Pagination -->
+    @if (totalPages > 1) {
+      <div class="pagination">
+        <button (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 1" class="btn-pagination">
+          Anterior
+        </button>
+        <span class="pagination-info">
+          Página {{ currentPage }} de {{ totalPages }} ({{ totalCount }} ordens)
+        </span>
+        <button (click)="onPageChange(currentPage + 1)" [disabled]="currentPage === totalPages" class="btn-pagination">
+          Próxima
+        </button>
+      </div>
+    }
+  </div>
+
+  <!-- Modal Create -->
+  @if (showCreateModal) {
+    <div class="modal-overlay" (click)="closeCreateModal()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2 class="modal-title">Nova Ordem de Serviço</h2>
+          <button (click)="closeCreateModal()" class="btn-close">
+            <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
             </svg>
-            Nova ordem
           </button>
+        </div>
+
+        <form [formGroup]="orderForm" (ngSubmit)="onSubmit()" class="modal-body">
+          <!-- Cliente e Veículo -->
+          <div class="form-section">
+            <h3 class="form-section-title">Cliente e Veículo</h3>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Cliente *</label>
+                <select formControlName="customerId" (change)="onCustomerChange($any($event.target).value)" class="form-input" [class.input-error]="isFieldInvalid('customerId')">
+                  <option value="">Selecione um cliente</option>
+                  @for (customer of customers; track customer.id) {
+                    <option [value]="customer.id">{{ customer.name }}</option>
+                  }
+                </select>
+                @if (isFieldInvalid('customerId')) {
+                  <span class="error-text">{{ getFieldError('customerId') }}</span>
+                }
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">Veículo *</label>
+                <select formControlName="vehicleId" class="form-input" [class.input-error]="isFieldInvalid('vehicleId')" [disabled]="vehicles.length === 0">
+                  <option value="">Selecione um veículo</option>
+                  @for (vehicle of vehicles; track vehicle.id) {
+                    <option [value]="vehicle.id">{{ vehicle.brand }} {{ vehicle.model }} - {{ vehicle.licensePlate }}</option>
+                  }
+                </select>
+                @if (isFieldInvalid('vehicleId')) {
+                  <span class="error-text">{{ getFieldError('vehicleId') }}</span>
+                }
+              </div>
+            </div>
+          </div>
+
+          <!-- Detalhes do Serviço -->
+          <div class="form-section">
+            <h3 class="form-section-title">Detalhes do Serviço</h3>
+            
+            <div class="form-group">
+              <label class="form-label">Descrição *</label>
+              <textarea formControlName="description" rows="3" placeholder="Descreva o problema ou serviço necessário..." class="form-input" [class.input-error]="isFieldInvalid('description')"></textarea>
+              @if (isFieldInvalid('description')) {
+                <span class="error-text">{{ getFieldError('description') }}</span>
+              }
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Prioridade *</label>
+                <select formControlName="priority" class="form-input">
+                  @for (priority of priorities; track priority.value) {
+                    <option [value]="priority.value">{{ priority.label }}</option>
+                  }
+                </select>
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">Valor Estimado (€) *</label>
+                <input type="number" formControlName="estimatedCost" placeholder="0.00" step="0.01" class="form-input" [class.input-error]="isFieldInvalid('estimatedCost')" />
+                @if (isFieldInvalid('estimatedCost')) {
+                  <span class="error-text">{{ getFieldError('estimatedCost') }}</span>
+                }
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Entrega Estimada</label>
+                <input type="datetime-local" formControlName="estimatedDelivery" class="form-input" />
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label flex items-center gap-2">
+                  <input type="checkbox" formControlName="requiresInspection" class="form-checkbox" />
+                  <span>Requer Inspeção</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Notas Internas</label>
+              <textarea formControlName="internalNotes" rows="2" placeholder="Notas privadas (não visíveis ao cliente)..." class="form-input"></textarea>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="modal-footer">
+            <button type="button" (click)="closeCreateModal()" class="btn-secondary">Cancelar</button>
+            <button type="submit" [disabled]="orderForm.invalid" class="btn-primary">Criar Ordem</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  <!-- Modal Details -->
+  @if (showDetailsModal && selectedOrder) {
+    <div class="modal-overlay" (click)="closeDetailsModal()">
+      <div class="modal-content modal-large" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <div>
+            <h2 class="modal-title">Ordem {{ selectedOrder.orderNumber }}</h2>
+            <p class="text-sm text-gray-500">{{ selectedOrder.description }}</p>
+          </div>
+          <button (click)="closeDetailsModal()" class="btn-close">
+            <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <!-- Status e Info -->
+          <div class="details-grid">
+            <div class="detail-card">
+              <h3 class="detail-title">Estado Atual</h3>
+              <span [class]="'badge badge-large badge-' + getStatusColor(selectedOrder.status)">
+                {{ getStatusLabel(selectedOrder.status) }}
+              </span>
+            </div>
+
+            <div class="detail-card">
+              <h3 class="detail-title">Prioridade</h3>
+              <span [class]="'badge badge-large badge-' + (selectedOrder.priority === 'Urgent' ? 'red' : 'gray')">
+                {{ getPriorityLabel(selectedOrder.priority) }}
+              </span>
+            </div>
+
+            <div class="detail-card">
+              <h3 class="detail-title">Valor Estimado</h3>
+              <p class="detail-value">{{ formatCurrency(selectedOrder.estimatedCost) }}</p>
+            </div>
+
+            @if (selectedOrder.finalCost) {
+              <div class="detail-card">
+                <h3 class="detail-title">Valor Final</h3>
+                <p class="detail-value">{{ formatCurrency(selectedOrder.finalCost) }}</p>
+              </div>
+            }
+          </div>
+
+          <!-- Atualizar Estado -->
+          @if (selectedOrder.status !== 'Completed' && selectedOrder.status !== 'Cancelled') {
+            <div class="action-section">
+              <h3 class="section-title">Atualizar Estado</h3>
+              <div class="flex gap-2 flex-wrap">
+                @for (status of statuses; track status.value) {
+                  @if (status.value !== selectedOrder.status && status.value !== 'Cancelled') {
+                    <button (click)="updateStatus(selectedOrder, status.value)" [class]="'btn-status btn-' + status.color">
+                      {{ status.label }}
+                    </button>
+                  }
+                }
+                <button (click)="cancelOrder(selectedOrder)" class="btn-status btn-red">
+                  Cancelar Ordem
+                </button>
+              </div>
+            </div>
+          }
+
+          <!-- Atribuir Mecânico -->
+          @if (!selectedOrder.mechanicId && selectedOrder.status !== 'Cancelled') {
+            <div class="action-section">
+              <h3 class="section-title">Atribuir Mecânico</h3>
+              <select (change)="assignMechanic(selectedOrder, $any($event.target).value)" class="form-input">
+                <option value="">Selecione um mecânico</option>
+                @for (mechanic of mechanics; track mechanic.id) {
+                  <option [value]="mechanic.id">{{ mechanic.fullName }} - {{ mechanic.role }}</option>
+                }
+              </select>
+            </div>
+          }
+        </div>
+
+        <div class="modal-footer">
+          <button (click)="closeDetailsModal()" class="btn-secondary">Fechar</button>
         </div>
       </div>
     </div>
-    
-    <div class="overflow-hidden rounded-2xl border border-slate-800/50 bg-slate-900/50 backdrop-blur-sm shadow-lg glass-enhanced">
-      <table class="min-w-full divide-y divide-slate-800/50">
-        <thead class="bg-slate-800/50">
-          <tr>
-            <th class="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-zinc-400">Nº</th>
-            <th class="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-zinc-400">Cliente</th>
-            <th class="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-zinc-400">Veículo</th>
-            <th class="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-zinc-400">Status</th>
-            <th class="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider text-zinc-400">Valor</th>
-            <th class="px-6 py-4"></th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-slate-800/50 bg-slate-900/30">
-          <tr class="hover:bg-slate-800/30 transition-colors">
-            <td class="px-6 py-4 text-white font-medium">OS-0001</td>
-            <td class="px-6 py-4 text-zinc-300">João Silva</td>
-            <td class="px-6 py-4 text-zinc-300">AA-00-BB</td>
-            <td class="px-6 py-4">
-              <span class="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">Em progresso</span>
-            </td>
-            <td class="px-6 py-4 text-zinc-300">€245.00</td>
-            <td class="px-6 py-4 text-right">
-              <button class="rounded-xl border border-slate-700 bg-slate-800/50 px-4 py-2 text-sm text-white hover:bg-slate-700/50 transition-colors backdrop-blur-sm">
-                Detalhes
-              </button>
-            </td>
-          </tr>
-          <tr class="hover:bg-slate-800/30 transition-colors">
-            <td class="px-6 py-4 text-white font-medium">OS-0002</td>
-            <td class="px-6 py-4 text-zinc-300">Maria Santos</td>
-            <td class="px-6 py-4 text-zinc-300">BB-11-CC</td>
-            <td class="px-6 py-4">
-              <span class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">Concluída</span>
-            </td>
-            <td class="px-6 py-4 text-zinc-300">€180.50</td>
-            <td class="px-6 py-4 text-right">
-              <button class="rounded-xl border border-slate-700 bg-slate-800/50 px-4 py-2 text-sm text-white hover:bg-slate-700/50 transition-colors backdrop-blur-sm">
-                Detalhes
-              </button>
-            </td>
-          </tr>
-          <tr class="hover:bg-slate-800/30 transition-colors">
-            <td class="px-6 py-4 text-white font-medium">OS-0003</td>
-            <td class="px-6 py-4 text-zinc-300">Pedro Costa</td>
-            <td class="px-6 py-4 text-zinc-300">CC-22-DD</td>
-            <td class="px-6 py-4">
-              <span class="inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800">Aguardando</span>
-            </td>
-            <td class="px-6 py-4 text-zinc-300">€320.00</td>
-            <td class="px-6 py-4 text-right">
-              <button class="rounded-xl border border-slate-700 bg-slate-800/50 px-4 py-2 text-sm text-white hover:bg-slate-700/50 transition-colors backdrop-blur-sm">
-                Detalhes
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+  }
 </div>
