@@ -1,5 +1,6 @@
 using MechaSoft.Application.Common.Responses;
 using MechaSoft.Application.CQ.Customers.Commands.CreateCustomer;
+using MechaSoft.Application.CQ.Customers.Commands.UpdateCustomer;
 using MechaSoft.Application.CQ.Customers.Queries.GetCustomers;
 using MechaSoft.Application.CQ.Customers.Queries.GetCustomerById;
 using MechaSoft.Application.CQ.Customers.Common;
@@ -28,10 +29,62 @@ public static class CustomerEndpoints
             .Produces<Error>(404);
 
         // POST /api/customers - Criar novo cliente
-        customers.MapPost("/", Queries.CreateCustomer)
+        customers.MapPost("/", Commands.CreateCustomer)
             .WithName("CreateCustomer")
             .Produces<CreateCustomerResponse>(201)
             .Produces<Error>(400);
+
+        // PUT /api/customers/{id} - Atualizar cliente
+        customers.MapPut("/{id:guid}", Commands.UpdateCustomer)
+            .WithName("UpdateCustomer")
+            .Produces<UpdateCustomerResponse>(200)
+            .Produces<Error>(400);
+    }
+
+    private static class Commands
+    {
+        public static async Task<Results<CreatedAtRoute<CreateCustomerResponse>, BadRequest<Error>>> CreateCustomer(
+            [FromServices] ISender sender,
+            [FromBody] CreateCustomerCommand command,
+            CancellationToken cancellationToken = default)
+        {
+            var result = await sender.Send(command, cancellationToken);
+            
+            return result.IsSuccess
+                ? TypedResults.CreatedAtRoute(result.Value!, "GetCustomerById", new { id = result.Value!.Id })
+                : TypedResults.BadRequest(result.Error!);
+        }
+
+        public static async Task<Results<Ok<UpdateCustomerResponse>, BadRequest<Error>>> UpdateCustomer(
+            [FromServices] ISender sender,
+            Guid id,
+            [FromBody] UpdateCustomerRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            if (request == null)
+            {
+                return TypedResults.BadRequest(Error.InvalidInput);
+            }
+
+            var command = new UpdateCustomerCommand(
+                id,
+                request.Name,
+                request.Email,
+                request.Phone,
+                request.Nif,
+                request.Street,
+                request.Number,
+                request.Parish,
+                request.City,
+                request.PostalCode
+            );
+
+            var result = await sender.Send(command, cancellationToken);
+
+            return result.IsSuccess
+                ? TypedResults.Ok(result.Value!)
+                : TypedResults.BadRequest(result.Error!);
+        }
     }
 
     private static class Queries
@@ -68,17 +121,18 @@ public static class CustomerEndpoints
                 ? TypedResults.Ok(result.Value)
                 : TypedResults.NotFound(result.Error);
         }
-
-        public static async Task<Results<CreatedAtRoute<CreateCustomerResponse>, BadRequest<Error>>> CreateCustomer(
-            [FromServices] ISender sender,
-            [FromBody] CreateCustomerCommand command,
-            CancellationToken cancellationToken = default)
-        {
-            var result = await sender.Send(command, cancellationToken);
-            
-            return result.IsSuccess
-                ? TypedResults.CreatedAtRoute(result.Value!, "GetCustomerById", new { id = result.Value!.Id })
-                : TypedResults.BadRequest(result.Error!);
-        }
     }
 }
+
+// DTOs for Customer Endpoints
+public record UpdateCustomerRequest(
+    string Name,
+    string Email,
+    string Phone,
+    string? Nif,
+    string Street,
+    string Number,
+    string Parish,
+    string City,
+    string PostalCode
+);

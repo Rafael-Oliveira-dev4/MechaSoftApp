@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MediatR;
 using FluentValidation;
@@ -23,3 +23,4 @@ public static class DependencyInjection
         return services;
     }
 }
+

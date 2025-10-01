@@ -32,7 +32,6 @@ public class CreateServiceOrderUseCaseRepository : Repository<ServiceOrder>, ICr
         };
 
         await _dbSet.AddAsync(serviceOrder);
-        await _context.SaveChangesAsync();
 
         return serviceOrder;
     }

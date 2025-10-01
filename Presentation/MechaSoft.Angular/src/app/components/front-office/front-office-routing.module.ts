@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { FrontOfficeLayoutComponent } from './layout/front-office-layout.component';
 import { FrontHomeComponent } from './pages/home/home.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { CustomersComponent } from './pages/customers/customers.component';
@@ -10,15 +11,21 @@ import { InspectionsComponent } from './pages/inspections/inspections.component'
 import { ServiceOrdersComponent } from './pages/service-orders/service-orders.component';
 
 const routes: Routes = [
-  { path: '', component: FrontHomeComponent },
-  { path: 'home', redirectTo: '', pathMatch: 'full' },
-  { path: 'dashboard', component: DashboardComponent },
-  { path: 'customers', component: CustomersComponent },
-  { path: 'vehicles', component: VehiclesComponent },
-  { path: 'services', component: ServicesComponent },
-  { path: 'parts', component: PartsComponent },
-  { path: 'inspections', component: InspectionsComponent },
-  { path: 'service-orders', component: ServiceOrdersComponent }
+  {
+    path: '',
+    component: FrontOfficeLayoutComponent,
+    children: [
+      { path: '', component: FrontHomeComponent },
+      { path: 'home', redirectTo: '', pathMatch: 'full' },
+      { path: 'dashboard', component: DashboardComponent },
+      { path: 'customers', component: CustomersComponent },
+      { path: 'vehicles', component: VehiclesComponent },
+      { path: 'services', component: ServicesComponent },
+      { path: 'parts', component: PartsComponent },
+      { path: 'inspections', component: InspectionsComponent },
+      { path: 'service-orders', component: ServiceOrdersComponent }
+    ]
+  }
 ];
 
 @NgModule({

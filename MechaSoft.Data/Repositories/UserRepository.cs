@@ -19,7 +19,6 @@ public class UserRepository : IUserRepository
     public async Task<User> SaveAsync(User entity)
     {
         await _dbSet.AddAsync(entity);
-        await _context.SaveChangesAsync();
         return entity;
     }
 
@@ -42,7 +41,6 @@ public class UserRepository : IUserRepository
     public async Task<User> UpdateAsync(User entity)
     {
         _dbSet.Update(entity);
-        await _context.SaveChangesAsync();
         return entity;
     }
 
@@ -52,7 +50,6 @@ public class UserRepository : IUserRepository
         if (entity != null)
         {
             _dbSet.Remove(entity);
-            await _context.SaveChangesAsync();
         }
     }
 

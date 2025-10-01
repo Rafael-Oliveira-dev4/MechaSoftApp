@@ -35,14 +35,12 @@ public class ScheduleInspectionRepository : IScheduleInspectionUseCase
         };
 
         await _dbSet.AddAsync(inspection);
-        await _context.SaveChangesAsync();
         return inspection;
     }
 
     public async Task<Inspection> SaveAsync(Inspection entity)
     {
         await _dbSet.AddAsync(entity);
-        await _context.SaveChangesAsync();
         return entity;
     }
 
@@ -59,7 +57,6 @@ public class ScheduleInspectionRepository : IScheduleInspectionUseCase
     public async Task<Inspection> UpdateAsync(Inspection entity)
     {
         _dbSet.Update(entity);
-        await _context.SaveChangesAsync();
         return entity;
     }
 
@@ -69,7 +66,6 @@ public class ScheduleInspectionRepository : IScheduleInspectionUseCase
         if (entity != null)
         {
             _dbSet.Remove(entity);
-            await _context.SaveChangesAsync();
         }
     }
 
