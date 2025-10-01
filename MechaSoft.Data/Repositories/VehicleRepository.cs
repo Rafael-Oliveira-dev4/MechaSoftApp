@@ -17,7 +17,6 @@ public class VehicleRepository : Repository<Vehicle>, IVehicleRepository
             throw new ArgumentNullException(nameof(vehicle));
         
         await _dbSet.AddAsync(vehicle);
-        await _context.SaveChangesAsync();
         return vehicle;
     }
 
@@ -60,7 +59,6 @@ public class VehicleRepository : Repository<Vehicle>, IVehicleRepository
             throw new ArgumentNullException(nameof(vehicle));
         
         _dbSet.Update(vehicle);
-        await _context.SaveChangesAsync();
         return vehicle;
     }
 }

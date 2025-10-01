@@ -33,11 +33,6 @@ public sealed class Result<TResult, TOk, TError>
         Error = error;
     }
 
-    public T Match<T>(Func<object, OkObjectResult> value1, Func<object, ObjectResult> value2)
-    {
-        throw new NotImplementedException();
-    }
-
     public static implicit operator Result<TResult, TOk, TError>(TResult value)
     {
         return new Result<TResult, TOk, TError>(value);

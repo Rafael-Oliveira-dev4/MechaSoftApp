@@ -23,7 +23,6 @@ public abstract class Repository<T> : IRepository<T> where T : class
             throw new ArgumentNullException(nameof(entity));
 
         await _dbSet.AddAsync(entity);
-        await _context.SaveChangesAsync();
         return entity;
     }
 
@@ -46,7 +45,6 @@ public abstract class Repository<T> : IRepository<T> where T : class
             throw new ArgumentNullException(nameof(entity));
 
         _dbSet.Update(entity);
-        await _context.SaveChangesAsync();
         return entity;
     }
 
@@ -59,7 +57,6 @@ public abstract class Repository<T> : IRepository<T> where T : class
         if (entity != null)
         {
             _dbSet.Remove(entity);
-            await _context.SaveChangesAsync();
         }
     }
 
@@ -125,20 +122,5 @@ public abstract class Repository<T> : IRepository<T> where T : class
             .ToListAsync();
 
         return (items, totalCount);
-    }
-
-    // Dispose pattern para limpeza de recursos
-    protected virtual void Dispose(bool disposing)
-    {
-        if (disposing)
-        {
-            _context?.Dispose();
-        }
-    }
-
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
     }
 }
