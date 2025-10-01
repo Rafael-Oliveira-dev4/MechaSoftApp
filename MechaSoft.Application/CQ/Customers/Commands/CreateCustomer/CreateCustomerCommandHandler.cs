@@ -40,10 +40,17 @@ public class CreateCustomerCommandHandler : IRequestHandler<CreateCustomerComman
             request.PostalCode
         );
 
-        // Parse name - split by first space
-        var nameParts = request.Name.Trim().Split(new[] { ' ' }, 2, StringSplitOptions.RemoveEmptyEntries);
-        var firstName = nameParts[0];
-        var lastName = nameParts.Length > 1 ? nameParts[1] : string.Empty;
+		// Validate and parse name - ensure non-empty first name after trimming
+		var trimmedName = request.Name?.Trim();
+		if (string.IsNullOrWhiteSpace(trimmedName))
+		{
+			_logger.LogWarning("Attempt to create customer with empty name");
+			return Error.InvalidInput;
+		}
+
+		var nameParts = trimmedName.Split(new[] { ' ' }, 2, StringSplitOptions.RemoveEmptyEntries);
+		var firstName = nameParts[0];
+		var lastName = nameParts.Length > 1 ? nameParts[1] : string.Empty;
 
         // Create customer
         var customer = new Customer
