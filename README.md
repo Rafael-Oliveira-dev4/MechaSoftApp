@@ -18,16 +18,20 @@ Solução full‑stack para gestão de oficina, com backend em .NET 8 (WebAPI + 
 ## Configuração
 
 ### 1) Base de dados
+
 - Verifique a connection string `MechaSoftCS` em:
   - `MechaSoft.WebAPI/appsettings.Development.json`
   - `MechaSoft.Data/Context/ApplicationDbContext.cs` (via DI)
 - Opcional: executar as migrações (já existentes)
+
 ```bash
 dotnet ef database update --project .\MechaSoft.Data\ --startup-project .\MechaSoft.WebAPI\
 ```
 
 ### 2) Certificado HTTPS (opcional para desenvolvimento)
+
 Para evitar avisos de “ligação não é privada” quando usar HTTPS:
+
 ```bash
 dotnet dev-certs https --trust
 ```
@@ -35,42 +39,53 @@ dotnet dev-certs https --trust
 ## Executar em Desenvolvimento
 
 ### Backend (.NET)
+
 - Porta HTTP: 5039
 - Porta HTTPS (opcional): 7277
 
 Arrancar só em HTTP (recomendado em dev para evitar avisos do browser):
+
 ```powershell
 & 'C:\Program Files\dotnet\dotnet.exe' run --project .\MechaSoft.WebAPI\MechaSoft.WebAPI.csproj --no-build --urls 'http://localhost:5039'
 ```
 
 Endpoints úteis:
+
 - Health check: `GET http://localhost:5039/health` (200 OK esperado)
 - Swagger UI: `http://localhost:5039/swagger` (ou `https://localhost:7277/swagger` se usar HTTPS)
 
 Notas:
+
 - A API usa Minimal Endpoints (sem controllers) e MediatR para CQRS.
 - Auditoria ativa via `AuditableEntityInterceptor` (usa `IHttpContextAccessor` opcional).
 
 ### Frontend (Angular)
+
 Config da API:
+
 - `Presentation/MechaSoft.Angular/src/environments/environment.development.ts`
+
 ```ts
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:5039/api'
+  apiUrl: 'http://localhost:5039/api',
 };
 ```
+
 - Produção (`environment.ts`) usa por padrão `https://localhost:7277/api`.
 
 Instalar e arrancar:
+
 ```powershell
 cd Presentation/MechaSoft.Angular
 npm ci
 npx ng serve --port 4300 --open=false
 ```
+
 App em `http://localhost:4300/`.
 
 Build produção:
+
 ```powershell
 npm run build
 # output em: Presentation/MechaSoft.Angular/dist/MechaSoft.Angular
@@ -80,15 +95,18 @@ npm run build
 
 - Porta ocupada (5039):
   - Identifique e termine o processo (Kestrel/IIS Express/Visual Studio):
+
 ```powershell
 taskkill /F /IM "MechaSoft.WebAPI.exe" 2>$null
 taskkill /F /IM "iisexpress.exe" 2>$null
 ```
 
 - Aviso HTTPS “ligação não é privada”:
+
   - Confiar certificado dev: `dotnet dev-certs https --trust`, ou usar HTTP (`http://localhost:5039`).
 
 - Erro MSB3026/MSB3027 (ficheiro bloqueado) ao compilar:
+
   - Feche instâncias da API/IIS Express/Visual Studio e repita o build.
 
 - Swagger 500 (conflitos de schema):
@@ -104,20 +122,52 @@ taskkill /F /IM "iisexpress.exe" 2>$null
 ## Scripts úteis (Windows PowerShell)
 
 - Arrancar API (HTTP):
+
 ```powershell
 & 'C:\Program Files\dotnet\dotnet.exe' run --project .\MechaSoft.WebAPI\MechaSoft.WebAPI.csproj --no-build --urls 'http://localhost:5039'
 ```
 
 - Parar processos comuns:
+
 ```powershell
 taskkill /F /IM "MechaSoft.WebAPI.exe" 2>$null; taskkill /F /IM "iisexpress.exe" 2>$null
 ```
 
 - Arrancar frontend:
+
 ```powershell
 cd Presentation/MechaSoft.Angular
 npx ng serve --port 4300 --open=false
 ```
+
+## 🛠️ Configuração do VS Code
+
+O projeto inclui configurações otimizadas para VS Code:
+
+### Extensões Recomendadas
+
+- **C# Dev Kit** - Desenvolvimento .NET completo
+- **Angular Language Service** - IntelliSense para Angular
+- **SQL Server (mssql)** - Conexão com banco de dados
+- **Prettier** - Formatação automática
+- **Tailwind CSS IntelliSense** - Autocomplete CSS
+- **GitLens** - Git supercharged
+- **Thunder Client** - Teste de APIs
+
+### Tarefas Automatizadas
+
+Use `Ctrl+Shift+P` → "Tasks: Run Task":
+
+- **Launch Full Stack** - Inicia backend + frontend
+- **Add Migration** - Cria migrações EF Core
+- **Update Database** - Aplica migrações
+
+### Debug Configurado
+
+- `F5` - Debug completo (backend + frontend)
+- `Ctrl+F5` - Executar sem debug
+
+Ver `.vscode/README.md` para detalhes completos.
 
 ## Contacto/Manutenção
 

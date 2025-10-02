@@ -1,0 +1,397 @@
+### ========================================
+### MECHA SOFT API - TESTES COMPLETOS
+### ========================================
+### Base URL: http://localhost:5039
+### Swagger UI: http://localhost:5039/swagger
+
+### ========================================
+### 1. AUTENTICAÇÃO E CONTAS
+### ========================================
+
+### POST /api/accounts/register - Registrar Novo Usuário (Cliente)
+POST http://localhost:5039/api/accounts/register
+Content-Type: application/json
+
+{
+  "username": "joao_silva",
+  "email": "joao.silva@email.com",
+  "password": "MinhaSenh@123",
+  "role": 1
+}
+
+### POST /api/accounts/register - Registrar Funcionário
+POST http://localhost:5039/api/accounts/register
+Content-Type: application/json
+
+{
+  "username": "admin_user",
+  "email": "admin@mechasoft.pt",
+  "password": "Admin@123",
+  "role": 2
+}
+
+### POST /api/accounts/login - Login
+POST http://localhost:5039/api/accounts/login
+Content-Type: application/json
+
+{
+  "username": "joao_silva",
+  "password": "MinhaSenh@123"
+}
+
+### GET /api/accounts/users - Listar Usuários
+GET http://localhost:5039/api/accounts/users?pageNumber=1&pageSize=10
+
+### ========================================
+### 2. CLIENTES
+### ========================================
+
+### POST /api/customers - Criar Cliente
+POST http://localhost:5039/api/customers
+Content-Type: application/json
+
+{
+  "name": "João Silva",
+  "email": "joao.silva@email.com",
+  "phone": "+351 912 345 678",
+  "nif": "123456789",
+  "street": "Rua das Flores",
+  "number": "123",
+  "parish": "Santo António",
+  "city": "Lisboa",
+  "postalCode": "1000-001"
+}
+
+### POST /api/customers - Criar Cliente 2
+POST http://localhost:5039/api/customers
+Content-Type: application/json
+
+{
+  "name": "Maria Santos",
+  "email": "maria.santos@email.com",
+  "phone": "+351 923 456 789",
+  "nif": "987654321",
+  "street": "Avenida da Liberdade",
+  "number": "456",
+  "parish": "Marquês de Pombal",
+  "city": "Lisboa",
+  "postalCode": "1250-096"
+}
+
+### GET /api/customers - Listar Clientes
+GET http://localhost:5039/api/customers?pageNumber=1&pageSize=10
+
+### GET /api/customers/{id} - Obter Cliente por ID
+GET http://localhost:5039/api/customers/00000000-0000-0000-0000-000000000001
+
+### PUT /api/customers/{id} - Atualizar Cliente
+PUT http://localhost:5039/api/customers/00000000-0000-0000-0000-000000000001
+Content-Type: application/json
+
+{
+  "name": "João Silva Santos",
+  "email": "joao.silva.santos@email.com",
+  "phone": "+351 912 345 679",
+  "nif": "123456789",
+  "street": "Rua das Flores",
+  "number": "125",
+  "parish": "Santo António",
+  "city": "Lisboa",
+  "postalCode": "1000-001"
+}
+
+### ========================================
+### 3. VEÍCULOS
+### ========================================
+
+### POST /api/vehicles - Criar Veículo
+POST http://localhost:5039/api/vehicles
+Content-Type: application/json
+
+{
+  "customerId": "00000000-0000-0000-0000-000000000001",
+  "brand": "Toyota",
+  "model": "Corolla",
+  "licensePlate": "12-AB-34",
+  "color": "Branco",
+  "year": 2020,
+  "vin": "1HGBH41JXMN109186",
+  "engineSize": 1.6,
+  "fuelType": 1
+}
+
+### POST /api/vehicles - Criar Veículo 2
+POST http://localhost:5039/api/vehicles
+Content-Type: application/json
+
+{
+  "customerId": "00000000-0000-0000-0000-000000000001",
+  "brand": "BMW",
+  "model": "X3",
+  "licensePlate": "56-CD-78",
+  "color": "Preto",
+  "year": 2019,
+  "vin": "WBAFR9C56DD123456",
+  "engineSize": 2.0,
+  "fuelType": 2
+}
+
+### GET /api/vehicles - Listar Veículos
+GET http://localhost:5039/api/vehicles?pageNumber=1&pageSize=10
+
+### GET /api/vehicles/customer/{customerId} - Veículos do Cliente
+GET http://localhost:5039/api/vehicles/customer/00000000-0000-0000-0000-000000000001
+
+### ========================================
+### 4. FUNCIONÁRIOS
+### ========================================
+
+### POST /api/employees - Criar Funcionário
+POST http://localhost:5039/api/employees
+Content-Type: application/json
+
+{
+  "name": "Carlos Mecânico",
+  "email": "carlos@mechasoft.pt",
+  "phone": "+351 934 567 890",
+  "role": 1,
+  "specialty": "Motor",
+  "hireDate": "2023-01-15T00:00:00Z",
+  "salary": 1500.00,
+  "isActive": true
+}
+
+### POST /api/employees - Criar Administrador
+POST http://localhost:5039/api/employees
+Content-Type: application/json
+
+{
+  "name": "Ana Administradora",
+  "email": "ana@mechasoft.pt",
+  "phone": "+351 945 678 901",
+  "role": 2,
+  "specialty": "Gestão",
+  "hireDate": "2023-01-01T00:00:00Z",
+  "salary": 2000.00,
+  "isActive": true
+}
+
+### GET /api/employees - Listar Funcionários
+GET http://localhost:5039/api/employees?pageNumber=1&pageSize=10
+
+### ========================================
+### 5. PEÇAS
+### ========================================
+
+### POST /api/parts - Criar Peça
+POST http://localhost:5039/api/parts
+Content-Type: application/json
+
+{
+  "name": "Filtro de Óleo",
+  "description": "Filtro de óleo para motor 1.6L",
+  "category": 1,
+  "brand": "Bosch",
+  "partNumber": "BO-123456",
+  "price": 25.50,
+  "stockQuantity": 50,
+  "minimumStock": 10,
+  "supplier": "Auto Parts Ltd",
+  "location": "A1-B2-C3"
+}
+
+### POST /api/parts - Criar Peça 2
+POST http://localhost:5039/api/parts
+Content-Type: application/json
+
+{
+  "name": "Pastilhas de Travão",
+  "description": "Pastilhas de travão dianteiras",
+  "category": 2,
+  "brand": "Brembo",
+  "partNumber": "BR-789012",
+  "price": 89.99,
+  "stockQuantity": 25,
+  "minimumStock": 5,
+  "supplier": "Brake Systems Inc",
+  "location": "B2-C3-D4"
+}
+
+### GET /api/parts - Listar Peças
+GET http://localhost:5039/api/parts?pageNumber=1&pageSize=10
+
+### ========================================
+### 6. SERVIÇOS
+### ========================================
+
+### POST /api/services - Criar Serviço
+POST http://localhost:5039/api/services
+Content-Type: application/json
+
+{
+  "name": "Mudança de Óleo",
+  "description": "Troca de óleo e filtro do motor",
+  "category": 1,
+  "estimatedHours": 1.5,
+  "pricePerHour": 25.00,
+  "fixedPrice": 45.00,
+  "requiresInspection": false
+}
+
+### POST /api/services - Criar Serviço 2
+POST http://localhost:5039/api/services
+Content-Type: application/json
+
+{
+  "name": "Reparação de Travões",
+  "description": "Substituição de pastilhas e discos de travão",
+  "category": 2,
+  "estimatedHours": 3.0,
+  "pricePerHour": 30.00,
+  "fixedPrice": null,
+  "requiresInspection": true
+}
+
+### GET /api/services - Listar Serviços
+GET http://localhost:5039/api/services?pageNumber=1&pageSize=10
+
+### ========================================
+### 7. ORDENS DE SERVIÇO
+### ========================================
+
+### POST /api/service-orders - Criar Ordem de Serviço
+POST http://localhost:5039/api/service-orders
+Content-Type: application/json
+
+{
+  "customerId": "00000000-0000-0000-0000-000000000001",
+  "vehicleId": "00000000-0000-0000-0000-000000000003",
+  "description": "Manutenção completa do veículo - mudança de óleo e inspeção",
+  "priority": 1,
+  "estimatedCost": 150.00,
+  "estimatedDelivery": "2024-12-15T16:00:00Z",
+  "mechanicId": "00000000-0000-0000-0000-000000000005",
+  "requiresInspection": true,
+  "internalNotes": "Cliente preferencial - prioridade alta"
+}
+
+### POST /api/service-orders - Criar Ordem de Serviço 2
+POST http://localhost:5039/api/service-orders
+Content-Type: application/json
+
+{
+  "customerId": "00000000-0000-0000-0000-000000000002",
+  "vehicleId": "00000000-0000-0000-0000-000000000004",
+  "description": "Reparação de travões - ruído anormal",
+  "priority": 2,
+  "estimatedCost": 200.00,
+  "estimatedDelivery": "2024-12-16T14:00:00Z",
+  "mechanicId": null,
+  "requiresInspection": false,
+  "internalNotes": "Verificar sistema de travagem completo"
+}
+
+### GET /api/service-orders - Listar Ordens de Serviço
+GET http://localhost:5039/api/service-orders?pageNumber=1&pageSize=10
+
+### GET /api/service-orders/{id} - Obter Ordem por ID
+GET http://localhost:5039/api/service-orders/00000000-0000-0000-0000-000000000007
+
+### PUT /api/service-orders/{id}/status - Atualizar Status
+PUT http://localhost:5039/api/service-orders/00000000-0000-0000-0000-000000000007/status
+Content-Type: application/json
+
+{
+  "status": 2,
+  "notes": "Iniciada reparação - peças encomendadas"
+}
+
+### PUT /api/service-orders/{id}/mechanic - Atribuir Mecânico
+PUT http://localhost:5039/api/service-orders/00000000-0000-0000-0000-000000000008/mechanic
+Content-Type: application/json
+
+{
+  "mechanicId": "00000000-0000-0000-0000-000000000005"
+}
+
+### POST /api/service-orders/{id}/services - Adicionar Serviço à Ordem
+POST http://localhost:5039/api/service-orders/00000000-0000-0000-0000-000000000007/services
+Content-Type: application/json
+
+{
+  "serviceId": "00000000-0000-0000-0000-000000000009",
+  "quantity": 1,
+  "estimatedHours": 1.5,
+  "discountPercentage": 10.0,
+  "mechanicId": "00000000-0000-0000-0000-000000000005"
+}
+
+### POST /api/service-orders/{id}/parts - Adicionar Peça à Ordem
+POST http://localhost:5039/api/service-orders/00000000-0000-0000-0000-000000000007/parts
+Content-Type: application/json
+
+{
+  "partId": "00000000-0000-0000-0000-000000000006",
+  "quantity": 2,
+  "discountPercentage": 5.0
+}
+
+### ========================================
+### 8. INSPEÇÕES
+### ========================================
+
+### POST /api/inspections - Agendar Inspeção
+POST http://localhost:5039/api/inspections
+Content-Type: application/json
+
+{
+  "vehicleId": "00000000-0000-0000-0000-000000000003",
+  "customerId": "00000000-0000-0000-0000-000000000001",
+  "scheduledDate": "2024-12-20T10:00:00Z",
+  "type": 1,
+  "notes": "Inspeção anual obrigatória"
+}
+
+### GET /api/inspections - Listar Inspeções
+GET http://localhost:5039/api/inspections?pageNumber=1&pageSize=10
+
+### ========================================
+### 9. DASHBOARD
+### ========================================
+
+### GET /api/dashboard/stats - Estatísticas do Dashboard
+GET http://localhost:5039/api/dashboard/stats
+
+### GET /api/dashboard/recent-orders - Ordens Recentes
+GET http://localhost:5039/api/dashboard/recent-orders
+
+### GET /api/dashboard/low-stock - Peças com Stock Baixo
+GET http://localhost:5039/api/dashboard/low-stock
+
+### ========================================
+### 10. HEALTH CHECK
+### ========================================
+
+### GET /health - Verificar Saúde da API
+GET http://localhost:5039/health
+
+### ========================================
+### NOTAS IMPORTANTES:
+### ========================================
+### 1. Substitua os IDs pelos IDs reais retornados pelas APIs
+### 2. Os enums usados são:
+###    - UserRole: 1=Customer, 2=Employee, 3=Admin
+###    - EmployeeRole: 1=Mechanic, 2=Admin
+###    - ServiceOrderStatus: 1=Pending, 2=InProgress, 3=Completed, 4=Cancelled
+###    - Priority: 1=Low, 2=Medium, 3=High, 4=Urgent
+###    - FuelType: 1=Gasoline, 2=Diesel, 3=Electric, 4=Hybrid
+###    - PartCategory: 1=Engine, 2=Brakes, 3=Transmission, 4=Suspension
+###    - ServiceCategory: 1=Maintenance, 2=Repair, 3=Inspection, 4=Diagnostic
+###    - InspectionType: 1=Annual, 2=PrePurchase, 3=Insurance
+### 3. Para testes completos, execute na ordem:
+###    1. Criar clientes
+###    2. Criar veículos
+###    3. Criar funcionários
+###    4. Criar peças e serviços
+###    5. Criar ordens de serviço
+###    6. Testar operações CRUD

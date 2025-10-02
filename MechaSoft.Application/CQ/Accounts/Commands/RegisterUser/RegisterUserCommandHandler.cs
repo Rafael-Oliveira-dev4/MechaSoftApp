@@ -55,7 +55,6 @@ public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, R
 
         // Save user
         var savedUser = await _unitOfWork.UserRepository.SaveAsync(user);
-        await _unitOfWork.CommitAsync(cancellationToken);
 
         _logger.LogInformation("User registered successfully: {Username}", request.Username);
 
