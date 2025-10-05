@@ -72,7 +72,7 @@
         <button class="user-button" (click)="toggleUserMenu()" [class.active]="isUserMenuOpen">
           <!-- Avatar -->
           <div class="user-avatar" [class]="getAvatarColor()">
-            <span class="avatar-text">{{ getUserInitials() }}</span>
+            <img [src]="getAvatarUrl()" alt="avatar" class="avatar-image" />
           </div>
           <!-- User Info -->
           <div class="user-info">
@@ -97,7 +97,7 @@
           <!-- User Info Header -->
           <div class="dropdown-header">
             <div class="dropdown-avatar" [class]="getAvatarColor()">
-              <span class="avatar-text">{{ getUserInitials() }}</span>
+              <img [src]="getAvatarUrl()" alt="avatar" class="avatar-image" />
             </div>
             <div class="dropdown-info">
               <p class="dropdown-name">{{ currentUser?.username }}</p>
@@ -229,7 +229,7 @@
     <!-- User Info Mobile -->
     <div class="mobile-user-info">
       <div class="user-avatar-large" [class]="getAvatarColor()">
-        <span class="avatar-text">{{ getUserInitials() }}</span>
+        <img [src]="getAvatarUrl()" alt="avatar" class="avatar-image" />
       </div>
       <div class="user-details">
         <p class="user-name-large">{{ currentUser?.username }}</p>

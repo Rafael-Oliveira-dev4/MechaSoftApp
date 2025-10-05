@@ -38,7 +38,7 @@ export class ProfileComponent implements OnInit {
   ngOnInit(): void {
     this.authService.currentUser$.subscribe((user: User | null) => {
       this.currentUser = user;
-      if (user) {
+      if (user?.username && user?.email) {
         this.editForm.username = user.username;
         this.editForm.email = user.email;
       }
@@ -48,7 +48,7 @@ export class ProfileComponent implements OnInit {
   // Toggle edit mode
   toggleEditMode(): void {
     this.isEditingProfile = !this.isEditingProfile;
-    if (!this.isEditingProfile && this.currentUser) {
+    if (!this.isEditingProfile && this.currentUser?.username && this.currentUser?.email) {
       // Reset form
       this.editForm.username = this.currentUser.username;
       this.editForm.email = this.currentUser.email;

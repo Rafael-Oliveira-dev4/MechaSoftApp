@@ -129,24 +129,18 @@ export class AuthService {
   // Renovar access token
   refreshAccessToken(): Observable<Result<LoginResponse>> {
     const refreshToken = this.getRefreshToken();
+    const accessToken = this.getAccessToken();
     return this.http
-      .post<LoginResponse>(`${this.apiUrl}/accounts/refresh-token`, { refreshToken })
+      .post<LoginResponse>(`${this.apiUrl}/accounts/refresh-token`, { accessToken, refreshToken })
       .pipe(
         map(response => {
           this.setTokens(response.accessToken, response.refreshToken);
 
-          // Build user object from refresh response
-          const user: User = {
-            id: response.userId,
-            username: response.username,
-            email: response.email,
-            role: response.role,
-            isActive: true,
-            emailConfirmed: false,
-            createdAt: new Date(),
-          };
-
-          this.currentUserSubject.next(user);
+          // Atualizar utilizador corrente a partir do novo access token
+          const userFromToken = this.getUserFromToken(response.accessToken);
+          if (userFromToken && this.isValidUser(userFromToken)) {
+            this.currentUserSubject.next(userFromToken);
+          }
           return success(response);
         }),
         catchError(error => of(failure<LoginResponse>(error)))
@@ -163,11 +157,30 @@ export class AuthService {
   private loadUserFromStorage(): void {
     const token = this.getAccessToken();
     if (token && !this.isTokenExpired(token)) {
-      const userInfo = this.decodeToken(token);
-      if (userInfo) {
-        this.currentUserSubject.next(userInfo);
+      const user = this.getUserFromToken(token);
+      if (user && this.isValidUser(user)) {
+        this.currentUserSubject.next(user);
+      } else {
+        console.warn('Token inválido detectado. A limpar sessão...');
+        this.logout();
       }
+    } else if (token) {
+      console.warn('Token expirado detectado. A limpar sessão...');
+      this.logout();
     }
+  }
+
+  private isValidUser(user: User): boolean {
+    return !!(
+      user &&
+      user.id &&
+      user.username &&
+      user.email &&
+      user.role &&
+      typeof user.username === 'string' &&
+      typeof user.email === 'string' &&
+      typeof user.role === 'string'
+    );
   }
 
   private isTokenExpired(token: string): boolean {
@@ -182,9 +195,55 @@ export class AuthService {
     }
   }
 
+  private getUserFromToken(token: string): User | null {
+    try {
+      const decoded = this.decodeToken(token);
+      if (!decoded) return null;
+
+      // Map JWT claims to User object
+      // Claims from backend: nameid, sub, email, role
+      const user: User = {
+        id: String(
+          decoded.nameid ||
+            decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'] ||
+            ''
+        ),
+        username: String(
+          decoded.sub || decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'] || ''
+        ),
+        email: String(
+          decoded.email ||
+            decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'] ||
+            ''
+        ),
+        role: String(
+          decoded.role ||
+            decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] ||
+            ''
+        ),
+        isActive: true,
+        emailConfirmed: false,
+        createdAt: new Date(),
+      };
+
+      // Validate required fields
+      if (!user.id || !user.username || !user.email || !user.role) {
+        console.warn('Token claims incomplete, clearing session');
+        return null;
+      }
+
+      return user;
+    } catch (error) {
+      console.error('Error parsing user from token, clearing session:', error);
+      return null;
+    }
+  }
+
   private decodeToken(token: string): any {
     try {
       const base64Url = token.split('.')[1];
+      if (!base64Url) return null;
+
       const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
       const jsonPayload = decodeURIComponent(
         atob(base64)
@@ -195,7 +254,8 @@ export class AuthService {
           .join('')
       );
       return JSON.parse(jsonPayload);
-    } catch {
+    } catch (error) {
+      console.error('Error decoding token:', error);
       return null;
     }
   }

@@ -45,6 +45,6 @@ export class FrontOfficeLayoutComponent implements OnInit {
 
   // Verificar se tem permissão
   hasRole(roles: string[]): boolean {
-    return this.currentUser ? roles.includes(this.currentUser.role) : false;
+    return this.currentUser?.role ? roles.includes(this.currentUser.role) : false;
   }
 }

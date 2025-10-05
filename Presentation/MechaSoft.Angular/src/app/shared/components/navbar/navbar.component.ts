@@ -5,6 +5,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { User } from '../../../core/models/api.models';
 import { AuthService } from '../../../core/services/auth.service';
+import { ProfileImageService } from '../../../core/services/profile-image.service';
 
 interface NavLink {
   label: string;
@@ -87,7 +88,11 @@ export class NavbarComponent implements OnInit, OnDestroy {
     },
   ];
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private profileImageService: ProfileImageService
+  ) {}
 
   ngOnInit(): void {
     // Subscrever ao estado de autenticação
@@ -122,7 +127,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
     if (!link.roles || link.roles.length === 0) {
       return true; // Link acessível a todos autenticados
     }
-    return this.currentUser ? link.roles.includes(this.currentUser.role) : false;
+    return this.currentUser?.role ? link.roles.includes(this.currentUser.role) : false;
   }
 
   // Obter links visíveis baseado na autenticação e role
@@ -160,13 +165,32 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   // Obter iniciais do nome do utilizador
   getUserInitials(): string {
-    if (!this.currentUser) return '?';
-    return this.currentUser.username.substring(0, 2).toUpperCase();
+    try {
+      // Verificação mais robusta
+      if (!this.currentUser || !this.currentUser.username) {
+        return '?';
+      }
+
+      const username = String(this.currentUser.username).trim();
+      if (!username || username.length === 0) {
+        return '?';
+      }
+
+      return username.substring(0, 2).toUpperCase();
+    } catch (error) {
+      console.warn('Error in getUserInitials:', error);
+      return '?';
+    }
+  }
+
+  // URL do avatar (imagem ou fallback)
+  getAvatarUrl(): string {
+    return this.profileImageService.getProfileImageUrl(this.currentUser?.profileImageUrl);
   }
 
   // Obter cor do avatar baseado na role
   getAvatarColor(): string {
-    if (!this.currentUser) return 'bg-gradient-to-br from-gray-500 to-gray-700';
+    if (!this.currentUser?.role) return 'bg-gradient-to-br from-gray-500 to-gray-700';
 
     const roleColors: { [key: string]: string } = {
       Owner: 'bg-gradient-to-br from-purple-500 to-purple-700',
@@ -180,7 +204,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   // Traduzir role para português
   getRoleLabel(): string {
-    if (!this.currentUser) return '';
+    if (!this.currentUser?.role) return '';
 
     const roleLabels: { [key: string]: string } = {
       Owner: 'Proprietário',

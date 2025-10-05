@@ -71,11 +71,11 @@
           <div class="info-grid">
             <div class="info-item">
               <label class="info-label">Nome de Utilizador</label>
-              <p class="info-value">{{ currentUser.username }}</p>
+              <p class="info-value">{{ currentUser.username || 'N/A' }}</p>
             </div>
             <div class="info-item">
               <label class="info-label">Email</label>
-              <p class="info-value">{{ currentUser.email }}</p>
+              <p class="info-value">{{ currentUser.email || 'N/A' }}</p>
             </div>
             <div class="info-item">
               <label class="info-label">Função</label>
