@@ -9,7 +9,7 @@ public class User : AuditableEntity, IEntity<Guid>
     public required string Username { get; set; }
     public required string Email { get; set; }
     public required string PasswordHash { get; set; }
-    public required string Salt { get; set; }
+    public string? Salt { get; set; }
     public UserRole Role { get; set; }
     public bool IsActive { get; set; }
     public bool EmailConfirmed { get; set; }
@@ -18,6 +18,7 @@ public class User : AuditableEntity, IEntity<Guid>
     public DateTime? RefreshTokenExpiryTime { get; set; }
     public int FailedLoginAttempts { get; set; }
     public DateTime? LockedUntil { get; set; }
+    public string? ProfileImageUrl { get; set; }
 
     // Navigation Properties
     public Guid? CustomerId { get; set; }
@@ -33,13 +34,13 @@ public class User : AuditableEntity, IEntity<Guid>
         FailedLoginAttempts = 0;
     }
 
-    public User(string username, string email, string passwordHash, string salt, UserRole role)
+    public User(string username, string email, string passwordHash, string? salt, UserRole role)
     {
         Id = Guid.NewGuid();
         Username = ValidateUsername(username);
         Email = ValidateEmail(email);
         PasswordHash = passwordHash ?? throw new ArgumentNullException(nameof(passwordHash));
-        Salt = salt ?? throw new ArgumentNullException(nameof(salt));
+        Salt = salt; // Salt is optional (null for BCrypt, value for legacy SHA256)
         Role = role;
         IsActive = true;
         EmailConfirmed = false;
@@ -111,7 +112,7 @@ public class User : AuditableEntity, IEntity<Guid>
         EmailConfirmed = true;
     }
 
-    public void ChangePassword(string newPasswordHash, string newSalt)
+    public void ChangePassword(string newPasswordHash, string? newSalt)
     {
         PasswordHash = newPasswordHash;
         Salt = newSalt;
@@ -129,6 +130,11 @@ public class User : AuditableEntity, IEntity<Guid>
     {
         EmployeeId = employeeId;
         CustomerId = null;
+    }
+
+    public void UpdateProfileImage(string? imageUrl)
+    {
+        ProfileImageUrl = imageUrl;
     }
 }
 

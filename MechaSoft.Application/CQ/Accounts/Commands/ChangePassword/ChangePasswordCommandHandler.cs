@@ -42,8 +42,8 @@ public class ChangePasswordCommandHandler : IRequestHandler<ChangePasswordComman
         // Hash new password using BCrypt
         var newPasswordHash = _passwordHasher.HashPassword(request.NewPassword);
 
-        // Update password (empty salt for BCrypt)
-        user.ChangePassword(newPasswordHash, string.Empty);
+        // Update password (null salt for BCrypt)
+        user.ChangePassword(newPasswordHash, null);
         await _unitOfWork.UserRepository.UpdateAsync(user);
         await _unitOfWork.CommitAsync(cancellationToken);
 

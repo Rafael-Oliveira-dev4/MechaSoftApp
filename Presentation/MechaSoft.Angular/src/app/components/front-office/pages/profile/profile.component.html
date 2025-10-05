@@ -1,0 +1,238 @@
+<div class="profile-container">
+  <!-- Background effects -->
+  <div class="absolute inset-0 pointer-events-none overflow-hidden">
+    <div class="absolute top-1/4 left-1/4 h-96 w-96 rounded-full bg-cyan-500/10 blur-3xl animate-float"></div>
+    <div
+      class="absolute bottom-1/4 right-1/4 h-80 w-80 rounded-full bg-purple-500/10 blur-3xl animate-float"
+      style="animation-delay: 2s"
+    ></div>
+  </div>
+
+  <!-- Error/Success Messages -->
+  <app-error-message [error]="error" (onClose)="error = null"></app-error-message>
+
+  @if (successMessage) {
+  <div class="success-message">
+    <svg class="icon" fill="currentColor" viewBox="0 0 20 20">
+      <path
+        fill-rule="evenodd"
+        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+        clip-rule="evenodd"
+      />
+    </svg>
+    <span>{{ successMessage }}</span>
+  </div>
+  }
+
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="title">
+        <span class="bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text text-transparent">Meu Perfil</span>
+      </h1>
+      <p class="subtitle">Gerencie suas informações pessoais</p>
+    </div>
+    <button routerLink="/system/settings" class="btn-secondary">
+      <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+        />
+      </svg>
+      <span>Configurações</span>
+    </button>
+  </div>
+
+  @if (currentUser) {
+  <div class="profile-grid">
+    <!-- Profile Card -->
+    <div class="profile-card">
+      <div class="card-header">
+        <h2 class="card-title">Informações do Perfil</h2>
+      </div>
+
+      <div class="profile-content">
+        <!-- Avatar Section with ProfileImageUploadComponent -->
+        <div class="avatar-section">
+          <app-profile-image-upload
+            [userId]="currentUser.id"
+            [currentImageUrl]="currentUser.profileImageUrl"
+            (uploadSuccess)="onImageUploadSuccess($event)"
+            (uploadError)="onImageUploadError($event)"
+          ></app-profile-image-upload>
+        </div>
+
+        <!-- User Info Section -->
+        <div class="info-section">
+          @if (!isEditingProfile) {
+          <!-- View Mode -->
+          <div class="info-grid">
+            <div class="info-item">
+              <label class="info-label">Nome de Utilizador</label>
+              <p class="info-value">{{ currentUser.username }}</p>
+            </div>
+            <div class="info-item">
+              <label class="info-label">Email</label>
+              <p class="info-value">{{ currentUser.email }}</p>
+            </div>
+            <div class="info-item">
+              <label class="info-label">Função</label>
+              <p class="info-value">
+                <span class="role-badge">{{ getRoleLabel() }}</span>
+              </p>
+            </div>
+            <div class="info-item">
+              <label class="info-label">Estado da Conta</label>
+              <p class="info-value">
+                @if (currentUser.isActive) {
+                <span class="status-badge status-active">Ativa</span>
+                } @else {
+                <span class="status-badge status-inactive">Inativa</span>
+                }
+              </p>
+            </div>
+            <div class="info-item">
+              <label class="info-label">Email Confirmado</label>
+              <p class="info-value">
+                @if (currentUser.emailConfirmed) {
+                <span class="status-badge status-confirmed">Sim</span>
+                } @else {
+                <span class="status-badge status-pending">Não</span>
+                }
+              </p>
+            </div>
+            <div class="info-item">
+              <label class="info-label">Último Acesso</label>
+              <p class="info-value text-sm">{{ formatDate(currentUser.lastLoginAt) }}</p>
+            </div>
+          </div>
+
+          <div class="action-buttons">
+            <button (click)="toggleEditMode()" class="btn-primary">
+              <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                />
+              </svg>
+              Editar Perfil
+            </button>
+          </div>
+          } @else {
+          <!-- Edit Mode -->
+          <form (ngSubmit)="saveProfile()" class="edit-form">
+            <div class="form-group">
+              <label for="username" class="form-label">Nome de Utilizador</label>
+              <input
+                type="text"
+                id="username"
+                name="username"
+                [(ngModel)]="editForm.username"
+                class="form-input"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="email" class="form-label">Email</label>
+              <input type="email" id="email" name="email" [(ngModel)]="editForm.email" class="form-input" required />
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="btn-primary">
+                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                Guardar Alterações
+              </button>
+              <button type="button" (click)="toggleEditMode()" class="btn-secondary">Cancelar</button>
+            </div>
+          </form>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats Card -->
+    <div class="stats-card">
+      <div class="card-header">
+        <h2 class="card-title">Estatísticas Rápidas</h2>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-item stat-cyan">
+          <div class="stat-icon-container">
+            <svg class="stat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </div>
+          <div class="stat-content">
+            <p class="stat-label">Conta Criada</p>
+            <p class="stat-value">{{ formatDate(currentUser.createdAt) }}</p>
+          </div>
+        </div>
+
+        <div class="stat-item stat-green">
+          <div class="stat-icon-container">
+            <svg class="stat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </div>
+          <div class="stat-content">
+            <p class="stat-label">Status</p>
+            <p class="stat-value">{{ currentUser.isActive ? 'Ativa' : 'Inativa' }}</p>
+          </div>
+        </div>
+
+        <div class="stat-item stat-purple">
+          <div class="stat-icon-container">
+            <svg class="stat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+              />
+            </svg>
+          </div>
+          <div class="stat-content">
+            <p class="stat-label">Email</p>
+            <p class="stat-value">{{ currentUser.emailConfirmed ? 'Confirmado' : 'Pendente' }}</p>
+          </div>
+        </div>
+
+        <div class="stat-item stat-blue">
+          <div class="stat-icon-container">
+            <svg class="stat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </div>
+          <div class="stat-content">
+            <p class="stat-label">Função</p>
+            <p class="stat-value">{{ getRoleLabel() }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  }
+</div>

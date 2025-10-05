@@ -43,7 +43,7 @@ public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, R
             Username = request.Username,
             Email = request.Email,
             PasswordHash = passwordHash,
-            Salt = string.Empty, // BCrypt handles salt internally
+            Salt = null, // BCrypt handles salt internally (null for BCrypt, value for legacy SHA256)
             Role = request.Role
         };
 
@@ -55,6 +55,9 @@ public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, R
 
         // Save user
         var savedUser = await _unitOfWork.UserRepository.SaveAsync(user);
+        
+        // Commit to database
+        await _unitOfWork.CommitAsync(cancellationToken);
 
         _logger.LogInformation("User registered successfully: {Username}", request.Username);
 

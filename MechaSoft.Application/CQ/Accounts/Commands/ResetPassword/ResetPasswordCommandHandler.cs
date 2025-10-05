@@ -51,8 +51,8 @@ public class ResetPasswordCommandHandler : IRequestHandler<ResetPasswordCommand,
         // Hash new password using BCrypt
         var newPasswordHash = _passwordHasher.HashPassword(request.NewPassword);
 
-        // Update password (empty salt for BCrypt) and clear reset token
-        user.ChangePassword(newPasswordHash, string.Empty);
+        // Update password (null salt for BCrypt) and clear reset token
+        user.ChangePassword(newPasswordHash, null);
         user.RevokeRefreshToken();
         await _unitOfWork.UserRepository.UpdateAsync(user);
         await _unitOfWork.CommitAsync(cancellationToken);

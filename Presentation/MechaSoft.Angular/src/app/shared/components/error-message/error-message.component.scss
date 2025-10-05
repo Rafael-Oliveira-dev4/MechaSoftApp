@@ -1,42 +1,49 @@
 .error-toast {
   @apply fixed top-4 right-4 z-50 max-w-md;
-  animation: slideInRight 0.3s ease-out;
+  animation: slideInRight 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
 .error-card {
-  @apply bg-red-50 border-l-4 border-red-500 p-4 rounded-lg shadow-lg;
-  
+  @apply bg-white border border-red-200 p-5 rounded-xl shadow-xl;
+  backdrop-filter: blur(10px);
+
   &:hover {
-    @apply shadow-2xl;
+    @apply shadow-2xl border-red-300;
+    transform: translateY(-2px);
+    transition: all 0.3s ease;
   }
 }
 
 .error-content {
-  @apply flex items-start;
+  @apply flex items-start gap-3;
 }
 
 .error-icon {
-  @apply flex-shrink-0;
-  
+  @apply flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full bg-red-100;
+
   .icon {
-    @apply h-5 w-5 text-red-400;
+    @apply w-6 h-6 text-red-600;
   }
 }
 
 .error-body {
-  @apply ml-3 flex-1;
+  @apply flex-1;
 }
 
 .error-title {
-  @apply text-sm font-medium text-red-800;
+  @apply text-base font-semibold text-gray-900 mb-1;
+}
+
+.error-message {
+  @apply text-sm text-gray-700 leading-relaxed;
 }
 
 .error-details {
-  @apply mt-2 text-sm text-red-700 whitespace-pre-line;
+  @apply mt-2 text-xs text-gray-600 whitespace-pre-line;
 }
 
 .error-code {
-  @apply mt-1 text-xs text-red-600 font-mono;
+  @apply mt-1 text-xs text-gray-500 font-mono;
 }
 
 .error-close {
@@ -44,39 +51,43 @@
 }
 
 .close-button {
-  @apply inline-flex text-red-400 hover:text-red-600 focus:outline-none transition-colors;
-  
+  @apply inline-flex items-center justify-center w-8 h-8 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 focus:outline-none transition-all duration-200;
+
   .icon {
     @apply h-5 w-5;
   }
-  
+
   &:hover {
-    transform: scale(1.1);
+    transform: scale(1.1) rotate(90deg);
+  }
+
+  &:active {
+    transform: scale(0.95);
   }
 }
 
 @keyframes slideInRight {
   from {
-    transform: translateX(100%);
+    transform: translateX(120%) scale(0.8);
     opacity: 0;
   }
   to {
-    transform: translateX(0);
+    transform: translateX(0) scale(1);
     opacity: 1;
   }
 }
 
 .error-toast.closing {
-  animation: slideOutRight 0.3s ease-in forwards;
+  animation: slideOutRight 0.3s cubic-bezier(0.55, 0.085, 0.68, 0.53) forwards;
 }
 
 @keyframes slideOutRight {
   from {
-    transform: translateX(0);
+    transform: translateX(0) scale(1);
     opacity: 1;
   }
   to {
-    transform: translateX(100%);
+    transform: translateX(120%) scale(0.8);
     opacity: 0;
   }
 }
