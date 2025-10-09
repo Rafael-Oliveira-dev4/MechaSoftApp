@@ -29,7 +29,7 @@ export class DashboardService {
 
   // Obter relatório de peças com stock baixo
   getLowStockReport(): Observable<Result<LowStockReport>> {
-    return this.http.get<LowStockReport>(`${this.apiUrl}/low-stock-report`).pipe(
+    return this.http.get<LowStockReport>(`${this.apiUrl}/reports/low-stock`).pipe(
       map(report => success(report)),
       catchError(error => of(failure<LowStockReport>(error)))
     );

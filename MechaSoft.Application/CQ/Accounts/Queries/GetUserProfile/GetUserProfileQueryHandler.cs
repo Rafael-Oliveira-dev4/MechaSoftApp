@@ -52,7 +52,8 @@ public class GetUserProfileQueryHandler : IRequestHandler<GetUserProfileQuery, R
             user.CustomerId,
             user.EmployeeId,
             customerName,
-            employeeName
+            employeeName,
+            user.ProfileImageUrl
         );
 
         return response;

@@ -1,31 +1,28 @@
-import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
-import { AuthService } from '../../../core/services/auth.service';
+import { Component } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router, RouterModule } from '@angular/router';
 import { ErrorDetail } from '../../../core/models/result.model';
+import { AuthService } from '../../../core/services/auth.service';
 import { ErrorMessageComponent } from '../../../shared/components/error-message/error-message.component';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ErrorMessageComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, ErrorMessageComponent],
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+  styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent {
   loginForm: FormGroup;
   error: ErrorDetail | null = null;
   isLoading: boolean = false;
+  showPassword: boolean = false;
 
-  constructor(
-    private fb: FormBuilder,
-    private authService: AuthService,
-    private router: Router
-  ) {
+  constructor(private fb: FormBuilder, private authService: AuthService, private router: Router) {
     this.loginForm = this.fb.group({
       username: ['', [Validators.required, Validators.minLength(3)]],
-      password: ['', [Validators.required, Validators.minLength(6)]]
+      password: ['', [Validators.required, Validators.minLength(6)]],
     });
   }
 
@@ -40,25 +37,41 @@ export class LoginComponent {
     this.error = null;
 
     this.authService.login(this.loginForm.value).subscribe({
-      next: (result) => {
+      next: result => {
         this.isLoading = false;
-        if (result.isSuccess && result.value) {
-          // Redirect baseado na role
-          const user = result.value.user;
-          if (user.role === 'Customer') {
-            this.router.navigate(['/portal/dashboard']);
+
+        if (result.isSuccess) {
+          if (result.value) {
+            // Redirect baseado na role
+            const role = result.value.role;
+            if (role === 'Customer') {
+              // Clientes vão para o sistema de gestão (como todos os utilizadores)
+              this.router.navigate(['/system/dashboard']);
+            } else {
+              // Employee, Admin, Owner → Sistema de gestão
+              this.router.navigate(['/system/dashboard']);
+            }
           } else {
-            // Employee, Admin, Owner → Sistema de gestão (vai para /app/home)
-            this.router.navigate(['/app']);
+            // Success but no value - shouldn't happen
+            this.error = {
+              code: 'UNKNOWN_ERROR',
+              message: 'Login bem-sucedido mas sem dados',
+              statusCode: 200,
+            };
           }
         } else {
-          this.error = result.error || null;
+          // Login failed
+          this.error = result.error || {
+            code: 'UNKNOWN_ERROR',
+            message: 'Erro desconhecido',
+            statusCode: 0,
+          };
         }
       },
-      error: (err) => {
+      error: err => {
         this.isLoading = false;
-        this.error = err;
-      }
+        this.error = err || { code: 'NETWORK_ERROR', message: 'Erro de rede', statusCode: 0 };
+      },
     });
   }
 
@@ -73,9 +86,13 @@ export class LoginComponent {
     if (!field || !field.errors) return '';
 
     if (field.errors['required']) return 'Campo obrigatório';
-    if (field.errors['minlength']) return `Mínimo ${field.errors['minlength'].requiredLength} caracteres`;
-    
+    if (field.errors['minlength'])
+      return `Mínimo ${field.errors['minlength'].requiredLength} caracteres`;
+
     return 'Campo inválido';
   }
-}
 
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
+  }
+}

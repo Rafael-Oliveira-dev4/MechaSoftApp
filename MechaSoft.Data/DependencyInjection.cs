@@ -32,10 +32,6 @@ public static class DependencyInjection
             options.UseSqlServer(connectionString, sqlOptions =>
             {
                 // Configure SQL Server options
-                sqlOptions.EnableRetryOnFailure(
-                    maxRetryCount: 3,
-                    maxRetryDelay: TimeSpan.FromSeconds(30),
-                    errorNumbersToAdd: null);
                 sqlOptions.CommandTimeout(30);
             });
         });

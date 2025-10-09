@@ -1,0 +1,301 @@
+<!-- Modern Navbar -->
+<nav class="navbar">
+  <div class="navbar-container">
+    <!-- Logo/Brand -->
+    <a routerLink="/" class="navbar-brand" (click)="closeMenus()">
+      <div class="brand-icon">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
+      </div>
+      <span class="brand-text">MechaSoft</span>
+    </a>
+
+    <!-- Desktop Navigation -->
+    <div class="desktop-nav">
+      <!-- Links Públicos (Não Autenticado) -->
+      @if (!isAuthenticated) { @for (link of publicLinks; track link.path) {
+      <a
+        [routerLink]="link.path.startsWith('/#') ? null : link.path"
+        [href]="link.path.startsWith('/#') ? link.path : null"
+        [class.active]="isActiveRoute(link.path, link.exact)"
+        class="nav-link"
+        (click)="closeMenus()"
+      >
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="link.icon" />
+        </svg>
+        <span>{{ link.label }}</span>
+      </a>
+      } }
+
+      <!-- Links do Sistema (Autenticado) -->
+      @if (isAuthenticated) { @for (link of visibleSystemLinks; track link.path) {
+      <a [routerLink]="link.path" [class.active]="isActiveRoute(link.path)" class="nav-link" (click)="closeMenus()">
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="link.icon" />
+        </svg>
+        <span>{{ link.label }}</span>
+      </a>
+      } }
+    </div>
+
+    <!-- Right Side Actions -->
+    <div class="navbar-actions">
+      @if (!isAuthenticated) {
+      <!-- Links de Autenticação -->
+      <a routerLink="/login" class="btn-link" routerLinkActive="active">
+        <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"
+          />
+        </svg>
+        Login
+      </a>
+      <a routerLink="/register" class="btn-primary" routerLinkActive="active">
+        <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
+          />
+        </svg>
+        Registar
+      </a>
+      } @else {
+      <!-- User Dropdown (Autenticado) -->
+      <div class="user-dropdown">
+        <button class="user-button" (click)="toggleUserMenu()" [class.active]="isUserMenuOpen">
+          <!-- Avatar -->
+          <div class="user-avatar" [class]="getAvatarColor()">
+            <img [src]="getAvatarUrl()" alt="avatar" class="avatar-image" />
+          </div>
+          <!-- User Info -->
+          <div class="user-info">
+            <span class="user-name">{{ currentUser?.username }}</span>
+            <span class="user-role">{{ getRoleLabel() }}</span>
+          </div>
+          <!-- Dropdown Icon -->
+          <svg
+            class="dropdown-icon"
+            [class.rotate]="isUserMenuOpen"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+
+        <!-- Dropdown Menu -->
+        @if (isUserMenuOpen) {
+        <div class="dropdown-menu" (click)="closeMenus()">
+          <!-- User Info Header -->
+          <div class="dropdown-header">
+            <div class="dropdown-avatar" [class]="getAvatarColor()">
+              <img [src]="getAvatarUrl()" alt="avatar" class="avatar-image" />
+            </div>
+            <div class="dropdown-info">
+              <p class="dropdown-name">{{ currentUser?.username }}</p>
+              <p class="dropdown-role">{{ getRoleLabel() }}</p>
+              @if (currentUser?.email) {
+              <p class="dropdown-email">{{ currentUser?.email }}</p>
+              }
+            </div>
+          </div>
+
+          <div class="dropdown-divider"></div>
+
+          <!-- Menu Items -->
+          <a routerLink="/system/dashboard" class="dropdown-item">
+            <svg class="dropdown-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+              />
+            </svg>
+            <span>Dashboard</span>
+          </a>
+
+          <a routerLink="/system/profile" class="dropdown-item">
+            <svg class="dropdown-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+              />
+            </svg>
+            <span>Meu Perfil</span>
+          </a>
+
+          <a routerLink="/system/settings" class="dropdown-item">
+            <svg class="dropdown-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+              />
+            </svg>
+            <span>Configurações</span>
+          </a>
+
+          <div class="dropdown-divider"></div>
+
+          <button (click)="logout()" class="dropdown-item dropdown-item-danger">
+            <svg class="dropdown-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+              />
+            </svg>
+            <span>Terminar Sessão</span>
+          </button>
+        </div>
+        }
+      </div>
+      }
+
+      <!-- Mobile Menu Button -->
+      <button class="mobile-menu-btn" (click)="toggleMobileMenu()" [class.active]="isMobileMenuOpen">
+        @if (!isMobileMenuOpen) {
+        <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+        } @else {
+        <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+        }
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Menu -->
+  @if (isMobileMenuOpen) {
+  <div class="mobile-menu" [@slideDown]>
+    @if (!isAuthenticated) {
+    <!-- Links Públicos Mobile -->
+    @for (link of publicLinks; track link.path) {
+    <a
+      [routerLink]="link.path.startsWith('/#') ? null : link.path"
+      [href]="link.path.startsWith('/#') ? link.path : null"
+      [class.active]="isActiveRoute(link.path, link.exact)"
+      class="mobile-link"
+      (click)="closeMenus()"
+    >
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="link.icon" />
+      </svg>
+      <span>{{ link.label }}</span>
+    </a>
+    }
+
+    <div class="mobile-divider"></div>
+
+    <!-- Auth Links Mobile -->
+    <a routerLink="/login" class="mobile-link" (click)="closeMenus()">
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"
+        />
+      </svg>
+      <span>Login</span>
+    </a>
+    <a routerLink="/register" class="mobile-link mobile-link-primary" (click)="closeMenus()">
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
+        />
+      </svg>
+      <span>Registar</span>
+    </a>
+    } @else {
+    <!-- User Info Mobile -->
+    <div class="mobile-user-info">
+      <div class="user-avatar-large" [class]="getAvatarColor()">
+        <img [src]="getAvatarUrl()" alt="avatar" class="avatar-image" />
+      </div>
+      <div class="user-details">
+        <p class="user-name-large">{{ currentUser?.username }}</p>
+        <p class="user-role-badge">{{ getRoleLabel() }}</p>
+        @if (currentUser?.email) {
+        <p class="user-email">{{ currentUser?.email }}</p>
+        }
+      </div>
+    </div>
+
+    <div class="mobile-divider"></div>
+
+    <!-- System Links Mobile -->
+    @for (link of visibleSystemLinks; track link.path) {
+    <a [routerLink]="link.path" [class.active]="isActiveRoute(link.path)" class="mobile-link" (click)="closeMenus()">
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="link.icon" />
+      </svg>
+      <span>{{ link.label }}</span>
+    </a>
+    }
+
+    <div class="mobile-divider"></div>
+
+    <!-- Profile & Settings Mobile -->
+    <a routerLink="/system/profile" class="mobile-link" (click)="closeMenus()">
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+        />
+      </svg>
+      <span>Meu Perfil</span>
+    </a>
+
+    <a routerLink="/system/settings" class="mobile-link" (click)="closeMenus()">
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+        />
+      </svg>
+      <span>Configurações</span>
+    </a>
+
+    <button (click)="logout()" class="mobile-link mobile-link-danger">
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+        />
+      </svg>
+      <span>Terminar Sessão</span>
+    </button>
+    }
+  </div>
+  }
+</nav>
+
+<!-- Overlay para fechar menu mobile ao clicar fora -->
+@if (isMobileMenuOpen || isUserMenuOpen) {
+<div class="navbar-overlay" (click)="closeMenus()"></div>
+}

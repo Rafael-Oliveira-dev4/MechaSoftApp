@@ -17,6 +17,7 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
     options.SerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+    options.SerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
 });
 
 // CORS Configuration
@@ -34,7 +35,7 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Services.AddIoCServices(builder.Configuration);
+builder.Services.AddIoCServices(builder.Configuration, builder.Environment);
 builder.Services.AddSecurityServices(builder.Configuration);
 
 // JWT Authentication
@@ -62,6 +63,9 @@ app.UseMiddleware<GlobalExceptionMiddleware>();
 
 // CORS
 app.UseCors("AllowAngularApp");
+
+// Static Files (for serving uploaded images)
+app.UseStaticFiles();
 
 app.UseHttpsRedirection();
 

@@ -17,5 +17,6 @@ public record GetUserProfileResponse(
     Guid? CustomerId,
     Guid? EmployeeId,
     string? CustomerName,
-    string? EmployeeName
+    string? EmployeeName,
+    string? ProfileImageUrl
 );

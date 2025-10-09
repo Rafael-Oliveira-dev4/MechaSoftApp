@@ -2,196 +2,174 @@
 
 Solução full‑stack para gestão de oficina, com backend em .NET 8 (WebAPI + EF Core) e frontend em Angular.
 
-## 🚀 Início Rápido
-
-**Escolha o guia de configuração para sua plataforma:**
-
-### 🪟 Windows
-→ **[docs/SETUP_WINDOWS.md](docs/SETUP_WINDOWS.md)** - Guia completo para Windows 10/11  
-→ **[scripts/windows/](scripts/windows/)** - Scripts PowerShell
-
-### 🐧 Linux
-→ **[docs/SETUP_LINUX.md](docs/SETUP_LINUX.md)** - Guia completo para Linux (Debian/Ubuntu)  
-→ **[scripts/linux/](scripts/linux/)** - Scripts Bash
-
-### 📚 Documentação Completa
-→ **[docs/](docs/)** - Toda a documentação organizada  
-→ **[docs/GUIA_RAPIDO.md](docs/GUIA_RAPIDO.md)** - ⚡ Referência rápida  
-→ **[docs/STATUS_PROJETO.md](docs/STATUS_PROJETO.md)** - 📊 Estado atual  
-→ **[docs/PROXIMOS_PASSOS.md](docs/PROXIMOS_PASSOS.md)** - 🎯 Próximos passos
-
----
-
-## Pré‑requisitos Gerais
+## Pré‑requisitos
 
 - .NET SDK 8.x
 - Node.js 18+ e npm 9+
 - Git
-- SQL Server (SQL Express no Windows, Docker no Linux)
+- SQL Server (localdb ou instância configurada)
 
-## 🏗️ Arquitetura
+## Estrutura
 
-### Camadas do Projeto
-- **MechaSoft.Domain** — Entidades de domínio e Value Objects
-- **MechaSoft.Domain.Core** — Interfaces e contratos
-- **MechaSoft.Application** — Lógica de aplicação (CQRS com MediatR)
-- **MechaSoft.Data** — Acesso a dados (EF Core e repositórios)
-- **MechaSoft.Security** — Autenticação JWT
-- **MechaSoft.IoC** — Injeção de dependências
-- **MechaSoft.WebAPI** — API REST (Minimal Endpoints)
-- **Presentation/MechaSoft.Angular** — Frontend Angular 20
+- `MechaSoft.WebAPI` — API ASP.NET Core (Minimal Endpoints)
+- `MechaSoft.Application`, `MechaSoft.Data`, `MechaSoft.Domain`, `MechaSoft.Security`, `MechaSoft.IoC` — camadas de aplicação, domínio, dados e DI
+- `Presentation/MechaSoft.Angular` — frontend Angular
 
-### Padrões Implementados
-✅ Clean Architecture  
-✅ CQRS (Command Query Responsibility Segregation)  
-✅ Repository Pattern  
-✅ Unit of Work  
-✅ Domain-Driven Design  
-✅ Value Objects (Money, Name, Address)
+## Configuração
 
----
+### 1) Base de dados
 
-## ⚡ Guias de Configuração
+- Verifique a connection string `MechaSoftCS` em:
+  - `MechaSoft.WebAPI/appsettings.Development.json`
+  - `MechaSoft.Data/Context/ApplicationDbContext.cs` (via DI)
+- Opcional: executar as migrações (já existentes)
 
-### 📖 Documentação Completa
-
-| Ficheiro | Descrição |
-|----------|-----------|
-| **[GUIA_RAPIDO.md](GUIA_RAPIDO.md)** | ⚡ Referência rápida - comandos essenciais |
-| **[SETUP_WINDOWS.md](SETUP_WINDOWS.md)** | 🪟 Configuração detalhada para Windows |
-| **[SETUP_LINUX.md](SETUP_LINUX.md)** | 🐧 Configuração detalhada para Linux |
-| **[STATUS_PROJETO.md](STATUS_PROJETO.md)** | 📊 Estado atual e endpoints disponíveis |
-| **[PROXIMOS_PASSOS.md](PROXIMOS_PASSOS.md)** | 🎯 Próximas funcionalidades e comandos úteis |
-
----
-
-## 🚀 Início Rápido
-
-### Windows
-```powershell
-# 1. Configurar base de dados
-.\scripts\windows\setup-db.ps1
-
-# 2. Iniciar aplicação
-.\scripts\windows\start.ps1
-
-# 3. Aceder
-# - Backend:  http://localhost:5039
-# - Swagger:  http://localhost:5039/swagger
-# - Frontend: http://localhost:4300
-
-# 4. Parar aplicação
-.\scripts\windows\stop.ps1
-```
-
-### Linux
 ```bash
-# 1. Configurar SQL Server (primeira vez)
-sudo ./scripts/linux/setup-sqlserver.sh
-
-# 2. Configurar base de dados
-./scripts/linux/setup-db.sh
-
-# 3. Iniciar aplicação
-./scripts/linux/start.sh
-
-# 4. Aceder
-# - Backend:  http://localhost:5039
-# - Swagger:  http://localhost:5039/swagger
-# - Frontend: http://localhost:4300
-
-# 5. Parar aplicação
-./scripts/linux/stop.sh
+dotnet ef database update --project .\MechaSoft.Data\ --startup-project .\MechaSoft.WebAPI\
 ```
 
----
+### 2) Certificado HTTPS (opcional para desenvolvimento)
 
-## 📁 Estrutura do Projeto
+Para evitar avisos de “ligação não é privada” quando usar HTTPS:
 
-```
-MechaSoftApp/
-├── docs/                         # 📚 Documentação
-│   ├── GUIA_RAPIDO.md
-│   ├── SETUP_WINDOWS.md
-│   ├── SETUP_LINUX.md
-│   ├── STATUS_PROJETO.md
-│   └── PROXIMOS_PASSOS.md
-│
-├── scripts/                      # 🛠️ Scripts
-│   ├── windows/                 # 🪟 PowerShell
-│   └── linux/                   # 🐧 Bash
-│
-├── MechaSoft.Domain/             # 📦 Domínio
-├── MechaSoft.Domain.Core/        # 🔌 Interfaces
-├── MechaSoft.Application/        # 💼 CQRS Handlers
-├── MechaSoft.Data/              # 🗄️ EF Core
-├── MechaSoft.Security/          # 🔐 JWT Auth
-├── MechaSoft.IoC/               # 🔧 DI
-├── MechaSoft.WebAPI/            # 🌐 API REST
-└── Presentation/
-    └── MechaSoft.Angular/       # 🅰️ Frontend
+```bash
+dotnet dev-certs https --trust
 ```
 
----
+## Executar em Desenvolvimento
 
-## 🛠️ Scripts Disponíveis
+### Backend (.NET)
 
-### Windows (PowerShell)
-Localização: `scripts/windows/`
-- `start.ps1` — Inicia backend e frontend
-- `stop.ps1` — Para aplicação
-- `setup-db.ps1` — Configura base de dados
+- Porta HTTP: 5039
+- Porta HTTPS (opcional): 7277
 
-### Linux (Bash)
-Localização: `scripts/linux/`
-- `start.sh` — Inicia backend e frontend
-- `stop.sh` — Para aplicação
-- `setup-sqlserver.sh` — Configura SQL Server (Docker)
-- `setup-db.sh` — Executa migrações
+Arrancar só em HTTP (recomendado em dev para evitar avisos do browser):
 
----
+```powershell
+& 'C:\Program Files\dotnet\dotnet.exe' run --project .\MechaSoft.WebAPI\MechaSoft.WebAPI.csproj --no-build --urls 'http://localhost:5039'
+```
 
-## 🔧 Tecnologias
+Endpoints úteis:
 
-### Backend
-- .NET 8.0
-- Entity Framework Core 9.0
-- MediatR 13.0
-- FluentValidation 12.0
-- JWT Bearer Authentication
-- Swagger/OpenAPI
+- Health check: `GET http://localhost:5039/health` (200 OK esperado)
+- Swagger UI: `http://localhost:5039/swagger` (ou `https://localhost:7277/swagger` se usar HTTPS)
 
-### Frontend
-- Angular 20.1
-- TypeScript 5.8
-- RxJS 7.8
-- Tailwind CSS
+Notas:
 
-### Base de Dados
-- SQL Server 2022
-- Entity Framework Core Migrations
+- A API usa Minimal Endpoints (sem controllers) e MediatR para CQRS.
+- Auditoria ativa via `AuditableEntityInterceptor` (usa `IHttpContextAccessor` opcional).
 
----
+### Frontend (Angular)
 
-## 📝 Convenções
+Config da API:
 
-- ✅ Mensagens de commit em inglês (ex.: `feat(api): add customer endpoints`)
-- ✅ Endpoints minimalistas (sem controllers)
-- ✅ CQRS para separação de responsabilidades
-- ✅ Configurações em ficheiros (não automáticas)
-- ✅ Documentação sempre atualizada
+- `Presentation/MechaSoft.Angular/src/environments/environment.development.ts`
 
----
+```ts
+export const environment = {
+  production: false,
+  apiUrl: 'http://localhost:5039/api',
+};
+```
 
-## 📞 Suporte
+- Produção (`environment.ts`) usa por padrão `https://localhost:7277/api`.
 
-Para dúvidas:
-1. Consulte [docs/GUIA_RAPIDO.md](docs/GUIA_RAPIDO.md)
-2. Verifique [docs/STATUS_PROJETO.md](docs/STATUS_PROJETO.md)
-3. Veja documentação específica:
-   - Windows: [docs/SETUP_WINDOWS.md](docs/SETUP_WINDOWS.md)
-   - Linux: [docs/SETUP_LINUX.md](docs/SETUP_LINUX.md)
+Instalar e arrancar:
 
----
+```powershell
+cd Presentation/MechaSoft.Angular
+npm ci
+npx ng serve --port 4300 --open=false
+```
 
-**Desenvolvido com ❤️ para gestão de oficinas**
+App em `http://localhost:4300/`.
+
+Build produção:
+
+```powershell
+npm run build
+# output em: Presentation/MechaSoft.Angular/dist/MechaSoft.Angular
+```
+
+## Troubleshooting
+
+- Porta ocupada (5039):
+  - Identifique e termine o processo (Kestrel/IIS Express/Visual Studio):
+
+```powershell
+taskkill /F /IM "MechaSoft.WebAPI.exe" 2>$null
+taskkill /F /IM "iisexpress.exe" 2>$null
+```
+
+- Aviso HTTPS “ligação não é privada”:
+
+  - Confiar certificado dev: `dotnet dev-certs https --trust`, ou usar HTTP (`http://localhost:5039`).
+
+- Erro MSB3026/MSB3027 (ficheiro bloqueado) ao compilar:
+
+  - Feche instâncias da API/IIS Express/Visual Studio e repita o build.
+
+- Swagger 500 (conflitos de schema):
+  - A solução usa `CustomSchemaIds` e nomes distintos de DTOs.
+  - Se criar DTOs com o mesmo nome em namespaces diferentes, renomeie (ex.: `VehicleDetailsResponse` vs `VehicleListItemResponse`) ou mantenha a regra `FullName`.
+
+## Convenções
+
+- Mensagens de commit em inglês (ex.: `feat(data): ...`, `fix(swagger): ...`).
+- Preferir Endpoints minimalistas em vez de Controllers.
+- Configurações mantidas em ficheiros de config (não automáticas).
+
+## Scripts úteis (Windows PowerShell)
+
+- Arrancar API (HTTP):
+
+```powershell
+& 'C:\Program Files\dotnet\dotnet.exe' run --project .\MechaSoft.WebAPI\MechaSoft.WebAPI.csproj --no-build --urls 'http://localhost:5039'
+```
+
+- Parar processos comuns:
+
+```powershell
+taskkill /F /IM "MechaSoft.WebAPI.exe" 2>$null; taskkill /F /IM "iisexpress.exe" 2>$null
+```
+
+- Arrancar frontend:
+
+```powershell
+cd Presentation/MechaSoft.Angular
+npx ng serve --port 4300 --open=false
+```
+
+## 🛠️ Configuração do VS Code
+
+O projeto inclui configurações otimizadas para VS Code:
+
+### Extensões Recomendadas
+
+- **C# Dev Kit** - Desenvolvimento .NET completo
+- **Angular Language Service** - IntelliSense para Angular
+- **SQL Server (mssql)** - Conexão com banco de dados
+- **Prettier** - Formatação automática
+- **Tailwind CSS IntelliSense** - Autocomplete CSS
+- **GitLens** - Git supercharged
+- **Thunder Client** - Teste de APIs
+
+### Tarefas Automatizadas
+
+Use `Ctrl+Shift+P` → "Tasks: Run Task":
+
+- **Launch Full Stack** - Inicia backend + frontend
+- **Add Migration** - Cria migrações EF Core
+- **Update Database** - Aplica migrações
+
+### Debug Configurado
+
+- `F5` - Debug completo (backend + frontend)
+- `Ctrl+F5` - Executar sem debug
+
+Ver `.vscode/README.md` para detalhes completos.
+
+## Contacto/Manutenção
+
+- Qualquer alteração estrutural deve manter as camadas desacopladas e o uso de MediatR.
+- Em caso de dúvidas, verificar `MechaSoft.WebAPI/Program.cs` e `MechaSoft.Data/DependencyInjection.cs`.

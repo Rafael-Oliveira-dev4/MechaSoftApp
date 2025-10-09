@@ -1,17 +1,19 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
+import { SharedModule } from '../../shared.module';
+import { PageHeaderComponent } from './components/page-header/page-header.component';
 import { FrontOfficeRoutingModule } from './front-office-routing.module';
-import { SharedModule } from '../../shared/shared.module';
 import { FrontOfficeLayoutComponent } from './layout/front-office-layout.component';
-import { FrontHomeComponent } from './pages/home/home.component';
-import { PageHeaderComponent } from '../../shared/components/page-header/page-header.component';
-import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { CustomersComponent } from './pages/customers/customers.component';
-import { VehiclesComponent } from './pages/vehicles/vehicles.component';
-import { ServicesComponent } from './pages/services/services.component';
-import { PartsComponent } from './pages/parts/parts.component';
+import { DashboardComponent } from './pages/dashboard/dashboard.component';
+import { FrontHomeComponent } from './pages/home/home.component';
 import { InspectionsComponent } from './pages/inspections/inspections.component';
+import { PartsComponent } from './pages/parts/parts.component';
+import { ProfileComponent } from './pages/profile/profile.component';
 import { ServiceOrdersComponent } from './pages/service-orders/service-orders.component';
+import { ServicesComponent } from './pages/services/services.component';
+import { SettingsComponent } from './pages/settings/settings.component';
+import { VehiclesComponent } from './pages/vehicles/vehicles.component';
 
 @NgModule({
   imports: [
@@ -27,9 +29,9 @@ import { ServiceOrdersComponent } from './pages/service-orders/service-orders.co
     ServicesComponent,
     PartsComponent,
     InspectionsComponent,
-    ServiceOrdersComponent
-  ]
+    ServiceOrdersComponent,
+    ProfileComponent,
+    SettingsComponent,
+  ],
 })
 export class FrontOfficeModule {}
-
-
