@@ -48,8 +48,8 @@ export class LoginComponent {
           if (user.role === 'Customer') {
             this.router.navigate(['/portal/dashboard']);
           } else {
-            // Employee, Admin, Owner → Sistema de gestão
-            this.router.navigate(['/dashboard']);
+            // Employee, Admin, Owner → Sistema de gestão (vai para /app/home)
+            this.router.navigate(['/app']);
           }
         } else {
           this.error = result.error || null;

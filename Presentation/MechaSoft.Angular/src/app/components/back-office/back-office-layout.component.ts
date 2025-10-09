@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
 @Component({
-  selector: 'app-back-office-main',
+  selector: 'app-back-office-layout',
   standalone: true,
   imports: [RouterOutlet],
   template: `
@@ -15,6 +15,6 @@ import { RouterOutlet } from '@angular/router';
     .container { padding: 1rem; }
   `]
 })
-export class BackOfficeMainComponent {}
+export class BackOfficeLayoutComponent {}
 
 

@@ -1,9 +1,13 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { ErrorComponent } from './components/common/error/error.component';
+import { ErrorComponent } from './shared/components/error/error.component';
 import { LoginComponent } from './components/auth/login/login.component';
+import { LandingComponent } from './components/landing/landing.component';
 
 const routes: Routes = [
+  // Landing Page (público)
+  { path: '', component: LandingComponent },
+  
   // Login (público)
   { path: 'login', component: LoginComponent },
   
@@ -11,7 +15,7 @@ const routes: Routes = [
   // NOTA: Nome "front-office" é mantido por compatibilidade
   // Este é o SISTEMA DE GESTÃO para funcionários
   {
-    path: '',
+    path: 'app',
     loadChildren: () => import('./components/front-office/front-office.module').then(m => m.FrontOfficeModule)
   },
   

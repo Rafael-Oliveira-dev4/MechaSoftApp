@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BackOfficeRoutingModule } from './back-office-routing.module';
-import { BackOfficeMainComponent } from './main.component';
+import { BackOfficeLayoutComponent } from './back-office-layout.component';
 
 @NgModule({
   declarations: [
@@ -9,7 +9,7 @@ import { BackOfficeMainComponent } from './main.component';
   imports: [
     CommonModule,
     BackOfficeRoutingModule,
-    BackOfficeMainComponent
+    BackOfficeLayoutComponent
   ]
 })
 export class BackOfficeModule {}

@@ -2,9 +2,10 @@ import { NgModule, provideBrowserGlobalErrorListeners, provideZonelessChangeDete
 import { BrowserModule, provideClientHydration, withEventReplay } from '@angular/platform-browser';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 
-import { AppRoutingModule } from './app-routing-module';
-import { App } from './app';
-import { ErrorComponent } from './components/common/error/error.component';
+import { AppRoutingModule } from './app-routing.module';
+import { App } from './app.component';
+import { ErrorComponent } from './shared/components/error/error.component';
+import { LandingModule } from './components/landing/landing.module';
 
 import { AuthInterceptor } from './core/interceptors/auth.interceptor';
 import { ErrorInterceptor } from './core/interceptors/error.interceptor';
@@ -15,12 +16,13 @@ import { ErrorMessageComponent } from './shared/components/error-message/error-m
 
 @NgModule({
   declarations: [
-    App,
+    App
   ],
   imports: [
     BrowserModule,
     HttpClientModule,
     AppRoutingModule,
+    LandingModule,
     ErrorComponent,
     LoadingSpinnerComponent,
     ErrorMessageComponent

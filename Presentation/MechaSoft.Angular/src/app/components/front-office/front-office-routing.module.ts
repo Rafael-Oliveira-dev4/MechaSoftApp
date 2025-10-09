@@ -31,7 +31,7 @@ const routes: Routes = [
     canActivate: [authGuard], // Requer autenticação
     children: [
       // Landing (interno)
-      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      { path: '', redirectTo: 'home', pathMatch: 'full' },
       { path: 'home', component: FrontHomeComponent },
       
       // Dashboard (todos os funcionários)
