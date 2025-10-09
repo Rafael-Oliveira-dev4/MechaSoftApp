@@ -1,59 +1,224 @@
-# MechaSoftAngular
+# 🎨 MechaSoft Angular Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.1.3.
+Modern Angular 19 frontend for the MechaSoft Workshop Management System.
 
-## Development server
+---
 
-To start a local development server, run:
-
-```bash
-ng serve
-```
-
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## 🚀 Quick Start
 
 ```bash
-ng generate component component-name
+# Install dependencies
+npm install
+
+# Start development server
+npm start
+# Open http://localhost:4200
+
+# Build for production
+npm run build
+# Output: dist/MechaSoft.Angular
+
+# Run linter
+npm run lint
+
+# Format code
+npm run format
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+---
 
+## 📁 Project Structure
+
+See `ESTRUTURA.md` for detailed architecture documentation.
+
+```
+/src/app/
+├── core/                   # Singleton services, guards, models
+│   ├── guards/            # Authentication & role guards
+│   ├── interceptors/      # HTTP interceptors
+│   ├── models/            # Data models & interfaces
+│   ├── services/          # API services
+│   └── validators/        # Async validators
+│
+├── shared/                # Reusable components
+│   ├── components/
+│   │   ├── navbar/       # Main navigation (707 lines CSS!)
+│   │   ├── profile-image-upload/
+│   │   ├── error/
+│   │   ├── error-message/
+│   │   ├── loading-spinner/
+│   │   └── page-header/
+│   └── shared.module.ts
+│
+└── components/            # Feature modules
+    ├── auth/
+    │   ├── login/
+    │   └── register/
+    ├── landing/           # Public landing page
+    ├── front-office/      # Management system
+    │   └── pages/
+    │       ├── dashboard/
+    │       ├── profile/
+    │       ├── settings/
+    │       ├── customers/
+    │       ├── vehicles/
+    │       ├── service-orders/
+    │       ├── inspections/
+    │       ├── services/
+    │       └── parts/
+    └── back-office/       # Admin panel (future)
+```
+
+---
+
+## 🗺️ Routes
+
+See `FLUXO_NAVEGACAO.md` for detailed routing documentation.
+
+### **Public**
+- `/` - Landing page
+- `/login` - Login
+- `/register` - Registration
+- `/404` - Error page
+
+### **Authenticated** (`/app/*`)
+- `/app/dashboard` - Main dashboard
+- `/app/profile` - User profile
+- `/app/settings` - User settings
+- `/app/customers` - Customer management
+- `/app/vehicles` - Vehicle management
+- `/app/service-orders` - Service orders
+- `/app/inspections` - Inspections
+- `/app/services` - Service catalog
+- `/app/parts` - Parts inventory
+
+---
+
+## 🎨 Design System
+
+### **Colors**
+- **Primary:** Cyan → Blue gradient
+- **Secondary:** Blue → Indigo gradient
+- **Success:** Emerald → Teal gradient
+- **Warning:** Amber → Orange gradient
+- **Danger:** Red → Pink gradient
+- **Info:** Purple → Violet gradient
+
+### **Animations**
+- `animate-float` - Smooth vertical movement
+- `animate-pulse-glow` - Pulsing glow effect
+- `animate-gradient` - Moving gradients
+- `animate-marquee` - Infinite scroll
+
+### **Effects**
+- Glassmorphism (backdrop blur)
+- 3D card transformations
+- Smooth hover effects
+- Gradient backgrounds
+
+---
+
+## 🔧 Configuration
+
+### **Environment Variables**
+- `src/environments/environment.ts` - Production
+- `src/environments/environment.development.ts` - Development
+
+### **API Base URL**
+Default: `http://localhost:5039/api`
+
+---
+
+## 📦 Key Dependencies
+
+- **@angular/core:** ^19.0.0
+- **@angular/router:** ^19.0.0
+- **rxjs:** ^7.8.0
+- **tailwindcss:** ^3.4.0
+
+---
+
+## 🎯 Features
+
+### **Authentication**
+- JWT token management
+- Refresh token flow
+- Role-based access control
+- Route guards
+
+### **User Management**
+- Profile editing
+- Image upload with preview
+- Settings management
+- Password change
+
+### **Workshop Features**
+- Customer CRUD
+- Vehicle tracking
+- Service order management
+- Inspection scheduling
+- Parts inventory
+- Service catalog
+
+### **UI/UX**
+- Responsive design
+- Dark theme
+- Smooth animations
+- Loading states
+- Error handling
+- Form validation
+
+---
+
+## 📚 Documentation
+
+- **ESTRUTURA.md** - Project architecture and structure
+- **FLUXO_NAVEGACAO.md** - Navigation flow and routing
+- **README.md** - This file
+
+---
+
+## 🔨 Build & Deploy
+
+### **Development Build**
 ```bash
-ng generate --help
+npm start
 ```
 
-## Building
-
-To build the project run:
-
+### **Production Build**
 ```bash
-ng build
+npm run build
+# Output: dist/MechaSoft.Angular (475 KB initial bundle)
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+### **Build Configuration**
+- **Budget Limits:**
+  - Initial bundle: 1 MB
+  - Component styles: 100 KB
+- **Optimizations:**
+  - Tree shaking
+  - Minification
+  - AOT compilation
+  - Lazy loading
 
-## Running unit tests
+---
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+## 🐛 Known Issues
 
-```bash
-ng test
-```
+None at the moment! 🎉
 
-## Running end-to-end tests
+---
 
-For end-to-end (e2e) testing, run:
+## 📝 Notes
 
-```bash
-ng e2e
-```
+- All services use `providedIn: 'root'` for singleton pattern
+- Lazy loading implemented for all feature modules
+- Guards protect routes based on authentication and roles
+- HTTP interceptors handle auth tokens, errors, and loading states
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+---
 
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+**Version:** 3.0.0  
+**Last Updated:** October 9, 2025  
+**Angular Version:** 19  
+**Node Version:** 18+
