@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { SharedModule } from '../../shared.module';
-import { PageHeaderComponent } from './components/page-header/page-header.component';
+import { SharedModule } from '../../shared/shared.module';
 import { FrontOfficeRoutingModule } from './front-office-routing.module';
 import { FrontOfficeLayoutComponent } from './layout/front-office-layout.component';
 import { CustomersComponent } from './pages/customers/customers.component';
@@ -22,7 +21,6 @@ import { VehiclesComponent } from './pages/vehicles/vehicles.component';
     FrontOfficeRoutingModule,
     FrontOfficeLayoutComponent,
     FrontHomeComponent,
-    PageHeaderComponent,
     DashboardComponent,
     CustomersComponent,
     VehiclesComponent,
