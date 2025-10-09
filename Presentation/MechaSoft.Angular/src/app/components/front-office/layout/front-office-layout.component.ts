@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { User } from '../../../core/models/api.models';
+import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
 
 @Component({
   selector: 'app-front-office-layout',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, NavbarComponent],
   templateUrl: './front-office-layout.component.html',
   styleUrls: ['./front-office-layout.component.scss']
 })

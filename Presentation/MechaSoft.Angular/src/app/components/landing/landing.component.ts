@@ -9,11 +9,20 @@ import { RouterModule } from '@angular/router';
   styleUrls: ['./landing.component.scss']
 })
 export class LandingComponent implements OnInit, AfterViewInit {
+  isMobileMenuOpen = false;
   
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
   
   ngOnInit() {
     // Initialize any component logic
+  }
+
+  toggleMobileMenu() {
+    this.isMobileMenuOpen = !this.isMobileMenuOpen;
+  }
+
+  closeMobileMenu() {
+    this.isMobileMenuOpen = false;
   }
 
   ngAfterViewInit() {

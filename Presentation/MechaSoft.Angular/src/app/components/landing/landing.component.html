@@ -1,4 +1,59 @@
-<!-- Hero Section -->
+<!-- Public Navbar -->
+<nav class="fixed top-0 left-0 right-0 z-50 border-b border-slate-800/60 bg-slate-950/90 backdrop-blur-xl">
+	<div class="container mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
+		<a routerLink="/" class="group flex items-center space-x-2">
+			<div class="h-8 w-8 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center">
+				<svg class="h-5 w-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+					<path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"></path>
+				</svg>
+			</div>
+			<span class="text-lg font-bold tracking-wide text-white group-hover:text-cyan-400 transition-colors">
+				MechaSoft
+			</span>
+		</a>
+
+		<!-- Desktop Navigation -->
+		<div class="hidden items-center gap-6 sm:flex">
+			<a href="#services" class="text-sm text-zinc-300 hover:text-white transition-colors">Serviços</a>
+			<a routerLink="/login" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-transparent border border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/10 transition-all">
+				<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
+				</svg>
+				Login
+			</a>
+			<a routerLink="/register" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-cyan-600 to-blue-700 text-white hover:from-cyan-500 hover:to-blue-600 transition-all">
+				<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+				</svg>
+				Registar
+			</a>
+		</div>
+
+		<!-- Mobile Menu Button -->
+		<button class="sm:hidden text-zinc-300 hover:text-white transition-colors" (click)="toggleMobileMenu()">
+			<svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+			</svg>
+          </button>
+	</div>
+
+	<!-- Mobile Menu -->
+	<div class="sm:hidden" [class.hidden]="!isMobileMenuOpen">
+		<div class="border-t border-slate-800/60 bg-slate-950/95 backdrop-blur-xl px-4 py-4 space-y-2">
+			<a href="#services" (click)="closeMobileMenu()" class="block px-3 py-2 text-sm text-zinc-300 hover:text-white hover:bg-slate-800/50 rounded-lg transition-colors">
+				Serviços
+			</a>
+			<div class="border-t border-slate-800 pt-2 mt-2 space-y-2">
+				<a routerLink="/login" class="block px-3 py-2 text-sm text-cyan-400 hover:bg-cyan-500/10 rounded-lg transition-colors">
+					Login
+				</a>
+				<a routerLink="/register" class="block px-3 py-2 text-sm bg-gradient-to-r from-cyan-600 to-blue-700 text-white rounded-lg hover:from-cyan-500 hover:to-blue-600 transition-all">
+					Registar
+				</a>
+			</div>
+		</div>
+	</div>
+</nav>
 
 <!-- Hero Section -->
 <section class="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 animate-gradient">
@@ -197,10 +252,10 @@
 					<h3 class="text-xl font-bold text-white mb-3">Professionalism & Rigor</h3>
 					<p class="text-zinc-300 leading-relaxed">Experienced team and clear processes, no surprises. Total transparency in quotes.</p>
 				</div>
-			</div>
-		</div>
-	</div>
-</section>
+        </div>
+      </div>
+    </div>
+  </section>
 
 <!-- Services Section -->
 <section id="services" class="relative bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950 py-20 overflow-hidden">
@@ -367,7 +422,7 @@
 				View All Services
 			</a>
 		</div>
-	</div>
+          </div>
 </section>
 
 <!-- Stats Section -->
@@ -376,8 +431,8 @@
 	<div class="absolute inset-0">
 		<div class="absolute top-1/4 left-1/4 h-64 w-64 rounded-full bg-cyan-500/15 blur-3xl animate-pulse"></div>
 		<div class="absolute bottom-1/4 right-1/4 h-80 w-80 rounded-full bg-purple-500/15 blur-3xl animate-pulse delay-1000"></div>
-	</div>
-	
+        </div>
+
 	<!-- Grid pattern -->
 	<div class="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:50px_50px]"></div>
 	
@@ -388,11 +443,11 @@
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
 				</svg>
 				Numbers That Speak
-			</div>
+          </div>
 			<h2 class="text-3xl font-bold text-white sm:text-4xl mb-4">Our Experience in Numbers</h2>
 			<p class="text-lg text-zinc-300 max-w-2xl mx-auto">Years of dedication, thousands of satisfied customers and a reputation built with excellence</p>
-		</div>
-		
+        </div>
+
 		<div class="grid grid-cols-2 gap-8 lg:grid-cols-4">
 			<!-- Stat 1 -->
 			<div class="group text-center">
@@ -405,9 +460,9 @@
 						<div class="text-sm font-medium text-zinc-300">Years of Experience</div>
 						<div class="mt-2 h-1 w-12 mx-auto bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full animate-pulse-glow"></div>
 					</div>
-				</div>
-			</div>
-			
+          </div>
+        </div>
+
 			<!-- Stat 2 -->
 			<div class="group text-center">
 				<div class="relative mb-4">
@@ -419,9 +474,9 @@
 						<div class="text-sm font-medium text-zinc-300">Customers Served</div>
 						<div class="mt-2 h-1 w-12 mx-auto bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full animate-pulse-glow"></div>
 					</div>
-				</div>
-			</div>
-			
+          </div>
+        </div>
+
 			<!-- Stat 3 -->
 			<div class="group text-center">
 				<div class="relative mb-4">
@@ -433,9 +488,9 @@
 						<div class="text-sm font-medium text-zinc-300">Average Rating</div>
 						<div class="mt-2 h-1 w-12 mx-auto bg-gradient-to-r from-emerald-500 to-teal-600 rounded-full animate-pulse-glow"></div>
 					</div>
-				</div>
-			</div>
-			
+          </div>
+        </div>
+
 			<!-- Stat 4 -->
 			<div class="group text-center">
 				<div class="relative mb-4">
@@ -448,9 +503,9 @@
 						<div class="mt-2 h-1 w-12 mx-auto bg-gradient-to-r from-purple-500 to-violet-600 rounded-full animate-pulse-glow"></div>
 					</div>
 				</div>
-			</div>
-		</div>
-		
+          </div>
+        </div>
+
 		<!-- Additional stats row -->
 		<div class="mt-16 grid grid-cols-1 gap-6 sm:grid-cols-3">
 			<div class="text-center">
@@ -481,7 +536,7 @@
 				<p class="text-sm text-zinc-400">State-of-the-art equipment for precise diagnostics</p>
 			</div>
 		</div>
-	</div>
+          </div>
 </section>
 
 <!-- Brands Section -->
@@ -490,8 +545,8 @@
 	<div class="absolute inset-0">
 		<div class="absolute top-1/2 left-1/4 h-64 w-64 rounded-full bg-cyan-500/15 blur-3xl animate-float"></div>
 		<div class="absolute bottom-1/4 right-1/4 h-80 w-80 rounded-full bg-purple-500/15 blur-3xl animate-float" style="animation-delay: 4s;"></div>
-	</div>
-	
+        </div>
+
 	<!-- Grid pattern overlay -->
 	<div class="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:50px_50px]"></div>
 	
@@ -531,11 +586,11 @@
 					<span class="text-2xl font-bold text-zinc-300">RENAULT</span>
 					<span class="text-2xl font-bold text-zinc-300">PEUGEOT</span>
 					<span class="text-2xl font-bold text-zinc-300">OPEL</span>
-				</div>
-			</div>
-		</div>
-	</div>
-</section>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
 <!-- Testimonials Section -->
 <section class="relative bg-gradient-to-br from-slate-900 via-slate-950 to-indigo-950 py-20 overflow-hidden">
@@ -793,11 +848,11 @@
 					</div>
 				</details>
 			</div>
-		</div>
-	</div>
-</section>
+      </div>
+    </div>
+  </section>
 
-<!-- CTA Section -->
+  <!-- CTA Section -->
 <section class="relative bg-gradient-to-br from-slate-900 via-slate-950 to-indigo-950 py-20 overflow-hidden">
 	<!-- Background effects -->
 	<div class="absolute inset-0">
@@ -865,10 +920,10 @@
 				</div>
 			</div>
 		</div>
-	</div>
-</section>
+    </div>
+  </section>
 
-<!-- Footer -->
+  <!-- Footer -->
 <footer class="bg-zinc-950 py-16">
 	<div class="container mx-auto px-4 sm:px-6 lg:px-8">
 		<div class="grid gap-8 md:grid-cols-4">
@@ -947,5 +1002,5 @@
 				</div>
 			</div>
 		</div>
-	</div>
-</footer>
+    </div>
+  </footer>

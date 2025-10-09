@@ -18,22 +18,23 @@
 
 #### Fluxo de Entrada
 ```
-/login (autenticação bem-sucedida) → /app → /app/home
+/login (autenticação bem-sucedida) → /app → /app/dashboard
 ```
 
 #### Rotas Disponíveis
 
 | Rota | Componente | Guard | Roles Permitidas | Descrição |
 |------|-----------|-------|------------------|-----------|
-| `/app` | → redirect → `/app/home` | `authGuard` | Todas | Redireciona para home |
-| `/app/home` | `FrontHomeComponent` | `authGuard` | Todas | **Página inicial** do sistema autenticado |
-| `/app/dashboard` | `DashboardComponent` | `authGuard` | Todas | Dashboard com estatísticas e métricas |
+| `/app` | → redirect → `/app/dashboard` | `authGuard` | Todas | Redireciona para dashboard |
+| `/app/dashboard` | `DashboardComponent` | `authGuard` | Todas | **Página inicial** - Dashboard com estatísticas e métricas |
 | `/app/customers` | `CustomersComponent` | `authGuard` + `roleGuard` | Employee, Admin, Owner | Gestão de clientes |
 | `/app/vehicles` | `VehiclesComponent` | `authGuard` | Todas | Gestão de veículos |
 | `/app/service-orders` | `ServiceOrdersComponent` | `authGuard` | Todas | Gestão de ordens de serviço |
 | `/app/inspections` | `InspectionsComponent` | `authGuard` | Todas | Gestão de inspeções técnicas |
 | `/app/services` | `ServicesComponent` | `authGuard` + `roleGuard` | Admin, Owner | Catálogo de serviços |
 | `/app/parts` | `PartsComponent` | `authGuard` + `roleGuard` | Employee, Admin, Owner | Gestão de peças |
+| `/app/profile` | `ProfileComponent` | `authGuard` | Todas | Perfil do utilizador 🆕 |
+| `/app/settings` | `SettingsComponent` | `authGuard` | Todas | Configurações do utilizador 🆕 |
 
 ---
 
