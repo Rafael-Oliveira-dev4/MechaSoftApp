@@ -24,77 +24,69 @@ public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, R
 
     public async Task<Result<RefreshTokenResponse, Success, Error>> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
     {
-        try
+        // Get principal from expired token
+        var principal = _unitOfWork.TokenService.GetPrincipalFromExpiredToken(request.AccessToken);
+        if (principal == null)
         {
-            // Get principal from expired token
-            var principal = _unitOfWork.TokenService.GetPrincipalFromExpiredToken(request.AccessToken);
-            if (principal == null)
-            {
-                _logger.LogWarning("Invalid access token provided for refresh");
-                return Error.InvalidToken;
-            }
-
-            // Get user ID from claims
-            var userIdClaim = principal.FindFirst(ClaimTypes.NameIdentifier);
-            if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
-            {
-                _logger.LogWarning("Invalid user ID in access token");
-                return Error.InvalidToken;
-            }
-
-            // Get user
-            var user = await _unitOfWork.UserRepository.GetByIdAsync(userId);
-            if (user == null)
-            {
-                _logger.LogWarning("User not found for refresh token: {UserId}", userId);
-                return Error.InvalidToken;
-            }
-
-            // Check if refresh token matches
-            if (user.RefreshToken != request.RefreshToken)
-            {
-                _logger.LogWarning("Invalid refresh token for user: {UserId}", userId);
-                return Error.InvalidToken;
-            }
-
-            // Check if refresh token is expired
-            if (user.RefreshTokenExpiryTime < DateTime.UtcNow)
-            {
-                _logger.LogWarning("Expired refresh token for user: {UserId}", userId);
-                return Error.InvalidToken;
-            }
-
-            // Check if account is active
-            if (!user.IsActive)
-            {
-                _logger.LogWarning("Inactive account attempting refresh: {UserId}", userId);
-                return Error.InvalidToken;
-            }
-
-            // Generate new tokens
-            var newAccessToken = _unitOfWork.TokenService.GenerateToken(user);
-            var newRefreshToken = _unitOfWork.TokenService.GenerateRefreshToken();
-            var expiresAt = DateTime.UtcNow.AddHours(1);
-
-            // Update refresh token
-            user.SetRefreshToken(newRefreshToken, DateTime.UtcNow.AddDays(7));
-            await _unitOfWork.UserRepository.UpdateAsync(user);
-            await _unitOfWork.CommitAsync(cancellationToken);
-
-            _logger.LogInformation("Tokens refreshed successfully for user: {UserId}", userId);
-
-            var response = new RefreshTokenResponse(
-                newAccessToken,
-                newRefreshToken,
-                expiresAt
-            );
-
-            return response;
+            _logger.LogWarning("Invalid access token provided for refresh");
+            return Error.InvalidToken;
         }
-        catch (Exception ex)
+
+        // Get user ID from claims
+        var userIdClaim = principal.FindFirst(ClaimTypes.NameIdentifier);
+        if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
         {
-            _logger.LogError(ex, "Error refreshing tokens");
-            return Error.OperationFailed;
+            _logger.LogWarning("Invalid user ID in access token");
+            return Error.InvalidToken;
         }
+
+        // Get user
+        var user = await _unitOfWork.UserRepository.GetByIdAsync(userId);
+        if (user == null)
+        {
+            _logger.LogWarning("User not found for refresh token: {UserId}", userId);
+            return Error.InvalidToken;
+        }
+
+        // Check if refresh token matches
+        if (user.RefreshToken != request.RefreshToken)
+        {
+            _logger.LogWarning("Invalid refresh token for user: {UserId}", userId);
+            return Error.InvalidToken;
+        }
+
+        // Check if refresh token is expired
+        if (user.RefreshTokenExpiryTime < DateTime.UtcNow)
+        {
+            _logger.LogWarning("Expired refresh token for user: {UserId}", userId);
+            return Error.InvalidToken;
+        }
+
+        // Check if account is active
+        if (!user.IsActive)
+        {
+            _logger.LogWarning("Inactive account attempting refresh: {UserId}", userId);
+            return Error.InvalidToken;
+        }
+
+        // Generate new tokens
+        var newAccessToken = _unitOfWork.TokenService.GenerateToken(user);
+        var newRefreshToken = _unitOfWork.TokenService.GenerateRefreshToken();
+        var expiresAt = DateTime.UtcNow.AddHours(1);
+
+        // Update refresh token
+        user.SetRefreshToken(newRefreshToken, DateTime.UtcNow.AddDays(7));
+        await _unitOfWork.UserRepository.UpdateAsync(user);
+        await _unitOfWork.CommitAsync(cancellationToken);
+
+        _logger.LogInformation("Tokens refreshed successfully for user: {UserId}", userId);
+
+        var response = new RefreshTokenResponse(
+            newAccessToken,
+            newRefreshToken,
+            expiresAt
+        );
+
+        return response;
     }
 }

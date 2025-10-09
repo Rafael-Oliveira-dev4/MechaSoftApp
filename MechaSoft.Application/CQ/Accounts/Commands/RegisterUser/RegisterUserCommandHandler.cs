@@ -3,6 +3,7 @@ using MechaSoft.Application.Common.Responses;
 using MechaSoft.Domain.Core.Interfaces;
 using MechaSoft.Domain.Core.Uow;
 using MechaSoft.Domain.Model;
+using MechaSoft.Security.Interfaces;
 using Microsoft.Extensions.Logging;
 
 namespace MechaSoft.Application.CQ.Accounts.Commands.RegisterUser;
@@ -10,90 +11,63 @@ namespace MechaSoft.Application.CQ.Accounts.Commands.RegisterUser;
 public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, Result<RegisterUserResponse, Success, Error>>
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IPasswordHasher _passwordHasher;
     private readonly ILogger<RegisterUserCommandHandler> _logger;
 
     public RegisterUserCommandHandler(
         IUnitOfWork unitOfWork,
+        IPasswordHasher passwordHasher,
         ILogger<RegisterUserCommandHandler> logger)
     {
         _unitOfWork = unitOfWork;
+        _passwordHasher = passwordHasher;
         _logger = logger;
     }
 
     public async Task<Result<RegisterUserResponse, Success, Error>> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
     {
-        try
+        // Check if username already exists
+        if (await _unitOfWork.UserRepository.UsernameExistsAsync(request.Username))
+            return Error.UsernameAlreadyExists;
+
+        // Check if email already exists
+        if (await _unitOfWork.UserRepository.EmailExistsAsync(request.Email))
+            return Error.EmailAlreadyExists;
+
+        // Hash password using BCrypt (salt is handled internally)
+        var passwordHash = _passwordHasher.HashPassword(request.Password);
+
+        // Create user
+        var user = new User
         {
-            // Check if username already exists
-            if (await _unitOfWork.UserRepository.UsernameExistsAsync(request.Username))
-            {
-                return Error.UsernameAlreadyExists;
-            }
+            Username = request.Username,
+            Email = request.Email,
+            PasswordHash = passwordHash,
+            Salt = string.Empty, // BCrypt handles salt internally
+            Role = request.Role
+        };
 
-            // Check if email already exists
-            if (await _unitOfWork.UserRepository.EmailExistsAsync(request.Email))
-            {
-                return Error.EmailAlreadyExists;
-            }
+        // Link to customer or employee if provided
+        if (request.CustomerId.HasValue)
+            user.LinkToCustomer(request.CustomerId.Value);
+        else if (request.EmployeeId.HasValue)
+            user.LinkToEmployee(request.EmployeeId.Value);
 
-            // Generate salt and hash password
-            var salt = GenerateSalt();
-            var passwordHash = HashPassword(request.Password, salt);
+        // Save user
+        var savedUser = await _unitOfWork.UserRepository.SaveAsync(user);
+        await _unitOfWork.CommitAsync(cancellationToken);
 
-            // Create user
-            var user = new User
-            {
-                Username = request.Username,
-                Email = request.Email,
-                PasswordHash = passwordHash,
-                Salt = salt,
-                Role = request.Role
-            };
+        _logger.LogInformation("User registered successfully: {Username}", request.Username);
 
-            // Link to customer or employee if provided
-            if (request.CustomerId.HasValue)
-            {
-                user.LinkToCustomer(request.CustomerId.Value);
-            }
-            else if (request.EmployeeId.HasValue)
-            {
-                user.LinkToEmployee(request.EmployeeId.Value);
-            }
+        var response = new RegisterUserResponse(
+            savedUser.Id,
+            savedUser.Username,
+            savedUser.Email,
+            savedUser.Role,
+            savedUser.EmailConfirmed
+        );
 
-            // Save user
-            var savedUser = await _unitOfWork.UserRepository.SaveAsync(user);
-            await _unitOfWork.CommitAsync(cancellationToken);
-
-            _logger.LogInformation("User registered successfully: {Username}", request.Username);
-
-            var response = new RegisterUserResponse(
-                savedUser.Id,
-                savedUser.Username,
-                savedUser.Email,
-                savedUser.Role,
-                savedUser.EmailConfirmed
-            );
-
-            return response;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error registering user: {Username}", request.Username);
-            return Error.OperationFailed;
-        }
+        return response;
     }
 
-    private static string GenerateSalt()
-    {
-        return Guid.NewGuid().ToString("N");
-    }
-
-    private static string HashPassword(string password, string salt)
-    {
-        // Simple hash implementation - in production, use BCrypt or similar
-        using var sha256 = System.Security.Cryptography.SHA256.Create();
-        var saltedPassword = password + salt;
-        var hashedBytes = sha256.ComputeHash(System.Text.Encoding.UTF8.GetBytes(saltedPassword));
-        return Convert.ToBase64String(hashedBytes);
-    }
 }

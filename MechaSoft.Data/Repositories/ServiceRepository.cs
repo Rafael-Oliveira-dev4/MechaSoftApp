@@ -17,7 +17,6 @@ public class ServiceRepository : Repository<Service>, IServiceRepository
             throw new ArgumentNullException(nameof(service));
         
         await _dbSet.AddAsync(service);
-        await _context.SaveChangesAsync();
         return service;
     }
 
@@ -53,7 +52,6 @@ public class ServiceRepository : Repository<Service>, IServiceRepository
             throw new ArgumentNullException(nameof(service));
         
         _dbSet.Update(service);
-        await _context.SaveChangesAsync();
         return service;
     }
 }

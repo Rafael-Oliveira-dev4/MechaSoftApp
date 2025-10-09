@@ -9,8 +9,6 @@ using MechaSoft.Domain.Core.Uow;
 using MechaSoft.Domain.Core.Interfaces;
 using MechaSoft.Data.Repositories;
 using MechaSoft.Data.Uow;
-using MechaSoft.Security.Interfaces;
-using MechaSoft.Security.Services;
 
 namespace MechaSoft.Data;
 
@@ -18,15 +16,27 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddDataServices(this IServiceCollection services, IConfiguration configuration)
     {
+        // Infra - HttpContext for interceptors/auditing
+        services.AddHttpContextAccessor();
+
+        // Get connection string from configuration
+        var connectionString = configuration.GetConnectionString("MechaSoftCS") 
+            ?? throw new InvalidOperationException("Connection string 'MechaSoftCS' not found.");
+
         // Interceptors and Context
+        // Re-enabled with optional IHttpContextAccessor
         services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
         services.AddDbContext<ApplicationDbContext>((sp, options) =>
         {
             options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
-            options.UseSqlServer("Server=localhost\\SQLEXPRESS;Database=DV_RO_MechaSoft;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True", sqlOptions =>
+            options.UseSqlServer(connectionString, sqlOptions =>
             {
-                // Configure SQL Server options if needed
-                sqlOptions.EnableRetryOnFailure(); // Example: Enable retry on failure
+                // Configure SQL Server options
+                sqlOptions.EnableRetryOnFailure(
+                    maxRetryCount: 3,
+                    maxRetryDelay: TimeSpan.FromSeconds(30),
+                    errorNumbersToAdd: null);
+                sqlOptions.CommandTimeout(30);
             });
         });
 
@@ -53,10 +63,12 @@ public static class DependencyInjection
         services.AddScoped<ICreateServiceOrderUseCase, CreateServiceOrderUseCaseRepository>();
         services.AddScoped<IScheduleInspectionUseCase, ScheduleInspectionRepository>();
 
-        //Services
-        services.AddScoped<ITokenService, TokenService>();
+        // Note: ITokenService is registered in MechaSoft.Security project
         // services.AddScoped<IFileStorageService, FileStorageService>();
         //services.AddScoped<INotificationService, NotificationService>();
+
+        // Health Checks (registered in WebAPI Program)
+        services.AddHealthChecks();
 
         return services;
     }
