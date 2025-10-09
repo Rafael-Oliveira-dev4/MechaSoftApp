@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { ErrorComponent } from './shared/components/error/error.component';
 import { LoginComponent } from './components/auth/login/login.component';
+import { RegisterComponent } from './components/auth/register/register.component';
 import { LandingComponent } from './components/landing/landing.component';
 
 const routes: Routes = [
@@ -10,6 +11,9 @@ const routes: Routes = [
   
   // Login (público)
   { path: 'login', component: LoginComponent },
+  
+  // Register (público)
+  { path: 'register', component: RegisterComponent },
   
   // Sistema de Gestão (Front-Office = Admin System)
   // NOTA: Nome "front-office" é mantido por compatibilidade

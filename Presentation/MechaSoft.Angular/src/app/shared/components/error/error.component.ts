@@ -1,17 +1,13 @@
 import { Component } from '@angular/core';
+import { RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-error',
   standalone: true,
-  template: `
-    <div class="container">
-      <h2>Página não encontrada</h2>
-      <p>Verifique o endereço.</p>
-    </div>
-  `,
-  styles: [`
-    .container { padding: 1rem; }
-  `]
+  imports: [CommonModule, RouterModule],
+  templateUrl: './error.component.html',
+  styleUrls: ['./error.component.scss']
 })
 export class ErrorComponent {}
 
