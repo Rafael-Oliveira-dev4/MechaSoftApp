@@ -11,12 +11,15 @@ import { DashboardStats, LowStockReport } from '../../../../core/models/dashboar
 import { ErrorDetail } from '../../../../core/models/result.model';
 import { DashboardService } from '../../../../core/services/dashboard.service';
 import { LoadingService } from '../../../../core/services/loading.service';
+import { AuthService } from '../../../../core/services/auth.service';
+import { User } from '../../../../core/models/api.models';
 import { ErrorMessageComponent } from '../../../../shared/components/error-message/error-message.component';
+import { ProfileCompletionAlertComponent } from '../../components/profile-completion-alert/profile-completion-alert.component';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, ErrorMessageComponent],
+  imports: [CommonModule, ErrorMessageComponent, ProfileCompletionAlertComponent],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
 })
@@ -27,6 +30,8 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   lowStockReport: LowStockReport | null = null;
   error: ErrorDetail | null = null;
   loading$;
+  currentUser: User | null = null;
+  showProfileAlert = false;
 
   // Animated values
   animatedTotalOrders: number = 0;
@@ -34,12 +39,26 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   animatedTotalCustomers: number = 0;
   animatedLowStockCount: number = 0;
 
-  constructor(private dashboardService: DashboardService, private loadingService: LoadingService) {
+  constructor(
+    private dashboardService: DashboardService, 
+    private loadingService: LoadingService,
+    private authService: AuthService
+  ) {
     this.loading$ = this.loadingService.loading$;
   }
 
   ngOnInit(): void {
     this.loadDashboardData();
+    this.checkUserProfile();
+  }
+
+  private checkUserProfile(): void {
+    this.authService.currentUser$.subscribe((user: User | null) => {
+      this.currentUser = user;
+      // Show alert if user is Customer and doesn't have a customer profile
+      this.showProfileAlert = 
+        user?.role === 'Customer' && !user?.customerId;
+    });
   }
 
   ngAfterViewInit(): void {

@@ -8,7 +8,8 @@ public class Name
     public Name(string firstName, string lastName)
     {
         FirstName = ValidateName(firstName, nameof(firstName));
-        LastName = ValidateName(lastName, nameof(lastName));
+        // LastName can be empty for companies
+        LastName = string.IsNullOrWhiteSpace(lastName) ? string.Empty : lastName.Trim();
     }
 
     private static string ValidateName(string name, string paramName)
@@ -22,7 +23,9 @@ public class Name
         return name.Trim();
     }
 
-    public string FullName => $"{FirstName} {LastName}";
+    public string FullName => string.IsNullOrWhiteSpace(LastName) 
+        ? FirstName 
+        : $"{FirstName} {LastName}";
 
     public override string ToString()
     {

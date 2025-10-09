@@ -41,6 +41,9 @@ export class AuthService {
           isActive: true,
           emailConfirmed: false,
           createdAt: new Date(),
+          customerId: response.customerId,
+          employeeId: response.employeeId,
+          profileImageUrl: response.profileImageUrl,
         };
 
         this.currentUserSubject.next(user);

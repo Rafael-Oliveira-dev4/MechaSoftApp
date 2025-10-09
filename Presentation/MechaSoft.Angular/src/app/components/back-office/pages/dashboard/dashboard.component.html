@@ -10,6 +10,11 @@
 
   <app-error-message [error]="error" (onClose)="error = null"></app-error-message>
 
+  <!-- Profile Completion Alert -->
+  @if (showProfileAlert) {
+  <app-profile-completion-alert [isDismissible]="true"></app-profile-completion-alert>
+  }
+
   <!-- Header -->
   <div class="dashboard-header">
     <div>

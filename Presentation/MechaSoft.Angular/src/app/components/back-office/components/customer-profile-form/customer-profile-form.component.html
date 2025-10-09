@@ -1,0 +1,369 @@
+<form (ngSubmit)="onSubmit()" class="customer-form">
+  <!-- Main Form Grid - Horizontal Layout -->
+  <div class="form-sections-grid">
+    <!-- Personal Information Section -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <svg class="section-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+          />
+        </svg>
+        Informações Pessoais
+      </h3>
+
+      <div class="form-grid-vertical">
+      <!-- Customer Type - First to determine other fields -->
+      <div class="form-group">
+        <label for="type" class="form-label">
+          Tipo de Cliente <span class="required">*</span>
+        </label>
+        <div class="select-wrapper">
+          <select
+            id="type"
+            name="type"
+            [(ngModel)]="formData.type"
+            (change)="onTypeChange()"
+            class="form-input form-select"
+            [disabled]="isLoading"
+            required
+          >
+            @for (type of customerTypes; track type.value) {
+            <option [value]="type.value">{{ type.label }}</option>
+            }
+          </select>
+          <svg class="select-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+      </div>
+
+      <!-- Name fields - Dynamic based on type -->
+      @if (formData.type === 'Individual') {
+      <!-- First Name - For Individuals -->
+      <div class="form-group">
+        <label for="firstName" class="form-label">
+          Primeiro Nome <span class="required">*</span>
+        </label>
+        <input
+          type="text"
+          id="firstName"
+          name="firstName"
+          [(ngModel)]="formData.firstName"
+          [class.error]="hasError('firstName')"
+          class="form-input"
+          placeholder="Ex: João"
+          [disabled]="isLoading"
+          required
+        />
+        @if (hasError('firstName')) {
+        <span class="error-message">{{ getError('firstName') }}</span>
+        }
+      </div>
+
+      <!-- Last Name - For Individuals -->
+      <div class="form-group">
+        <label for="lastName" class="form-label">
+          Apelido <span class="required">*</span>
+        </label>
+        <input
+          type="text"
+          id="lastName"
+          name="lastName"
+          [(ngModel)]="formData.lastName"
+          [class.error]="hasError('lastName')"
+          class="form-input"
+          placeholder="Ex: Silva"
+          [disabled]="isLoading"
+          required
+        />
+        @if (hasError('lastName')) {
+        <span class="error-message">{{ getError('lastName') }}</span>
+        }
+      </div>
+      } @else {
+      <!-- Company Name - For Companies -->
+      <div class="form-group">
+        <label for="companyName" class="form-label">
+          Nome da Empresa <span class="required">*</span>
+        </label>
+        <input
+          type="text"
+          id="companyName"
+          name="companyName"
+          [(ngModel)]="formData.firstName"
+          [class.error]="hasError('firstName')"
+          class="form-input"
+          placeholder="Ex: MechaSoft Auto Repair, Lda"
+          [disabled]="isLoading"
+          required
+        />
+        @if (hasError('firstName')) {
+        <span class="error-message">{{ getError('firstName') }}</span>
+        }
+      </div>
+      }
+
+      <!-- Phone -->
+      <div class="form-group">
+        <label for="phone" class="form-label">
+          Telefone <span class="required">*</span>
+        </label>
+        <input
+          type="tel"
+          id="phone"
+          name="phone"
+          [(ngModel)]="formData.phone"
+          [class.error]="hasError('phone')"
+          class="form-input"
+          placeholder="Ex: 912345678"
+          [disabled]="isLoading"
+          required
+        />
+        @if (hasError('phone')) {
+        <span class="error-message">{{ getError('phone') }}</span>
+        }
+      </div>
+
+      </div>
+    </div>
+
+    <!-- Address Section -->
+    <div class="form-section">
+      <h3 class="section-title">
+        <svg class="section-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+          />
+        </svg>
+        Morada
+      </h3>
+
+      <div class="form-grid-vertical">
+      <!-- Street -->
+      <div class="form-group">
+        <label for="street" class="form-label">
+          Rua <span class="required">*</span>
+        </label>
+        <input
+          type="text"
+          id="street"
+          name="street"
+          [(ngModel)]="formData.address.street"
+          [class.error]="hasError('street')"
+          class="form-input"
+          placeholder="Ex: Rua das Flores"
+          [disabled]="isLoading"
+          required
+        />
+        @if (hasError('street')) {
+        <span class="error-message">{{ getError('street') }}</span>
+        }
+      </div>
+
+      <!-- Number -->
+      <div class="form-group">
+        <label for="number" class="form-label">
+          Número <span class="required">*</span>
+        </label>
+        <input
+          type="text"
+          id="number"
+          name="number"
+          [(ngModel)]="formData.address.number"
+          [class.error]="hasError('number')"
+          class="form-input"
+          placeholder="Ex: 123"
+          [disabled]="isLoading"
+          required
+        />
+        @if (hasError('number')) {
+        <span class="error-message">{{ getError('number') }}</span>
+        }
+      </div>
+
+      <!-- Parish -->
+      <div class="form-group">
+        <label for="parish" class="form-label">
+          Freguesia <span class="required">*</span>
+        </label>
+        <input
+          type="text"
+          id="parish"
+          name="parish"
+          [(ngModel)]="formData.address.parish"
+          [class.error]="hasError('parish')"
+          class="form-input"
+          placeholder="Ex: Paranhos"
+          [disabled]="isLoading"
+          required
+        />
+        @if (hasError('parish')) {
+        <span class="error-message">{{ getError('parish') }}</span>
+        }
+      </div>
+
+      <!-- Municipality -->
+      <div class="form-group">
+        <label for="municipality" class="form-label">
+          Concelho <span class="required">*</span>
+        </label>
+        <input
+          type="text"
+          id="municipality"
+          name="municipality"
+          [(ngModel)]="formData.address.municipality"
+          [class.error]="hasError('municipality')"
+          class="form-input"
+          placeholder="Ex: Porto"
+          [disabled]="isLoading"
+          required
+        />
+        @if (hasError('municipality')) {
+        <span class="error-message">{{ getError('municipality') }}</span>
+        }
+      </div>
+
+      <!-- District -->
+      <div class="form-group">
+        <label for="district" class="form-label">
+          Distrito <span class="required">*</span>
+        </label>
+        <input
+          type="text"
+          id="district"
+          name="district"
+          [(ngModel)]="formData.address.district"
+          [class.error]="hasError('district')"
+          class="form-input"
+          placeholder="Ex: Porto"
+          [disabled]="isLoading"
+          required
+        />
+        @if (hasError('district')) {
+        <span class="error-message">{{ getError('district') }}</span>
+        }
+      </div>
+
+      <!-- Postal Code -->
+      <div class="form-group">
+        <label for="postalCode" class="form-label">
+          Código Postal <span class="required">*</span>
+        </label>
+        <input
+          type="text"
+          id="postalCode"
+          name="postalCode"
+          [(ngModel)]="formData.address.postalCode"
+          (input)="formatPostalCode()"
+          [class.error]="hasError('postalCode')"
+          class="form-input"
+          placeholder="1234-567"
+          maxlength="8"
+          [disabled]="isLoading"
+          required
+        />
+        @if (hasError('postalCode')) {
+        <span class="error-message">{{ getError('postalCode') }}</span>
+        }
+      </div>
+
+      <!-- Complement -->
+      <div class="form-group">
+        <label for="complement" class="form-label">Complemento</label>
+        <input
+          type="text"
+          id="complement"
+          name="complement"
+          [(ngModel)]="formData.address.complement"
+          class="form-input"
+          placeholder="Ex: 2º Esq"
+          [disabled]="isLoading"
+        />
+      </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Optional Information Section (Full Width) -->
+  <div class="form-section">
+    <h3 class="section-title">
+      <svg class="section-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+        />
+      </svg>
+      Informações Adicionais (Opcional)
+    </h3>
+
+    <div class="form-grid-horizontal">
+      <!-- NIF - Label changes based on type -->
+      <div class="form-group">
+        <label for="nif" class="form-label">
+          {{ formData.type === 'Company' ? 'NIF da Empresa' : 'NIF' }}
+        </label>
+        <input
+          type="text"
+          id="nif"
+          name="nif"
+          [(ngModel)]="formData.nif"
+          (input)="formatNif()"
+          [class.error]="hasError('nif')"
+          class="form-input"
+          placeholder="123456789"
+          maxlength="9"
+          [disabled]="isLoading"
+        />
+        @if (hasError('nif')) {
+        <span class="error-message">{{ getError('nif') }}</span>
+        }
+      </div>
+
+      <!-- Citizen Card -->
+      <div class="form-group">
+        <label for="citizenCard" class="form-label">Cartão de Cidadão</label>
+        <input
+          type="text"
+          id="citizenCard"
+          name="citizenCard"
+          [(ngModel)]="formData.citizenCard"
+          class="form-input"
+          placeholder="12345678 9 ZZ0"
+          [disabled]="isLoading"
+        />
+      </div>
+    </div>
+  </div>
+
+  <!-- Form Actions -->
+  <div class="form-actions">
+    <button type="button" (click)="onCancel()" class="btn-secondary" [disabled]="isLoading">
+      <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+      Cancelar
+    </button>
+
+    <button type="submit" class="btn-primary" [disabled]="isLoading">
+      @if (isLoading) {
+      <span class="spinner"></span>
+      <span>A guardar...</span>
+      } @else {
+      <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+      </svg>
+      <span>Guardar Perfil</span>
+      }
+    </button>
+  </div>
+</form>
+

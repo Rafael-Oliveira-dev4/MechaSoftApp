@@ -231,8 +231,49 @@
             <p class="stat-value">{{ getRoleLabel() }}</p>
           </div>
         </div>
+
+        <!-- Customer Status Card (only for customers) -->
+        @if (isCustomer()) {
+        <div class="customer-status-wrapper">
+          <app-customer-status-card
+            [hasCustomerProfile]="hasCustomerProfile()"
+            [customerName]="currentUser.customerId ? 'Perfil Completo' : undefined"
+            (onClick)="scrollToCustomerForm()"
+          ></app-customer-status-card>
+        </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Customer Profile Form Card (only for customers without profile) - Full Width Row -->
+  @if (currentUser && isCustomer() && !hasCustomerProfile()) {
+  <div class="customer-form-row">
+    <div id="customer-profile-section" class="customer-profile-form-card">
+      <div class="card-header">
+        <h2 class="card-title">
+          <svg class="section-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+            />
+          </svg>
+          Complete o seu Perfil de Cliente
+        </h2>
+        <p class="card-subtitle">Preencha os dados abaixo para aceder a todos os serviços da oficina</p>
+      </div>
+
+      <div class="customer-form-container">
+        <app-customer-profile-form
+          [isLoading]="isLoadingCustomerProfile"
+          (formSubmit)="onCustomerProfileSubmit($event)"
+          (formCancel)="onCustomerProfileCancel()"
+        ></app-customer-profile-form>
       </div>
     </div>
   </div>
   }
-</div>
+}
+

@@ -2,6 +2,58 @@
   @apply relative min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-6 overflow-hidden;
 }
 
+// Customer Status Card Wrapper - Add spacing
+.customer-status-wrapper {
+  margin-top: 1rem;
+}
+
+// Customer Form Row - Full Width Row Below Main Grid
+.customer-form-row {
+  @apply relative z-10 mt-6;
+}
+
+// Customer Profile Form Card - Full Width
+.customer-profile-form-card {
+  @apply bg-slate-900/50 backdrop-blur-xl border border-slate-800/50 rounded-2xl shadow-2xl overflow-hidden;
+  scroll-margin-top: 2rem;
+  animation: fadeInUp 0.5s ease-out;
+
+  .card-header {
+    @apply px-6 py-4 border-b border-slate-800/50;
+  }
+
+  .card-title {
+    @apply text-xl font-bold text-white flex items-center gap-2 mb-2;
+    background: linear-gradient(135deg, #10b981, #14b8a6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+
+    .section-icon {
+      @apply w-6 h-6 text-emerald-500;
+    }
+  }
+
+  .card-subtitle {
+    @apply text-zinc-400 text-sm;
+  }
+
+  .customer-form-container {
+    @apply p-6;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 // Background Grid Pattern
 .profile-container::before {
   content: '';

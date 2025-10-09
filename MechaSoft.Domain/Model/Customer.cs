@@ -1,5 +1,6 @@
 ﻿using MechaSoft.Domain.Common;
 using MechaSoft.Domain.Interfaces;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MechaSoft.Domain.Model;
 
@@ -27,6 +28,7 @@ public class Customer : AuditableEntity, IEntity<Guid>
         ServiceOrders = [];
     }
 
+    [SetsRequiredMembers]
     public Customer(string firstName, string lastName, string email, string phone,
                    Address address, CustomerType type, string? nif = null, string? citizenCard = null)
     {

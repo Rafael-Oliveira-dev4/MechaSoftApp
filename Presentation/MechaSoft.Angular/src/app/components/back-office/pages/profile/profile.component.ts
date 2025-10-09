@@ -5,8 +5,11 @@ import { RouterModule } from '@angular/router';
 import { User } from '../../../../core/models/api.models';
 import { ErrorDetail } from '../../../../core/models/result.model';
 import { AuthService } from '../../../../core/services/auth.service';
+import { CustomerService, CompleteCustomerProfileRequest } from '../../../../core/services/customer.service';
 import { ErrorMessageComponent } from '../../../../shared/components/error-message/error-message.component';
 import { ProfileImageUploadComponent } from '../../../../shared/components/profile-image-upload/profile-image-upload.component';
+import { CustomerStatusCardComponent } from '../../components/customer-status-card/customer-status-card.component';
+import { CustomerProfileFormComponent, CustomerProfileFormData } from '../../components/customer-profile-form/customer-profile-form.component';
 
 @Component({
   selector: 'app-profile',
@@ -17,6 +20,8 @@ import { ProfileImageUploadComponent } from '../../../../shared/components/profi
     FormsModule,
     ErrorMessageComponent,
     ProfileImageUploadComponent,
+    CustomerStatusCardComponent,
+    CustomerProfileFormComponent,
   ],
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.scss'],
@@ -24,6 +29,8 @@ import { ProfileImageUploadComponent } from '../../../../shared/components/profi
 export class ProfileComponent implements OnInit {
   currentUser: User | null = null;
   isEditingProfile: boolean = false;
+  isEditingCustomerProfile: boolean = false;
+  isLoadingCustomerProfile: boolean = false;
   error: ErrorDetail | null = null;
   successMessage: string | null = null;
 
@@ -33,7 +40,10 @@ export class ProfileComponent implements OnInit {
     email: '',
   };
 
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private customerService: CustomerService
+  ) {}
 
   ngOnInit(): void {
     this.authService.currentUser$.subscribe((user: User | null) => {
@@ -108,5 +118,90 @@ export class ProfileComponent implements OnInit {
       hour: '2-digit',
       minute: '2-digit',
     });
+  }
+
+  // Check if user is customer
+  isCustomer(): boolean {
+    return this.currentUser?.role === 'Customer';
+  }
+
+  // Check if user has customer profile
+  hasCustomerProfile(): boolean {
+    return !!this.currentUser?.customerId;
+  }
+
+  // Toggle customer profile edit mode
+  toggleCustomerProfileEdit(): void {
+    this.isEditingCustomerProfile = !this.isEditingCustomerProfile;
+  }
+
+  // Handle customer profile form submit
+  onCustomerProfileSubmit(formData: CustomerProfileFormData): void {
+    if (!this.currentUser?.id) {
+      this.error = { code: 'NO_USER', message: 'Utilizador não encontrado' };
+      return;
+    }
+
+    this.isLoadingCustomerProfile = true;
+    this.error = null;
+
+    const request: CompleteCustomerProfileRequest = {
+      userId: this.currentUser.id,
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      phone: formData.phone,
+      type: formData.type,
+      street: formData.address.street,
+      number: formData.address.number,
+      parish: formData.address.parish,
+      municipality: formData.address.municipality,
+      district: formData.address.district,
+      postalCode: formData.address.postalCode,
+      complement: formData.address.complement,
+      nif: formData.nif,
+      citizenCard: formData.citizenCard,
+    };
+
+    this.customerService.completeProfile(request).subscribe({
+      next: result => {
+        this.isLoadingCustomerProfile = false;
+        if (result.isSuccess && result.value) {
+          this.successMessage = 'Perfil de cliente completado com sucesso!';
+          this.isEditingCustomerProfile = false;
+          
+          // Refresh user data
+          if (this.currentUser) {
+            this.currentUser.customerId = result.value.customerId;
+          }
+          
+          // Auto-hide success message
+          setTimeout(() => (this.successMessage = null), 5000);
+        } else {
+          this.error = result.error || { code: 'UNKNOWN', message: 'Erro desconhecido' };
+        }
+      },
+      error: err => {
+        this.isLoadingCustomerProfile = false;
+        this.error = {
+          code: 'SUBMIT_ERROR',
+          message: err?.error?.message || 'Erro ao completar perfil de cliente',
+        };
+      },
+    });
+  }
+
+  // Handle customer profile form cancel
+  onCustomerProfileCancel(): void {
+    this.isEditingCustomerProfile = false;
+  }
+
+  // Scroll to customer form
+  scrollToCustomerForm(): void {
+    setTimeout(() => {
+      const element = document.getElementById('customer-profile-section');
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
   }
 }

@@ -132,6 +132,8 @@ export interface User {
   lastLoginAt?: Date;
   createdAt: Date;
   profileImageUrl?: string;
+  customerId?: string;
+  employeeId?: string;
 }
 
 export interface LoginRequest {
@@ -147,6 +149,9 @@ export interface LoginResponse {
   accessToken: string;
   refreshToken: string;
   expiresAt: string;
+  customerId?: string;
+  employeeId?: string;
+  profileImageUrl?: string;
 }
 
 export interface RegisterRequest {

@@ -98,7 +98,10 @@ public class LoginUserCommandHandler : IRequestHandler<LoginUserCommand, Result<
             user.Role,
             accessToken,
             refreshToken,
-            expiresAt
+            expiresAt,
+            user.CustomerId,
+            user.EmployeeId,
+            user.ProfileImageUrl
         );
 
         return response;

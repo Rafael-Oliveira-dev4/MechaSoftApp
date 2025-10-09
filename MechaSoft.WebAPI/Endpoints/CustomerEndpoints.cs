@@ -1,6 +1,7 @@
 using MechaSoft.Application.Common.Responses;
 using MechaSoft.Application.CQ.Customers.Commands.CreateCustomer;
 using MechaSoft.Application.CQ.Customers.Commands.UpdateCustomer;
+using MechaSoft.Application.CQ.Customers.Commands.CompleteCustomerProfile;
 using MechaSoft.Application.CQ.Customers.Queries.GetCustomers;
 using MechaSoft.Application.CQ.Customers.Queries.GetCustomerById;
 using MechaSoft.Application.CQ.Customers.Common;
@@ -38,6 +39,12 @@ public static class CustomerEndpoints
         customers.MapPut("/{id:guid}", Commands.UpdateCustomer)
             .WithName("UpdateCustomer")
             .Produces<UpdateCustomerResponse>(200)
+            .Produces<Error>(400);
+
+        // POST /api/customers/complete-profile - Completar perfil de cliente
+        customers.MapPost("/complete-profile", Commands.CompleteCustomerProfile)
+            .WithName("CompleteCustomerProfile")
+            .Produces<CompleteCustomerProfileResponse>(201)
             .Produces<Error>(400);
     }
 
@@ -96,6 +103,41 @@ public static class CustomerEndpoints
 
             return result.IsSuccess
                 ? TypedResults.Ok(result.Value!)
+                : TypedResults.BadRequest(result.Error!);
+        }
+
+        public static async Task<Results<Created<CompleteCustomerProfileResponse>, BadRequest<Error>>> CompleteCustomerProfile(
+            [FromServices] ISender sender,
+            [FromBody] CompleteCustomerProfileRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            if (request == null)
+            {
+                return TypedResults.BadRequest(Error.InvalidInput);
+            }
+
+            var command = new CompleteCustomerProfileCommand
+            {
+                UserId = request.UserId,
+                FirstName = request.FirstName,
+                LastName = request.LastName,
+                Phone = request.Phone,
+                Type = request.Type,
+                Street = request.Street,
+                Number = request.Number,
+                Parish = request.Parish,
+                Municipality = request.Municipality,
+                District = request.District,
+                PostalCode = request.PostalCode,
+                Complement = request.Complement,
+                Nif = request.Nif,
+                CitizenCard = request.CitizenCard
+            };
+
+            var result = await sender.Send(command, cancellationToken);
+
+            return result.IsSuccess
+                ? TypedResults.Created($"/api/customers/{result.Value!.CustomerId}", result.Value!)
                 : TypedResults.BadRequest(result.Error!);
         }
     }

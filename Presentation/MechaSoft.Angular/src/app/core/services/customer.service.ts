@@ -85,4 +85,40 @@ export class CustomerService {
       })
     );
   }
+
+  // Completar perfil de cliente
+  completeProfile(request: CompleteCustomerProfileRequest): Observable<Result<CompleteCustomerProfileResponse>> {
+    return this.http.post<CompleteCustomerProfileResponse>(`${this.apiUrl}/complete-profile`, request).pipe(
+      map(response => success(response)),
+      catchError(error => of(failure<CompleteCustomerProfileResponse>(error)))
+    );
+  }
+}
+
+// Request/Response types for complete profile
+export interface CompleteCustomerProfileRequest {
+  userId: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  type: string; // 'Individual' or 'Company'
+  street: string;
+  number: string;
+  parish: string;
+  municipality: string;
+  district: string;
+  postalCode: string;
+  complement?: string;
+  nif?: string;
+  citizenCard?: string;
+}
+
+export interface CompleteCustomerProfileResponse {
+  customerId: string;
+  fullName: string;
+  email: string;
+  phone: string;
+  type: string;
+  nif?: string;
+  createdAt: string;
 }
