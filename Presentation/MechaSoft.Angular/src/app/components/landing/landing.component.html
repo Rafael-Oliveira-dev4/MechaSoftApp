@@ -1,56 +1,94 @@
-<!-- Public Navbar -->
-<nav class="fixed top-0 left-0 right-0 z-50 border-b border-slate-800/60 bg-slate-950/90 backdrop-blur-xl">
-	<div class="container mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
-		<a routerLink="/" class="group flex items-center space-x-2">
-			<div class="h-8 w-8 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center">
-				<svg class="h-5 w-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-					<path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"></path>
-				</svg>
+<!-- Modern Navbar with Scroll Effect -->
+<nav [ngClass]="{'navbar-scrolled': isNavbarScrolled}" 
+     class="fixed top-0 left-0 right-0 z-50 border-b border-slate-800/40 bg-slate-950/80 backdrop-blur-2xl transition-all duration-300">
+	<div class="container mx-auto flex h-20 items-center justify-between px-4 sm:px-6 lg:px-8">
+		<!-- Logo -->
+		<a routerLink="/" class="group flex items-center space-x-3 relative z-10">
+			<div class="relative">
+				<div class="absolute inset-0 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl blur-lg opacity-50 group-hover:opacity-75 transition-opacity"></div>
+				<div class="relative h-10 w-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center transform group-hover:scale-110 group-hover:rotate-12 transition-all duration-300">
+					<svg class="h-6 w-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+						<path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"></path>
+					</svg>
+				</div>
 			</div>
-			<span class="text-lg font-bold tracking-wide text-white group-hover:text-cyan-400 transition-colors">
-				MechaSoft
-			</span>
+			<div class="flex flex-col">
+				<span class="text-xl font-black tracking-tight text-white group-hover:text-cyan-400 transition-colors">
+					MechaSoft
+				</span>
+				<span class="text-xs text-cyan-400/70 font-medium">Gestão Inteligente</span>
+			</div>
 		</a>
 
 		<!-- Desktop Navigation -->
-		<div class="hidden items-center gap-6 sm:flex">
-			<a href="#services" class="text-sm text-zinc-300 hover:text-white transition-colors">Serviços</a>
-			<a routerLink="/login" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-transparent border border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/10 transition-all">
+		<div class="hidden items-center gap-2 sm:flex">
+			<a (click)="scrollToSection('#services')" 
+			   class="px-4 py-2.5 text-sm font-medium text-zinc-300 hover:text-white hover:bg-slate-800/50 rounded-lg transition-all cursor-pointer">
+				Funcionalidades
+			</a>
+			<a (click)="scrollToSection('#about')" 
+			   class="px-4 py-2.5 text-sm font-medium text-zinc-300 hover:text-white hover:bg-slate-800/50 rounded-lg transition-all cursor-pointer">
+				Sobre
+			</a>
+			
+			<div class="h-6 w-px bg-slate-700 mx-2"></div>
+			
+			<a routerLink="/login" 
+			   class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-transparent border-2 border-cyan-500/30 text-cyan-400 hover:border-cyan-500 hover:bg-cyan-500/10 hover:scale-105 transition-all duration-300 font-semibold text-sm">
 				<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
 				</svg>
 				Login
 			</a>
-			<a routerLink="/register" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-cyan-600 to-blue-700 text-white hover:from-cyan-500 hover:to-blue-600 transition-all">
+			<a routerLink="/register" 
+			   class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-700 text-white hover:from-cyan-500 hover:to-blue-600 hover:scale-105 hover:shadow-lg hover:shadow-cyan-500/30 transition-all duration-300 font-semibold text-sm">
 				<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
 				</svg>
-				Registar
+				Criar Conta
 			</a>
 		</div>
 
 		<!-- Mobile Menu Button -->
-		<button class="sm:hidden text-zinc-300 hover:text-white transition-colors" (click)="toggleMobileMenu()">
-			<svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+		<button (click)="toggleMobileMenu()" 
+		        class="sm:hidden relative z-10 p-2 text-zinc-300 hover:text-white hover:bg-slate-800/50 rounded-lg transition-all">
+			<svg *ngIf="!isMobileMenuOpen" class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
 			</svg>
-          </button>
+			<svg *ngIf="isMobileMenuOpen" class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+			</svg>
+        </button>
 	</div>
 
 	<!-- Mobile Menu -->
-	<div class="sm:hidden" [class.hidden]="!isMobileMenuOpen">
-		<div class="border-t border-slate-800/60 bg-slate-950/95 backdrop-blur-xl px-4 py-4 space-y-2">
-			<a href="#services" (click)="closeMobileMenu()" class="block px-3 py-2 text-sm text-zinc-300 hover:text-white hover:bg-slate-800/50 rounded-lg transition-colors">
-				Serviços
+	<div *ngIf="isMobileMenuOpen" class="sm:hidden animate-fadeInUp">
+		<div class="border-t border-slate-800/60 bg-slate-950/98 backdrop-blur-xl px-4 py-6 space-y-3">
+			<a (click)="scrollToSection('#services')" 
+			   class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-zinc-300 hover:text-white hover:bg-slate-800/50 rounded-xl transition-all cursor-pointer">
+				<svg class="h-5 w-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+				</svg>
+				Funcionalidades
 			</a>
-			<div class="border-t border-slate-800 pt-2 mt-2 space-y-2">
-				<a routerLink="/login" class="block px-3 py-2 text-sm text-cyan-400 hover:bg-cyan-500/10 rounded-lg transition-colors">
-					Login
-				</a>
-				<a routerLink="/register" class="block px-3 py-2 text-sm bg-gradient-to-r from-cyan-600 to-blue-700 text-white rounded-lg hover:from-cyan-500 hover:to-blue-600 transition-all">
-					Registar
-				</a>
-			</div>
+			<a (click)="scrollToSection('#about')" 
+			   class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-zinc-300 hover:text-white hover:bg-slate-800/50 rounded-xl transition-all cursor-pointer">
+				<svg class="h-5 w-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+				</svg>
+				Sobre
+			</a>
+			
+			<div class="border-t border-slate-800 my-3"></div>
+			
+			<a routerLink="/login" (click)="closeMobileMenu()" 
+			   class="flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold text-cyan-400 hover:bg-cyan-500/10 rounded-xl transition-all">
+				Login
+			</a>
+			<a routerLink="/register" (click)="closeMobileMenu()" 
+			   class="flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold bg-gradient-to-r from-cyan-600 to-blue-700 text-white rounded-xl hover:from-cyan-500 hover:to-blue-600 transition-all">
+				Criar Conta
+			</a>
 		</div>
 	</div>
 </nav>

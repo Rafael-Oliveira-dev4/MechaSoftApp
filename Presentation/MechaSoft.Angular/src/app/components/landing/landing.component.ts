@@ -10,11 +10,14 @@ import { RouterModule } from '@angular/router';
 })
 export class LandingComponent implements OnInit, AfterViewInit {
   isMobileMenuOpen = false;
+  isNavbarScrolled = false;
   
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
   
   ngOnInit() {
-    // Initialize any component logic
+    if (isPlatformBrowser(this.platformId)) {
+      this.setupScrollListener();
+    }
   }
 
   toggleMobileMenu() {
@@ -25,10 +28,46 @@ export class LandingComponent implements OnInit, AfterViewInit {
     this.isMobileMenuOpen = false;
   }
 
+  private setupScrollListener() {
+    if (typeof window === 'undefined') return;
+    
+    window.addEventListener('scroll', () => {
+      this.isNavbarScrolled = window.scrollY > 50;
+    }, { passive: true });
+  }
+
+  scrollToSection(sectionId: string) {
+    if (typeof document === 'undefined') return;
+    
+    const element = document.querySelector(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      this.closeMobileMenu();
+    }
+  }
+
   ngAfterViewInit() {
     if (isPlatformBrowser(this.platformId)) {
       this.animateCounters();
+      this.animateOnScroll();
     }
+  }
+
+  private animateOnScroll() {
+    if (typeof document === 'undefined') return;
+    
+    const elements = document.querySelectorAll('[data-animate]');
+    
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('animate-fadeInUp');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    elements.forEach(el => observer.observe(el));
   }
 
   private animateCounters() {
