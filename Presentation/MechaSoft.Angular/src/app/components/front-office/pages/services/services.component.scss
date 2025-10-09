@@ -1,23 +1,66 @@
 .services-container {
-  @apply p-6 max-w-7xl mx-auto;
+  @apply relative min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 p-6 overflow-hidden;
 }
 
-// shared: page header/title/subtitle moved to global
+// Background Grid Pattern
+.services-container::before {
+  content: '';
+  @apply absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:50px_50px] pointer-events-none;
+}
 
-// shared: buttons moved to global
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}
 
-// shared: table-card moved to global
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
 
-// shared: data-table moved to global
+// Services Grid
+.services-grid {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 z-10 relative;
+}
 
-// shared: badge moved to global
-
-// shared: btn-icon moved to global
-
-// shared: pagination moved to global
-
-// shared: modal moved to global
-
-// shared: forms moved to global
-
-// animations moved to global
+.service-card {
+  @apply relative overflow-hidden rounded-2xl border backdrop-blur-xl p-6 shadow-2xl transition-all duration-300;
+  @apply bg-slate-900/50 border-slate-800/50;
+  @apply hover:-translate-y-2 hover:shadow-purple-500/20;
+  
+  .card-glow {
+    @apply absolute -inset-1 rounded-2xl bg-gradient-to-r from-purple-500/20 to-violet-600/20 opacity-0 transition-opacity duration-300;
+  }
+  
+  &:hover .card-glow {
+    @apply opacity-100;
+  }
+  
+  .service-icon {
+    @apply h-12 w-12 rounded-xl bg-gradient-to-br from-purple-500 to-violet-600 flex items-center justify-center mb-4;
+    @apply transition-transform duration-300;
+    
+    svg {
+      @apply h-6 w-6 text-white;
+    }
+  }
+  
+  &:hover .service-icon {
+    @apply scale-110;
+  }
+  
+  h3 {
+    @apply text-xl font-bold text-white mb-2 transition-colors;
+  }
+  
+  &:hover h3 {
+    @apply text-purple-400;
+  }
+  
+  .service-description {
+    @apply text-zinc-300 mb-4 leading-relaxed;
+  }
+  
+  .service-price {
+    @apply text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text text-transparent;
+  }
+}

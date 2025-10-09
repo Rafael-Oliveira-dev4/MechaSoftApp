@@ -1,45 +1,53 @@
 .parts-container {
-  @apply p-6 max-w-7xl mx-auto;
+  @apply relative min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 p-6 overflow-hidden;
 }
 
-.page-header {
-  @apply flex justify-between items-start mb-6;
+// Background Grid Pattern
+.parts-container::before {
+  content: '';
+  @apply absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:50px_50px] pointer-events-none;
 }
 
-// shared: title/subtitle moved to global
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}
 
-// shared: buttons moved to global
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
 
-.btn-filter {
-  @apply flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium;
+// Low stock warning
+.low-stock-alert {
+  @apply relative bg-red-500/10 border border-red-500/30 rounded-2xl p-4 mb-6 z-10;
+  @apply flex items-center gap-3;
   
-  .icon {
-    @apply w-5 h-5;
+  svg {
+    @apply h-5 w-5 text-red-400;
   }
   
-  &.active {
-    @apply bg-yellow-600 text-white border-yellow-600;
+  span {
+    @apply text-red-300 font-medium;
   }
 }
 
-// shared: table-card moved to global
-
-// shared: data-table moved to global
-
-// shared: badge moved to global
-
-// shared: action-buttons moved to global
-
-.btn-icon { &.btn-stock { @apply text-purple-600 hover:bg-purple-50; } }
-
-// shared: pagination moved to global
-
-// shared: modal moved to global
-
-// shared: forms moved to global
-
-.stock-info {
-  @apply bg-blue-50 rounded-lg p-4 mb-4;
+// Stock indicators
+.stock-indicator {
+  @apply inline-flex items-center gap-2;
+  
+  .stock-dot {
+    @apply h-2 w-2 rounded-full;
+    
+    &.stock-high {
+      @apply bg-green-500 animate-pulse;
+    }
+    
+    &.stock-low {
+      @apply bg-yellow-500 animate-pulse;
+    }
+    
+    &.stock-empty {
+      @apply bg-red-500 animate-pulse;
+    }
+  }
 }
-
-// animations moved to global

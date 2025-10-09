@@ -1,83 +1,68 @@
 .orders-container {
-  @apply p-6 max-w-7xl mx-auto;
+  @apply relative min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 p-6 overflow-hidden;
 }
 
-// shared: page header/title/subtitle moved to global
-
-// shared: buttons moved to global
-
-.status-filters {
-  @apply flex gap-2 mb-6 overflow-x-auto pb-2;
+// Background Grid Pattern
+.orders-container::before {
+  content: '';
+  @apply absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:50px_50px] pointer-events-none;
 }
 
-.filter-btn {
-  @apply px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium whitespace-nowrap;
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+// Order Number styling
+.order-number {
+  @apply font-mono font-bold bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text text-transparent;
+}
+
+// Priority indicators
+.priority-badge {
+  @apply inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold;
   
-  &.active {
-    @apply bg-blue-600 text-white border-blue-600;
+  &.priority-urgent {
+    @apply bg-red-500/20 text-red-300 ring-1 ring-red-500/30 animate-pulse;
+  }
+  
+  &.priority-high {
+    @apply bg-orange-500/20 text-orange-300 ring-1 ring-orange-500/30;
+  }
+  
+  &.priority-normal {
+    @apply bg-blue-500/20 text-blue-300 ring-1 ring-blue-500/30;
+  }
+  
+  &.priority-low {
+    @apply bg-gray-500/20 text-gray-300 ring-1 ring-gray-500/30;
   }
 }
 
-// shared: table-card moved to global
-
-// shared: data-table moved to global
-
-// shared: badge moved to global
-
-// shared: btn-icon moved to global
-
-// shared: pagination moved to global
-
-// shared: modal moved to global
-
-// shared: forms moved to global
-
-.details-grid {
-  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6;
-}
-
-.detail-card {
-  @apply bg-gray-50 rounded-lg p-4;
-}
-
-.detail-title {
-  @apply text-xs font-medium text-gray-600 uppercase tracking-wider mb-2;
-}
-
-.detail-value {
-  @apply text-2xl font-bold text-gray-900;
-}
-
-.action-section {
-  @apply bg-blue-50 rounded-lg p-4 mb-4;
-}
-
-.section-title {
-  @apply text-sm font-semibold text-gray-800 mb-3;
-}
-
-.btn-status {
-  @apply px-4 py-2 rounded-lg font-medium transition-all;
+// Status progress bar
+.status-progress {
+  @apply h-2 bg-slate-800 rounded-full overflow-hidden;
   
-  &.btn-blue {
-    @apply bg-blue-600 text-white hover:bg-blue-700;
-  }
-  
-  &.btn-green {
-    @apply bg-green-600 text-white hover:bg-green-700;
-  }
-  
-  &.btn-yellow {
-    @apply bg-yellow-600 text-white hover:bg-yellow-700;
-  }
-  
-  &.btn-red {
-    @apply bg-red-600 text-white hover:bg-red-700;
-  }
-  
-  &.btn-orange {
-    @apply bg-orange-600 text-white hover:bg-orange-700;
+  .progress-fill {
+    @apply h-full bg-gradient-to-r transition-all duration-500;
+    
+    &.fill-pending {
+      @apply from-yellow-500 to-orange-500;
+      width: 25%;
+    }
+    
+    &.fill-in-progress {
+      @apply from-blue-500 to-cyan-500;
+      width: 50%;
+    }
+    
+    &.fill-completed {
+      @apply from-green-500 to-emerald-500;
+      width: 100%;
+    }
   }
 }
-
-// animations moved to global

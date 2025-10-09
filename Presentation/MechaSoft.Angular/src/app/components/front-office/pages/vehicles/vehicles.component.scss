@@ -1,47 +1,27 @@
 .vehicles-container {
-  @apply p-6 max-w-7xl mx-auto;
+  @apply relative min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 p-6 overflow-hidden;
 }
 
-// shared: page-header, title, subtitle moved to global
-
-// shared: btn-primary moved to global
-
-// shared: btn-secondary moved to global
-
-.search-bar {
-  @apply relative mb-6;
+// Background Grid Pattern
+.vehicles-container::before {
+  content: '';
+  @apply absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:50px_50px] pointer-events-none;
 }
 
-.search-icon {
-  @apply absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400;
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
 }
 
-.search-input {
-  @apply w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+.animate-float {
+  animation: float 6s ease-in-out infinite;
 }
 
-// shared: table-card moved to global
-
-// shared: data-table moved to global
-
-// shared: badge moved to global
-
-// shared: action-buttons moved to global
-
-// shared: btn-icon moved to global
-
-// shared: pagination moved to global
-
-// shared: btn-pagination moved to global
-
-// shared: pagination-info moved to global
-
-// shared: modal-* moved to global
-
-// shared: form-* moved to global
-
-.modal-footer {
-  @apply flex justify-end gap-3 px-6 py-4 bg-gray-50 border-t border-gray-200;
+// Vehicle specific styles
+.vehicle-plate {
+  @apply font-mono font-bold text-lg bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text text-transparent;
 }
 
-// animations moved to global
+.vehicle-brand-model {
+  @apply font-semibold text-white;
+}

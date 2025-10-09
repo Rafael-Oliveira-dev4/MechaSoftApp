@@ -1,10 +1,79 @@
-:host {
-	display: block;
-	@apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6;
+.inspections-container {
+  @apply relative min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 p-6 overflow-hidden;
 }
 
-.section { padding: 1rem; display: grid; gap: 1rem; }
-.section__header { display: flex; align-items: center; justify-content: space-between; }
-.btn { padding: .5rem 1rem; border: 1px solid #ddd; border-radius: .5rem; background: #f7f7f7; cursor: pointer; }
-.btn:hover { background: #eee; }
-.card { border: 1px solid #e5e5e5; border-radius: .75rem; padding: 1rem; background: #fff; }
+// Background Grid Pattern
+.inspections-container::before {
+  content: '';
+  @apply absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:50px_50px] pointer-events-none;
+}
+
+// Floating Animation
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-20px) scale(1.05);
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+// Calendar View specific styles
+.calendar-grid {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 z-10 relative;
+}
+
+.inspection-card {
+  @apply relative overflow-hidden rounded-2xl border backdrop-blur-xl p-6 shadow-2xl transition-all duration-300;
+  @apply bg-slate-900/50 border-slate-800/50;
+  @apply hover:-translate-y-2 hover:shadow-cyan-500/20 cursor-pointer;
+  
+  .card-header {
+    @apply flex justify-between items-start mb-4;
+    
+    .inspection-date {
+      @apply text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text text-transparent;
+    }
+    
+    .inspection-time {
+      @apply text-sm text-zinc-400;
+    }
+  }
+  
+  .vehicle-info {
+    @apply mb-4 pb-4 border-b border-slate-800;
+    
+    h4 {
+      @apply text-lg font-semibold text-white mb-1;
+    }
+    
+    p {
+      @apply text-sm text-zinc-400;
+    }
+  }
+  
+  .inspection-footer {
+    @apply flex justify-between items-center;
+  }
+}
+
+// Status indicators
+.inspection-status {
+  @apply inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold;
+  
+  &.status-scheduled {
+    @apply bg-blue-500/20 text-blue-300 ring-1 ring-blue-500/30;
+  }
+  
+  &.status-completed {
+    @apply bg-green-500/20 text-green-300 ring-1 ring-green-500/30;
+  }
+  
+  &.status-cancelled {
+    @apply bg-red-500/20 text-red-300 ring-1 ring-red-500/30;
+  }
+}
