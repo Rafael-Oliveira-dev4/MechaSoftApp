@@ -1,64 +1,184 @@
+// Dark Elegant Error Notification
 .error-toast {
-  @apply fixed top-4 right-4 z-50 max-w-md;
-  animation: slideInRight 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-}
-
-.error-card {
-  @apply bg-white border border-red-200 p-5 rounded-xl shadow-xl;
-  backdrop-filter: blur(10px);
-
-  &:hover {
-    @apply shadow-2xl border-red-300;
-    transform: translateY(-2px);
-    transition: all 0.3s ease;
+  position: fixed;
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: 9999;
+  max-width: 420px;
+  width: calc(100vw - 3rem);
+  animation: slideInRight 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  
+  @media (max-width: 640px) {
+    top: 1rem;
+    right: 1rem;
+    left: 1rem;
+    max-width: none;
+    width: auto;
   }
 }
 
-.error-content {
-  @apply flex items-start gap-3;
+// Glow effect behind card
+.error-glow {
+  position: absolute;
+  inset: -0.5rem;
+  background: radial-gradient(circle, rgba(239, 68, 68, 0.3) 0%, transparent 70%);
+  border-radius: 1rem;
+  filter: blur(20px);
+  animation: pulseGlow 2s ease-in-out infinite;
+  z-index: -1;
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.05);
+  }
+}
+
+// Main card
+.error-card {
+  position: relative;
+  background: rgba(30, 41, 59, 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 1rem;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(239, 68, 68, 0.1);
+  overflow: hidden;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(239, 68, 68, 0.2);
+    border-color: rgba(239, 68, 68, 0.4);
+  }
+}
+
+// Icon section
+.error-icon-wrapper {
+  position: absolute;
+  top: 1.25rem;
+  left: 1.25rem;
+  width: 48px;
+  height: 48px;
+}
+
+.icon-glow {
+  position: absolute;
+  inset: -0.25rem;
+  background: radial-gradient(circle, rgba(239, 68, 68, 0.3) 0%, transparent 70%);
+  border-radius: 50%;
+  filter: blur(8px);
+  animation: iconPulse 2s ease-in-out infinite;
+}
+
+@keyframes iconPulse {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 
 .error-icon {
-  @apply flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full bg-red-100;
+  position: relative;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1.5px solid rgba(239, 68, 68, 0.4);
+  border-radius: 50%;
+  backdrop-filter: blur(10px);
 
-  .icon {
-    @apply w-6 h-6 text-red-600;
+  svg {
+    width: 28px;
+    height: 28px;
+    color: #ef4444;
+    filter: drop-shadow(0 2px 4px rgba(239, 68, 68, 0.5));
   }
 }
 
-.error-body {
-  @apply flex-1;
+// Content section
+.error-content {
+  padding: 1.25rem 1.25rem 1.25rem 5rem;
+}
+
+.error-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
 }
 
 .error-title {
-  @apply text-base font-semibold text-gray-900 mb-1;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+  letter-spacing: -0.02em;
 }
 
 .error-message {
-  @apply text-sm text-gray-700 leading-relaxed;
+  font-size: 0.875rem;
+  color: #cbd5e1;
+  line-height: 1.5;
+  margin: 0 0 0.75rem 0;
 }
 
-.error-details {
-  @apply mt-2 text-xs text-gray-600 whitespace-pre-line;
+// Meta information (code and status)
+.error-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
 }
 
-.error-code {
-  @apply mt-1 text-xs text-gray-500 font-mono;
+.error-code,
+.error-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.625rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-family: 'Courier New', monospace;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 0.375rem;
+  color: #fca5a5;
 }
 
-.error-close {
-  @apply ml-4 flex-shrink-0;
-}
-
+// Close button
 .close-button {
-  @apply inline-flex items-center justify-center w-8 h-8 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 focus:outline-none transition-all duration-200;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(51, 65, 85, 0.5);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 0.5rem;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: all 0.2s ease;
 
-  .icon {
-    @apply h-5 w-5;
+  svg {
+    width: 18px;
+    height: 18px;
   }
 
   &:hover {
-    transform: scale(1.1) rotate(90deg);
+    background: rgba(239, 68, 68, 0.2);
+    border-color: rgba(239, 68, 68, 0.4);
+    color: #ef4444;
+    transform: scale(1.05);
   }
 
   &:active {
@@ -66,6 +186,34 @@
   }
 }
 
+// Progress bar for auto-dismiss
+.progress-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: rgba(239, 68, 68, 0.1);
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%);
+  animation: shrink linear forwards;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+}
+
+@keyframes shrink {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+
+// Slide in animation
 @keyframes slideInRight {
   from {
     transform: translateX(120%) scale(0.8);
@@ -77,6 +225,7 @@
   }
 }
 
+// Slide out animation
 .error-toast.closing {
   animation: slideOutRight 0.3s cubic-bezier(0.55, 0.085, 0.68, 0.53) forwards;
 }
@@ -89,5 +238,37 @@
   to {
     transform: translateX(120%) scale(0.8);
     opacity: 0;
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 640px) {
+  .error-content {
+    padding: 1rem 1rem 1rem 4.5rem;
+  }
+
+  .error-icon-wrapper {
+    top: 1rem;
+    left: 1rem;
+    width: 40px;
+    height: 40px;
+  }
+
+  .error-icon {
+    width: 40px;
+    height: 40px;
+
+    svg {
+      width: 24px;
+      height: 24px;
+    }
+  }
+
+  .error-title {
+    font-size: 0.9375rem;
+  }
+
+  .error-message {
+    font-size: 0.8125rem;
   }
 }

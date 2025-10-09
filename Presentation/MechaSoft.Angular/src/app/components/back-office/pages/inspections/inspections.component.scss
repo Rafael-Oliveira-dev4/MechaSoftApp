@@ -1,5 +1,5 @@
 .inspections-container {
-  @apply relative min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 p-6 overflow-hidden;
+  @apply relative min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-6 overflow-hidden;
 }
 
 // Background Grid Pattern
@@ -30,13 +30,13 @@
 .inspection-card {
   @apply relative overflow-hidden rounded-2xl border backdrop-blur-xl p-6 shadow-2xl transition-all duration-300;
   @apply bg-slate-900/50 border-slate-800/50;
-  @apply hover:-translate-y-2 hover:shadow-cyan-500/20 cursor-pointer;
+  @apply hover:-translate-y-2 hover:shadow-emerald-500/20 cursor-pointer;
   
   .card-header {
     @apply flex justify-between items-start mb-4;
     
     .inspection-date {
-      @apply text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text text-transparent;
+      @apply text-2xl font-bold bg-gradient-to-r from-emerald-400 to-teal-600 bg-clip-text text-transparent;
     }
     
     .inspection-time {
@@ -66,7 +66,7 @@
   @apply inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold;
   
   &.status-scheduled {
-    @apply bg-blue-500/20 text-blue-300 ring-1 ring-blue-500/30;
+    @apply bg-teal-500/20 text-blue-300 ring-1 ring-teal-500/30;
   }
   
   &.status-completed {

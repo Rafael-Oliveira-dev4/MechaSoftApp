@@ -6,13 +6,13 @@ import { User } from '../../../core/models/api.models';
 import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
 
 @Component({
-  selector: 'app-front-office-layout',
+  selector: 'app-back-office-layout',
   standalone: true,
   imports: [CommonModule, RouterModule, NavbarComponent],
-  templateUrl: './front-office-layout.component.html',
-  styleUrls: ['./front-office-layout.component.scss']
+  templateUrl: './back-office-layout.component.html',
+  styleUrls: ['./back-office-layout.component.scss']
 })
-export class FrontOfficeLayoutComponent implements OnInit {
+export class BackOfficeLayoutComponent implements OnInit {
   currentUser: User | null = null;
   isMobileMenuOpen = false;
   

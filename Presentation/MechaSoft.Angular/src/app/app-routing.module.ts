@@ -15,15 +15,8 @@ const routes: Routes = [
   // Register (público)
   { path: 'register', component: RegisterComponent },
   
-  // Sistema de Gestão (Front-Office = Admin System)
-  // NOTA: Nome "front-office" é mantido por compatibilidade
-  // Este é o SISTEMA DE GESTÃO para funcionários
-  {
-    path: 'app',
-    loadChildren: () => import('./components/front-office/front-office.module').then(m => m.FrontOfficeModule)
-  },
-  
-  // Back-Office (reservado para futuro)
+  // Back-Office / Admin (Sistema de Gestão Administrativo)
+  // Sistema completo para funcionários e administradores
   {
     path: 'admin',
     loadChildren: () => import('./components/back-office/back-office.module').then(m => m.BackOfficeModule)

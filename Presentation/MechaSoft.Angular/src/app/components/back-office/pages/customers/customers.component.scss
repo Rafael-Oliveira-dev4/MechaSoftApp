@@ -1,5 +1,5 @@
 .customers-container {
-  @apply relative min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 p-6 overflow-hidden;
+  @apply relative min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-6 overflow-hidden;
 }
 
 // Background Grid Pattern
@@ -19,7 +19,7 @@
 
 // Customer Avatar (for future use)
 .customer-avatar {
-  @apply h-10 w-10 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white font-bold;
+  @apply h-10 w-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white font-bold;
 }
 
 // Customer status indicator
@@ -43,10 +43,10 @@
 .customer-card {
   @apply relative overflow-hidden rounded-2xl border backdrop-blur-xl p-6 shadow-2xl transition-all duration-300;
   @apply bg-slate-900/50 border-slate-800/50;
-  @apply hover:-translate-y-2 hover:shadow-cyan-500/20;
+  @apply hover:-translate-y-2 hover:shadow-emerald-500/20;
   
   .card-glow {
-    @apply absolute -inset-1 rounded-2xl bg-gradient-to-r from-cyan-500/20 to-blue-600/20 opacity-0 transition-opacity duration-300;
+    @apply absolute -inset-1 rounded-2xl bg-gradient-to-r from-emerald-500/20 to-teal-600/20 opacity-0 transition-opacity duration-300;
   }
   
   &:hover .card-glow {

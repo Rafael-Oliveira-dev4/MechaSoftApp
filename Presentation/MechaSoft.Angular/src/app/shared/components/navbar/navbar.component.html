@@ -72,7 +72,18 @@
         <button class="user-button" (click)="toggleUserMenu()" [class.active]="isUserMenuOpen">
           <!-- Avatar -->
           <div class="user-avatar" [class]="getAvatarColor()">
-            <img [src]="getAvatarUrl()" alt="avatar" class="avatar-image" />
+            @if (getAvatarUrl()) {
+            <img [src]="getAvatarUrl()" alt="avatar" class="avatar-image" (error)="onAvatarError($event)" />
+            } @else {
+            <svg class="avatar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+              />
+            </svg>
+            }
           </div>
           <!-- User Info -->
           <div class="user-info">
@@ -97,7 +108,18 @@
           <!-- User Info Header -->
           <div class="dropdown-header">
             <div class="dropdown-avatar" [class]="getAvatarColor()">
-              <img [src]="getAvatarUrl()" alt="avatar" class="avatar-image" />
+              @if (getAvatarUrl()) {
+              <img [src]="getAvatarUrl()" alt="avatar" class="avatar-image" (error)="onAvatarError($event)" />
+              } @else {
+              <svg class="avatar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                />
+              </svg>
+              }
             </div>
             <div class="dropdown-info">
               <p class="dropdown-name">{{ currentUser?.username }}</p>
@@ -111,7 +133,7 @@
           <div class="dropdown-divider"></div>
 
           <!-- Menu Items -->
-          <a routerLink="/system/dashboard" class="dropdown-item">
+          <a routerLink="/admin/dashboard" class="dropdown-item">
             <svg class="dropdown-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 stroke-linecap="round"
@@ -123,7 +145,7 @@
             <span>Dashboard</span>
           </a>
 
-          <a routerLink="/system/profile" class="dropdown-item">
+          <a routerLink="/admin/profile" class="dropdown-item">
             <svg class="dropdown-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 stroke-linecap="round"
@@ -135,7 +157,7 @@
             <span>Meu Perfil</span>
           </a>
 
-          <a routerLink="/system/settings" class="dropdown-item">
+          <a routerLink="/admin/settings" class="dropdown-item">
             <svg class="dropdown-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 stroke-linecap="round"
@@ -229,7 +251,18 @@
     <!-- User Info Mobile -->
     <div class="mobile-user-info">
       <div class="user-avatar-large" [class]="getAvatarColor()">
-        <img [src]="getAvatarUrl()" alt="avatar" class="avatar-image" />
+        @if (getAvatarUrl()) {
+        <img [src]="getAvatarUrl()" alt="avatar" class="avatar-image" (error)="onAvatarError($event)" />
+        } @else {
+        <svg class="avatar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+          />
+        </svg>
+        }
       </div>
       <div class="user-details">
         <p class="user-name-large">{{ currentUser?.username }}</p>
@@ -255,7 +288,7 @@
     <div class="mobile-divider"></div>
 
     <!-- Profile & Settings Mobile -->
-    <a routerLink="/system/profile" class="mobile-link" (click)="closeMenus()">
+    <a routerLink="/admin/profile" class="mobile-link" (click)="closeMenus()">
       <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
           stroke-linecap="round"
@@ -267,7 +300,7 @@
       <span>Meu Perfil</span>
     </a>
 
-    <a routerLink="/system/settings" class="mobile-link" (click)="closeMenus()">
+    <a routerLink="/admin/settings" class="mobile-link" (click)="closeMenus()">
       <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
           stroke-linecap="round"

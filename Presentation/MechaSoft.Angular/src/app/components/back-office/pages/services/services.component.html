@@ -43,7 +43,7 @@
           <tr [class.row-inactive]="!service.isActive">
             <td class="font-medium">{{ service.name }}</td>
             <td>
-              <span class="badge badge-blue">{{ service.category }}</span>
+              <span class="badge badge-teal">{{ service.category }}</span>
             </td>
             <td>{{ service.estimatedHours }}h</td>
             <td>{{ service.pricePerHour ? formatCurrency(service.pricePerHour) : '-' }}</td>

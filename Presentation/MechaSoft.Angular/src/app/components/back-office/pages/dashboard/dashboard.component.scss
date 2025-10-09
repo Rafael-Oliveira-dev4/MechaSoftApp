@@ -1,5 +1,5 @@
 .dashboard-container {
-  @apply relative min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 p-6 overflow-hidden;
+  @apply relative min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-6 overflow-hidden;
 }
 
 // Background Grid Pattern
@@ -53,7 +53,7 @@
 }
 
 .btn-refresh {
-  @apply flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-cyan-600 to-blue-700 text-white rounded-xl font-semibold shadow-lg transition-all hover:-translate-y-1 hover:shadow-cyan-500/25 hover:from-cyan-500 hover:to-blue-600;
+  @apply flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-xl font-semibold shadow-lg transition-all hover:-translate-y-1 hover:shadow-emerald-500/25 hover:from-emerald-500 hover:to-teal-600;
 
   .icon {
     @apply w-5 h-5;
@@ -71,8 +71,8 @@
   @apply bg-slate-900/50 border-slate-800/50;
   opacity: 0;
 
-  &.card-cyan {
-    @apply border-t-4 border-t-cyan-500;
+  &.card-emerald {
+    @apply border-t-4 border-t-emerald-500;
   }
 
   &.card-green {
@@ -80,7 +80,7 @@
   }
 
   &.card-purple {
-    @apply border-t-4 border-t-purple-500;
+    @apply border-t-4 border-t-emerald-500;
   }
 
   &.card-red {
@@ -92,8 +92,8 @@
     z-index: -1;
   }
 
-  &.card-cyan:hover .card-glow {
-    @apply from-cyan-500/20 to-blue-600/20 opacity-100;
+  &.card-emerald:hover .card-glow {
+    @apply from-emerald-500/20 to-teal-600/20 opacity-100;
   }
 
   &.card-green:hover .card-glow {
@@ -101,7 +101,7 @@
   }
 
   &.card-purple:hover .card-glow {
-    @apply from-purple-500/20 to-violet-600/20 opacity-100;
+    @apply from-emerald-500/20 to-violet-600/20 opacity-100;
   }
 
   &.card-red:hover .card-glow {
@@ -155,8 +155,8 @@
 .badge {
   @apply px-3 py-1 text-xs font-bold rounded-full transition-all duration-200;
 
-  &.badge-blue {
-    @apply bg-blue-500/20 text-blue-400 border border-blue-500/30;
+  &.badge-teal {
+    @apply bg-teal-500/20 text-teal-400 border border-teal-500/30;
   }
   &.badge-green {
     @apply bg-green-500/20 text-green-400 border border-green-500/30;
@@ -244,11 +244,11 @@
 }
 
 .section-icon {
-  @apply w-7 h-7 text-cyan-400;
+  @apply w-7 h-7 text-emerald-400;
 }
 
 .section-badge {
-  @apply px-4 py-2 text-sm font-bold text-cyan-400 bg-cyan-500/20 border border-cyan-500/30 rounded-full;
+  @apply px-4 py-2 text-sm font-bold text-emerald-400 bg-emerald-500/20 border border-emerald-500/30 rounded-full;
 
   &.badge-red {
     @apply text-red-400 bg-red-500/20 border-red-500/30;
@@ -321,6 +321,6 @@
   @apply absolute inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center z-50;
 
   .spinner {
-    @apply w-16 h-16 border-4 border-cyan-500/20 border-t-cyan-500 rounded-full animate-spin;
+    @apply w-16 h-16 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin;
   }
 }

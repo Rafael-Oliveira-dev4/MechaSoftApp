@@ -52,7 +52,7 @@
 
     .brand-icon {
       transform: scale(1.1) rotate(-5deg);
-      background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%); // cyan-500 to blue-500
+      background: linear-gradient(135deg, #10b981 0%, #14b8a6 100%); // emerald-500 to teal-500
     }
   }
 
@@ -60,11 +60,11 @@
     width: 40px;
     height: 40px;
     border-radius: 10px;
-    background: linear-gradient(135deg, #22d3ee 0%, #60a5fa 100%); // cyan-400 to blue-400
+    background: linear-gradient(135deg, #34d399 0%, #2dd4bf 100%); // emerald-400 to teal-400
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 6px -1px rgba(34, 211, 238, 0.3);
+    box-shadow: 0 4px 6px -1px rgba(52, 211, 153, 0.3);
     transition: all 0.3s ease;
 
     svg {
@@ -75,7 +75,7 @@
   }
 
   .brand-text {
-    background: linear-gradient(135deg, #22d3ee 0%, #60a5fa 100%);
+    background: linear-gradient(135deg, #34d399 0%, #2dd4bf 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -128,13 +128,13 @@
 
   &:hover {
     color: white;
-    background: rgba(59, 130, 246, 0.1); // blue-500 with opacity
+    background: rgba(20, 184, 166, 0.1); // teal-500 with opacity
     transform: translateY(-1px);
   }
 
   &.active {
-    color: rgb(34, 211, 238); // cyan-400
-    background: rgba(34, 211, 238, 0.1);
+    color: rgb(52, 211, 153); // emerald-400
+    background: rgba(52, 211, 153, 0.1);
     font-weight: 600;
 
     &::after {
@@ -145,7 +145,7 @@
       transform: translateX(-50%);
       width: 60%;
       height: 2px;
-      background: linear-gradient(90deg, transparent, rgb(34, 211, 238), transparent);
+      background: linear-gradient(90deg, transparent, rgb(52, 211, 153), transparent);
       border-radius: 2px;
     }
   }
@@ -186,13 +186,13 @@
 
   &:hover {
     color: white;
-    background: rgba(59, 130, 246, 0.1);
-    border-color: rgba(59, 130, 246, 0.3);
+    background: rgba(20, 184, 166, 0.1);
+    border-color: rgba(20, 184, 166, 0.3);
   }
 
   &.active {
-    color: rgb(34, 211, 238);
-    border-color: rgb(34, 211, 238);
+    color: rgb(52, 211, 153);
+    border-color: rgb(52, 211, 153);
   }
 }
 
@@ -202,7 +202,7 @@
   gap: 0.5rem;
   padding: 0.5rem 1.25rem;
   border-radius: 0.5rem;
-  background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+  background: linear-gradient(135deg, #10b981 0%, #14b8a6 100%);
   color: white;
   font-weight: 600;
   font-size: 0.875rem;
@@ -256,13 +256,13 @@
 
   &:hover {
     background: rgba(51, 65, 85, 0.8);
-    border-color: rgba(34, 211, 238, 0.4);
+    border-color: rgba(52, 211, 153, 0.4);
     transform: translateY(-1px);
   }
 
   &.active {
     background: rgba(51, 65, 85, 0.9);
-    border-color: rgba(34, 211, 238, 0.6);
+    border-color: rgba(52, 211, 153, 0.6);
   }
 }
 
@@ -276,12 +276,67 @@
   font-weight: 700;
   font-size: 0.875rem;
   color: white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  &:hover::before {
+    opacity: 1;
+  }
 
   .avatar-text {
     text-transform: uppercase;
   }
+
+  .avatar-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 0.5rem;
+  }
+
+  .avatar-icon {
+    width: 22px;
+    height: 22px;
+    color: white;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+  }
+}
+
+// Avatar color classes based on role
+.avatar-owner {
+  background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%); // purple
+  box-shadow: 0 4px 8px rgba(168, 85, 247, 0.4);
+}
+
+.avatar-admin {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); // red
+  box-shadow: 0 4px 8px rgba(239, 68, 68, 0.4);
+}
+
+.avatar-employee {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); // blue
+  box-shadow: 0 4px 8px rgba(59, 130, 246, 0.4);
+}
+
+.avatar-customer {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%); // green/emerald
+  box-shadow: 0 4px 8px rgba(16, 185, 129, 0.4);
+}
+
+.avatar-default {
+  background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%); // gray
+  box-shadow: 0 4px 8px rgba(107, 114, 128, 0.4);
 }
 
 .user-info {
@@ -370,8 +425,50 @@
   font-weight: 700;
   font-size: 1.125rem;
   color: white;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
   flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+
+  .avatar-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 0.75rem;
+  }
+
+  .avatar-icon {
+    width: 28px;
+    height: 28px;
+    color: white;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+  }
+
+  // Apply role colors to dropdown avatar
+  &.avatar-owner {
+    background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
+    box-shadow: 0 6px 12px rgba(168, 85, 247, 0.4);
+  }
+
+  &.avatar-admin {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    box-shadow: 0 6px 12px rgba(239, 68, 68, 0.4);
+  }
+
+  &.avatar-employee {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    box-shadow: 0 6px 12px rgba(59, 130, 246, 0.4);
+  }
+
+  &.avatar-customer {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    box-shadow: 0 6px 12px rgba(16, 185, 129, 0.4);
+  }
+
+  &.avatar-default {
+    background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+    box-shadow: 0 6px 12px rgba(107, 114, 128, 0.4);
+  }
 }
 
 .dropdown-info {
@@ -391,7 +488,7 @@
 
 .dropdown-role {
   font-size: 0.8125rem;
-  color: rgb(34, 211, 238); // cyan-400
+  color: rgb(52, 211, 153); // emerald-400
   margin: 0.125rem 0 0 0;
   font-weight: 500;
 }
@@ -436,11 +533,11 @@
   }
 
   &:hover {
-    background: rgba(59, 130, 246, 0.1);
+    background: rgba(20, 184, 166, 0.1);
     color: white;
 
     .dropdown-icon {
-      color: rgb(34, 211, 238);
+      color: rgb(52, 211, 153);
     }
   }
 
@@ -486,12 +583,12 @@
 
   &:hover {
     background: rgba(51, 65, 85, 0.8);
-    border-color: rgba(34, 211, 238, 0.4);
+    border-color: rgba(52, 211, 153, 0.4);
   }
 
   &.active {
     background: rgba(51, 65, 85, 0.9);
-    border-color: rgba(34, 211, 238, 0.6);
+    border-color: rgba(52, 211, 153, 0.6);
   }
 }
 
@@ -540,28 +637,28 @@
   }
 
   &:hover {
-    background: rgba(59, 130, 246, 0.1);
+    background: rgba(20, 184, 166, 0.1);
     color: white;
-    border-color: rgba(59, 130, 246, 0.2);
+    border-color: rgba(20, 184, 166, 0.2);
 
     .nav-icon {
-      color: rgb(34, 211, 238);
+      color: rgb(52, 211, 153);
     }
   }
 
   &.active {
-    background: rgba(34, 211, 238, 0.1);
-    color: rgb(34, 211, 238);
-    border-color: rgba(34, 211, 238, 0.3);
+    background: rgba(52, 211, 153, 0.1);
+    color: rgb(52, 211, 153);
+    border-color: rgba(52, 211, 153, 0.3);
     font-weight: 600;
 
     .nav-icon {
-      color: rgb(34, 211, 238);
+      color: rgb(52, 211, 153);
     }
   }
 
   &-primary {
-    background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+    background: linear-gradient(135deg, #10b981 0%, #14b8a6 100%);
     color: white;
     font-weight: 600;
     border: none;
@@ -617,8 +714,50 @@
   font-weight: 700;
   font-size: 1.25rem;
   color: white;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
   flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+
+  .avatar-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 0.75rem;
+  }
+
+  .avatar-icon {
+    width: 32px;
+    height: 32px;
+    color: white;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+  }
+
+  // Apply role colors to large avatar (mobile)
+  &.avatar-owner {
+    background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
+    box-shadow: 0 8px 16px rgba(168, 85, 247, 0.4);
+  }
+
+  &.avatar-admin {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    box-shadow: 0 8px 16px rgba(239, 68, 68, 0.4);
+  }
+
+  &.avatar-employee {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    box-shadow: 0 8px 16px rgba(59, 130, 246, 0.4);
+  }
+
+  &.avatar-customer {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    box-shadow: 0 8px 16px rgba(16, 185, 129, 0.4);
+  }
+
+  &.avatar-default {
+    background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+    box-shadow: 0 8px 16px rgba(107, 114, 128, 0.4);
+  }
 }
 
 .user-details {
@@ -636,8 +775,8 @@
 .user-role-badge {
   display: inline-block;
   font-size: 0.75rem;
-  color: rgb(34, 211, 238);
-  background: rgba(34, 211, 238, 0.1);
+  color: rgb(52, 211, 153);
+  background: rgba(52, 211, 153, 0.1);
   padding: 0.125rem 0.5rem;
   border-radius: 0.25rem;
   font-weight: 600;

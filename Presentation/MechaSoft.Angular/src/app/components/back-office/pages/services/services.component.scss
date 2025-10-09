@@ -1,5 +1,5 @@
 .services-container {
-  @apply relative min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 p-6 overflow-hidden;
+  @apply relative min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-6 overflow-hidden;
 }
 
 // Background Grid Pattern
@@ -25,10 +25,10 @@
 .service-card {
   @apply relative overflow-hidden rounded-2xl border backdrop-blur-xl p-6 shadow-2xl transition-all duration-300;
   @apply bg-slate-900/50 border-slate-800/50;
-  @apply hover:-translate-y-2 hover:shadow-purple-500/20;
+  @apply hover:-translate-y-2 hover:shadow-emerald-500/20;
   
   .card-glow {
-    @apply absolute -inset-1 rounded-2xl bg-gradient-to-r from-purple-500/20 to-violet-600/20 opacity-0 transition-opacity duration-300;
+    @apply absolute -inset-1 rounded-2xl bg-gradient-to-r from-emerald-500/20 to-violet-600/20 opacity-0 transition-opacity duration-300;
   }
   
   &:hover .card-glow {
@@ -36,7 +36,7 @@
   }
   
   .service-icon {
-    @apply h-12 w-12 rounded-xl bg-gradient-to-br from-purple-500 to-violet-600 flex items-center justify-center mb-4;
+    @apply h-12 w-12 rounded-xl bg-gradient-to-br from-emerald-500 to-violet-600 flex items-center justify-center mb-4;
     @apply transition-transform duration-300;
     
     svg {
@@ -53,7 +53,7 @@
   }
   
   &:hover h3 {
-    @apply text-purple-400;
+    @apply text-emerald-400;
   }
   
   .service-description {
@@ -61,6 +61,6 @@
   }
   
   .service-price {
-    @apply text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text text-transparent;
+    @apply text-2xl font-bold bg-gradient-to-r from-emerald-400 to-teal-600 bg-clip-text text-transparent;
   }
 }

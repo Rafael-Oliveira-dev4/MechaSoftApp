@@ -54,7 +54,7 @@
             <td class="font-medium">{{ part.name }}</td>
             <td>{{ part.brand }}</td>
             <td>
-              <span class="badge badge-blue">{{ part.category }}</span>
+              <span class="badge badge-teal">{{ part.category }}</span>
             </td>
             <td>{{ formatCurrency(part.unitPrice) }}</td>
             <td [class.text-red-600]="isLowStock(part)" [class.font-bold]="isLowStock(part)">

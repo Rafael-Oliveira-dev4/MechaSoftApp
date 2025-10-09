@@ -46,10 +46,10 @@ export class LoginComponent {
             const role = result.value.role;
             if (role === 'Customer') {
               // Clientes vão para o sistema de gestão (como todos os utilizadores)
-              this.router.navigate(['/system/dashboard']);
+              this.router.navigate(['/admin/dashboard']);
             } else {
               // Employee, Admin, Owner → Sistema de gestão
-              this.router.navigate(['/system/dashboard']);
+              this.router.navigate(['/admin/dashboard']);
             }
           } else {
             // Success but no value - shouldn't happen

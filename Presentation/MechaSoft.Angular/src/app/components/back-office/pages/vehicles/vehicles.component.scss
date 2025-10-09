@@ -1,5 +1,5 @@
 .vehicles-container {
-  @apply relative min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 p-6 overflow-hidden;
+  @apply relative min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-6 overflow-hidden;
 }
 
 // Background Grid Pattern
@@ -19,7 +19,7 @@
 
 // Vehicle specific styles
 .vehicle-plate {
-  @apply font-mono font-bold text-lg bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text text-transparent;
+  @apply font-mono font-bold text-lg bg-gradient-to-r from-emerald-400 to-teal-600 bg-clip-text text-transparent;
 }
 
 .vehicle-brand-model {
