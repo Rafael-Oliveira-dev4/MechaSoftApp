@@ -57,7 +57,7 @@ export class ProfileImageService {
    * Get default avatar URL
    */
   getDefaultAvatarUrl(): string {
-    return 'assets/images/default-avatar.svg';
+    return 'assets/images/default_avatar.jpeg';
   }
 
   /**

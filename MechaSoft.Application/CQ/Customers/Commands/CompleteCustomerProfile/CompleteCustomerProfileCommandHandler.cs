@@ -115,12 +115,14 @@ public class CompleteCustomerProfileCommandHandler
         }
         catch (ArgumentException ex)
         {
-            _logger.LogWarning(ex, "Validation error while completing customer profile: {UserId}", request.UserId);
+            _logger.LogWarning(ex, "Validation error while completing customer profile: {UserId}, Message: {Message}", 
+                request.UserId, ex.Message);
             return Error.ValidationFailed;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error completing customer profile: {UserId}", request.UserId);
+            _logger.LogError(ex, "Error completing customer profile: {UserId}, Message: {Message}", 
+                request.UserId, ex.Message);
             return Error.ServerError;
         }
     }

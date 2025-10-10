@@ -32,7 +32,7 @@
       </h1>
       <p class="subtitle">Gira as suas informações pessoais</p>
     </div>
-    <button routerLink="/system/settings" class="btn-secondary">
+    <button routerLink="/admin/settings" class="btn-secondary">
       <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
           stroke-linecap="round"
@@ -124,32 +124,61 @@
           </div>
           } @else {
           <!-- Edit Mode -->
-          <form (ngSubmit)="saveProfile()" class="edit-form">
+          <form [formGroup]="editForm" (ngSubmit)="saveProfile()" class="edit-form">
             <div class="form-group">
               <label for="username" class="form-label">Nome de Utilizador</label>
               <input
                 type="text"
                 id="username"
-                name="username"
-                [(ngModel)]="editForm.username"
+                formControlName="username"
                 class="form-input"
-                required
+                [class.invalid]="isFieldInvalid('username')"
               />
+              @if (isFieldInvalid('username')) {
+              <span class="error-message">{{ getFieldError('username') }}</span>
+              }
             </div>
 
             <div class="form-group">
               <label for="email" class="form-label">Email</label>
-              <input type="email" id="email" name="email" [(ngModel)]="editForm.email" class="form-input" required />
+              <input
+                type="email"
+                id="email"
+                formControlName="email"
+                class="form-input"
+                [class.invalid]="isFieldInvalid('email')"
+              />
+              @if (isFieldInvalid('email')) {
+              <span class="error-message">{{ getFieldError('email') }}</span>
+              }
             </div>
 
             <div class="form-actions">
-              <button type="submit" class="btn-primary">
+              <button 
+                type="submit" 
+                class="btn-primary"
+                [disabled]="editForm.invalid || editForm.pending || isLoadingProfileUpdate"
+              >
+                @if (isLoadingProfileUpdate) {
+                <svg class="icon animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                A guardar...
+                } @else {
                 <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                 </svg>
                 Guardar Alterações
+                }
               </button>
-              <button type="button" (click)="toggleEditMode()" class="btn-secondary">Cancelar</button>
+              <button 
+                type="button" 
+                (click)="toggleEditMode()" 
+                class="btn-secondary"
+                [disabled]="isLoadingProfileUpdate"
+              >
+                Cancelar
+              </button>
             </div>
           </form>
           }

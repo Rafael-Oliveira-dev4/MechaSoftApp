@@ -5,6 +5,7 @@ using MechaSoft.Application.CQ.Accounts.Commands.ResetPassword;
 using MechaSoft.Application.CQ.Accounts.Commands.ForgotPassword;
 using MechaSoft.Application.CQ.Accounts.Commands.RefreshToken;
 using MechaSoft.Application.CQ.Accounts.Commands.UploadProfileImage;
+using MechaSoft.Application.CQ.Accounts.Commands.UpdateUserProfile;
 using MechaSoft.Application.CQ.Accounts.Queries.GetUserProfile;
 using MechaSoft.Application.CQ.Accounts.Queries.GetUsers;
 using MechaSoft.Application.CQ.Accounts.Queries.CheckUsernameAvailability;
@@ -65,6 +66,12 @@ public static class AccountEndpoints
                 .WithName("GetUserProfile")
                 .Produces<GetUserProfileResponse>(200)
                 .Produces<Error>(404);
+
+        // PUT /api/accounts/profile/{userId} - Atualizar perfil do usuário
+        accounts.MapPut("/profile/{userId:guid}", Commands.UpdateUserProfile)
+                .WithName("UpdateUserProfile")
+                .Produces<UpdateUserProfileResponse>(200)
+                .Produces<Error>(400);
 
         // GET /api/accounts/users - Listar usuários com paginação
         accounts.MapGet("/users", Queries.GetUsers)
@@ -221,6 +228,30 @@ public static class AccountEndpoints
                 : TypedResults.BadRequest(result.Error);
         }
 
+        public static async Task<Results<Ok<UpdateUserProfileResponse>, BadRequest<Error>>> UpdateUserProfile(
+            [FromServices] ISender sender,
+            Guid userId,
+            [FromBody] UpdateUserProfileRequest request)
+        {
+            if (request == null)
+            {
+                return TypedResults.BadRequest(Error.InvalidInput);
+            }
+
+            var command = new UpdateUserProfileCommand
+            {
+                UserId = userId,
+                Username = request.Username,
+                Email = request.Email
+            };
+
+            var result = await sender.Send(command);
+
+            return result.IsSuccess
+                ? TypedResults.Ok(result.Value!)
+                : TypedResults.BadRequest(result.Error!);
+        }
+
         public static async Task<Results<Ok<UploadProfileImageResponse>, BadRequest<Error>>> UploadProfileImage(
             [FromServices] ISender sender,
             Guid userId,
@@ -359,3 +390,7 @@ public record ResetPasswordRequest(
 public record RefreshTokenRequest(
     string AccessToken,
     string RefreshToken);
+
+public record UpdateUserProfileRequest(
+    string Username,
+    string Email);

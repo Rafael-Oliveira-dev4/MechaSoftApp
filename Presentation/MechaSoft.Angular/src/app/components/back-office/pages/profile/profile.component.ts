@@ -1,11 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { User } from '../../../../core/models/api.models';
 import { ErrorDetail } from '../../../../core/models/result.model';
 import { AuthService } from '../../../../core/services/auth.service';
 import { CustomerService, CompleteCustomerProfileRequest } from '../../../../core/services/customer.service';
+import { usernameAvailabilityExcludeValidator } from '../../../../core/validators/username-availability-exclude.validator';
+import { emailAvailabilityExcludeValidator } from '../../../../core/validators/email-availability-exclude.validator';
 import { ErrorMessageComponent } from '../../../../shared/components/error-message/error-message.component';
 import { ProfileImageUploadComponent } from '../../../../shared/components/profile-image-upload/profile-image-upload.component';
 import { CustomerStatusCardComponent } from '../../components/customer-status-card/customer-status-card.component';
@@ -18,6 +20,7 @@ import { CustomerProfileFormComponent, CustomerProfileFormData } from '../../com
     CommonModule,
     RouterModule,
     FormsModule,
+    ReactiveFormsModule,
     ErrorMessageComponent,
     ProfileImageUploadComponent,
     CustomerStatusCardComponent,
@@ -31,16 +34,15 @@ export class ProfileComponent implements OnInit {
   isEditingProfile: boolean = false;
   isEditingCustomerProfile: boolean = false;
   isLoadingCustomerProfile: boolean = false;
+  isLoadingProfileUpdate: boolean = false;
   error: ErrorDetail | null = null;
   successMessage: string | null = null;
 
-  // Edit form
-  editForm = {
-    username: '',
-    email: '',
-  };
+  // Edit form with validation
+  editForm!: FormGroup;
 
   constructor(
+    private fb: FormBuilder,
     private authService: AuthService,
     private customerService: CustomerService
   ) {}
@@ -49,28 +51,122 @@ export class ProfileComponent implements OnInit {
     this.authService.currentUser$.subscribe((user: User | null) => {
       this.currentUser = user;
       if (user?.username && user?.email) {
-        this.editForm.username = user.username;
-        this.editForm.email = user.email;
+        this.initializeEditForm(user);
       }
+    });
+  }
+
+  // Initialize edit form with validations
+  private initializeEditForm(user: User): void {
+    this.editForm = this.fb.group({
+      username: [
+        user.username,
+        {
+          validators: [
+            Validators.required,
+            Validators.minLength(3),
+            Validators.maxLength(50),
+            Validators.pattern(/^[a-zA-Z0-9_]+$/),
+          ],
+          asyncValidators: [usernameAvailabilityExcludeValidator(this.authService, user.username)],
+          updateOn: 'change',
+        },
+      ],
+      email: [
+        user.email,
+        {
+          validators: [Validators.required, Validators.email],
+          asyncValidators: [emailAvailabilityExcludeValidator(this.authService, user.email)],
+          updateOn: 'change',
+        },
+      ],
     });
   }
 
   // Toggle edit mode
   toggleEditMode(): void {
     this.isEditingProfile = !this.isEditingProfile;
-    if (!this.isEditingProfile && this.currentUser?.username && this.currentUser?.email) {
+    if (!this.isEditingProfile && this.currentUser) {
       // Reset form
-      this.editForm.username = this.currentUser.username;
-      this.editForm.email = this.currentUser.email;
+      this.initializeEditForm(this.currentUser);
     }
   }
 
   // Save profile changes
   saveProfile(): void {
-    // TODO: Implementar atualização de perfil
-    this.successMessage = 'Perfil atualizado com sucesso!';
-    this.isEditingProfile = false;
-    setTimeout(() => (this.successMessage = null), 3000);
+    // Bloquear submit se ainda está validando
+    if (this.editForm.pending) {
+      return;
+    }
+
+    if (this.editForm.invalid) {
+      this.editForm.markAllAsTouched();
+      return;
+    }
+
+    if (!this.currentUser?.id) {
+      this.error = { code: 'NO_USER', message: 'Utilizador não encontrado' };
+      return;
+    }
+
+    this.isLoadingProfileUpdate = true;
+    this.error = null;
+
+    const { username, email } = this.editForm.value;
+
+    this.authService.updateUserProfile(this.currentUser.id, username, email).subscribe({
+      next: result => {
+        this.isLoadingProfileUpdate = false;
+        if (result.isSuccess && result.value) {
+          this.successMessage = '✅ Perfil atualizado com sucesso!';
+          this.isEditingProfile = false;
+
+          // Update current user
+          if (this.currentUser) {
+            this.currentUser.username = result.value.username;
+            this.currentUser.email = result.value.email;
+          }
+
+          setTimeout(() => (this.successMessage = null), 5000);
+        } else {
+          this.error = result.error || { code: 'UNKNOWN', message: 'Erro desconhecido' };
+        }
+      },
+      error: err => {
+        this.isLoadingProfileUpdate = false;
+        this.error = {
+          code: 'UPDATE_ERROR',
+          message: err?.message || 'Erro ao atualizar perfil',
+        };
+      },
+    });
+  }
+
+  // Helper para validação de campos
+  isFieldInvalid(fieldName: string): boolean {
+    const field = this.editForm.get(fieldName);
+    return !!(field && field.invalid && (field.dirty || field.touched));
+  }
+
+  getFieldError(fieldName: string): string {
+    const field = this.editForm.get(fieldName);
+    if (!field || !field.errors) return '';
+
+    if (field.errors['required']) return 'Campo obrigatório';
+    if (field.errors['minlength'])
+      return `Mínimo ${field.errors['minlength'].requiredLength} caracteres`;
+    if (field.errors['maxlength'])
+      return `Máximo ${field.errors['maxlength'].requiredLength} caracteres`;
+    if (field.errors['email']) return 'Email inválido';
+    if (field.errors['emailTaken']) return 'Este email já está registado';
+    if (field.errors['usernameTaken']) return 'Este nome de utilizador já está em uso';
+    if (field.errors['pattern']) {
+      if (fieldName === 'username') {
+        return 'Apenas letras, números e underscore (_)';
+      }
+    }
+
+    return 'Campo inválido';
   }
 
   // Handle profile image upload success
@@ -166,7 +262,7 @@ export class ProfileComponent implements OnInit {
       next: result => {
         this.isLoadingCustomerProfile = false;
         if (result.isSuccess && result.value) {
-          this.successMessage = 'Perfil de cliente completado com sucesso!';
+          this.successMessage = `✅ Perfil completado com sucesso! Bem-vindo(a), ${result.value.fullName}!`;
           this.isEditingCustomerProfile = false;
           
           // Refresh user data
@@ -174,8 +270,8 @@ export class ProfileComponent implements OnInit {
             this.currentUser.customerId = result.value.customerId;
           }
           
-          // Auto-hide success message
-          setTimeout(() => (this.successMessage = null), 5000);
+          // Auto-hide success message after 6 seconds
+          setTimeout(() => (this.successMessage = null), 6000);
         } else {
           this.error = result.error || { code: 'UNKNOWN', message: 'Erro desconhecido' };
         }
@@ -184,7 +280,7 @@ export class ProfileComponent implements OnInit {
         this.isLoadingCustomerProfile = false;
         this.error = {
           code: 'SUBMIT_ERROR',
-          message: err?.error?.message || 'Erro ao completar perfil de cliente',
+          message: err?.error?.message || err?.message || 'Erro ao completar perfil de cliente',
         };
       },
     });

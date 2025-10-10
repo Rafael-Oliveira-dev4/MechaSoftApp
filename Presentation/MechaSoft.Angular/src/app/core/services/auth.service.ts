@@ -1,5 +1,5 @@
 import { isPlatformBrowser } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpBackend } from '@angular/common/http';
 import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
@@ -14,13 +14,18 @@ export class AuthService {
   private readonly apiUrl: string;
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
+  private httpClientNoInterceptors: HttpClient;
 
   constructor(
     private http: HttpClient,
     private apiConfig: ApiConfigService,
+    private httpBackend: HttpBackend,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.apiUrl = this.apiConfig.getApiUrl();
+    // Create HttpClient that bypasses interceptors to avoid circular dependency
+    this.httpClientNoInterceptors = new HttpClient(httpBackend);
+    
     if (isPlatformBrowser(this.platformId)) {
       this.loadUserFromStorage();
     }
@@ -80,6 +85,16 @@ export class AuthService {
       .pipe(
         map(response => response.isAvailable),
         catchError(() => of(true)) // Em caso de erro, assume disponível para não bloquear
+      );
+  }
+
+  // Atualizar perfil do utilizador
+  updateUserProfile(userId: string, username: string, email: string): Observable<Result<any>> {
+    return this.http
+      .put<any>(`${this.apiUrl}/accounts/profile/${userId}`, { username, email })
+      .pipe(
+        map(response => success(response)),
+        catchError(error => of(failure<any>(error)))
       );
   }
 
@@ -163,6 +178,9 @@ export class AuthService {
       const user = this.getUserFromToken(token);
       if (user && this.isValidUser(user)) {
         this.currentUserSubject.next(user);
+        
+        // Fetch full user profile to get customerId, employeeId, etc.
+        this.loadFullUserProfile(user.id).subscribe();
       } else {
         console.warn('Token inválido detectado. A limpar sessão...');
         this.logout();
@@ -171,6 +189,37 @@ export class AuthService {
       console.warn('Token expirado detectado. A limpar sessão...');
       this.logout();
     }
+  }
+
+  // Load full user profile from backend (bypasses interceptors to avoid circular dependency)
+  private loadFullUserProfile(userId: string): Observable<void> {
+    const token = this.getAccessToken();
+    const options = token 
+      ? { headers: { Authorization: `Bearer ${token}` } } 
+      : {};
+    
+    return this.httpClientNoInterceptors.get<any>(`${this.apiUrl}/accounts/profile/${userId}`, options).pipe(
+      map(response => {
+        // Merge with current user to preserve JWT data
+        const currentUser = this.currentUserSubject.value;
+        const fullUser: User = {
+          ...currentUser!,
+          id: response.userId || userId,
+          username: response.username || currentUser?.username || '',
+          email: response.email || currentUser?.email || '',
+          role: response.role || currentUser?.role || '',
+          isActive: response.isActive,
+          emailConfirmed: response.emailConfirmed,
+          lastLoginAt: response.lastLoginAt ? new Date(response.lastLoginAt) : undefined,
+          customerId: response.customerId,
+          employeeId: response.employeeId,
+          profileImageUrl: response.profileImageUrl
+        };
+        
+        this.currentUserSubject.next(fullUser);
+      }),
+      catchError(() => of(undefined))
+    );
   }
 
   private isValidUser(user: User): boolean {
