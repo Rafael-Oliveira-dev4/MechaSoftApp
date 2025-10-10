@@ -23,15 +23,41 @@ export interface DashboardStats {
   
   // Recent activity (últimas 5)
   recentOrders: RecentOrder[];
+  
+  // Cliente specific
+  nextAppointment?: NextAppointment;
+  vehicles?: DashboardVehicle[];
+  monthlyExpenses?: MonthlyExpense[];
 }
 
 export interface RecentOrder {
   id: string;
   orderNumber: string;
-  customerName: string;
+  customerName?: string;
   vehiclePlate: string;
+  service?: string;
   status: string;
   createdAt: Date;
+}
+
+export interface NextAppointment {
+  date: Date;
+  service: string;
+  vehicle: string;
+}
+
+export interface DashboardVehicle {
+  id: string;
+  plate: string;
+  brand: string;
+  model: string;
+  year: number;
+  lastService?: string;
+}
+
+export interface MonthlyExpense {
+  month: string;
+  amount: number;
 }
 
 export interface LowStockReport {

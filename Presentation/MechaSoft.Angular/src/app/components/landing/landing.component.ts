@@ -94,6 +94,7 @@ export class LandingComponent implements OnInit, AfterViewInit {
     const start = 0;
     const increment = target / (duration / 16); // 60fps
     let current = start;
+    const format = element.getAttribute('data-format') || 'number';
 
     const timer = setInterval(() => {
       current += increment;
@@ -102,10 +103,23 @@ export class LandingComponent implements OnInit, AfterViewInit {
         clearInterval(timer);
       }
       
-      if (target % 1 === 0) {
-        element.textContent = Math.floor(current).toString();
-      } else {
-        element.textContent = current.toFixed(1);
+      const value = Math.floor(current);
+      
+      switch(format) {
+        case 'number+':
+          element.textContent = value + '+';
+          break;
+        case 'k+':
+          element.textContent = (value / 1000).toFixed(0) + 'K+';
+          break;
+        case 'decimal':
+          element.textContent = current.toFixed(1) + '★';
+          break;
+        case 'percent':
+          element.textContent = value + '%';
+          break;
+        default:
+          element.textContent = value.toString();
       }
     }, 16);
   }

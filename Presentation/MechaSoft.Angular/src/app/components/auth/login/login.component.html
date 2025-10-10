@@ -2,7 +2,7 @@
   <!-- Header -->
   <div class="auth-header">
     <h1 class="auth-title">Bem-vindo</h1>
-    <p class="auth-subtitle">Faça login para continuar</p>
+    <p class="auth-subtitle">Inicie sessão para continuar</p>
   </div>
 
   <!-- Error Message -->
@@ -21,12 +21,12 @@
             d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
           />
         </svg>
-        Username
+        Nome de Utilizador
       </label>
       <input
         type="text"
         formControlName="username"
-        placeholder="Digite seu username"
+        placeholder="Insira o seu nome de utilizador"
         class="form-input"
         [class.input-error]="isFieldInvalid('username')"
         autocomplete="username"
@@ -47,13 +47,13 @@
             d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
           />
         </svg>
-        Password
+        Palavra-passe
       </label>
       <div class="input-with-icon">
         <input
           [type]="showPassword ? 'text' : 'password'"
           formControlName="password"
-          placeholder="Digite sua password"
+          placeholder="Insira a sua palavra-passe"
           class="form-input"
           [class.input-error]="isFieldInvalid('password')"
           autocomplete="current-password"
@@ -122,7 +122,7 @@
   <!-- Footer -->
   <div class="auth-footer">
     <div class="footer-links">
-      <a routerLink="/forgot-password" class="forgot-link">Esqueceu a password?</a>
+      <a routerLink="/forgot-password" class="forgot-link">Esqueceu a palavra-passe?</a>
     </div>
     <p class="footer-text">
       Não tem conta?

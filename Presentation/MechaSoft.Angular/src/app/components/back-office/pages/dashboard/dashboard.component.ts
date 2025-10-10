@@ -85,20 +85,118 @@ export class DashboardComponent implements OnInit, AfterViewInit {
 
   // Carregar dados do dashboard
   private loadDashboardData(): void {
-    this.dashboardService.getStats().subscribe(result => {
-      if (result.isSuccess && result.value) {
-        this.stats = result.value;
-        this.animateCounters();
-      } else {
-        this.error = result.error || null;
-      }
-    });
+    // TODO: Descomentar quando o backend estiver pronto
+    // this.dashboardService.getStats().subscribe(result => {
+    //   if (result.isSuccess && result.value) {
+    //     this.stats = result.value;
+    //     this.animateCounters();
+    //   } else {
+    //     this.error = result.error || null;
+    //   }
+    // });
+    // this.dashboardService.getLowStockReport().subscribe(result => {
+    //   if (result.isSuccess && result.value) {
+    //     this.lowStockReport = result.value;
+    //   }
+    // });
 
-    this.dashboardService.getLowStockReport().subscribe(result => {
-      if (result.isSuccess && result.value) {
-        this.lowStockReport = result.value;
-      }
-    });
+    // Usar dados fictícios para visualização
+    this.loadMockData();
+  }
+
+  // Dados fictícios para desenvolvimento/visualização (Cliente)
+  private loadMockData(): void {
+    setTimeout(() => {
+      this.stats = {
+        totalOrders: 5,
+        pendingOrders: 1,
+        inProgressOrders: 1,
+        completedOrders: 3,
+        monthRevenue: 2450.00, // Total gasto pelo cliente este ano
+        todayRevenue: 0,
+        yearRevenue: 2450.00,
+        totalCustomers: 0, // Não usado no dashboard de cliente
+        totalVehicles: 2, // Veículos do cliente
+        totalPartsValue: 0,
+        lowStockPartsCount: 0,
+        pendingInspections: 0,
+        nextAppointment: {
+          date: new Date('2024-10-15T14:00:00'),
+          service: 'Revisão dos 10.000 km',
+          vehicle: 'BMW 320d'
+        },
+        monthlyExpenses: [
+          { month: 'Mai', amount: 320.50 },
+          { month: 'Jun', amount: 180.00 },
+          { month: 'Jul', amount: 560.75 },
+          { month: 'Ago', amount: 425.00 },
+          { month: 'Set', amount: 654.50 },
+          { month: 'Out', amount: 310.25 }
+        ],
+        vehicles: [
+          {
+            id: '1',
+            plate: '12-AB-34',
+            brand: 'BMW',
+            model: '320d',
+            year: 2020,
+            lastService: '05/09/2024'
+          },
+          {
+            id: '2',
+            plate: '56-CD-78',
+            brand: 'Volkswagen',
+            model: 'Golf 1.6 TDI',
+            year: 2018,
+            lastService: '20/08/2024'
+          }
+        ],
+        recentOrders: [
+          {
+            id: '1',
+            orderNumber: 'OS-2024-156',
+            vehiclePlate: '12-AB-34',
+            service: 'Troca de óleo e filtros',
+            status: 'InProgress',
+            createdAt: new Date('2024-10-09T10:30:00')
+          },
+          {
+            id: '2',
+            orderNumber: 'OS-2024-142',
+            vehiclePlate: '56-CD-78',
+            service: 'Revisão periódica',
+            status: 'Pending',
+            createdAt: new Date('2024-09-28T14:15:00')
+          },
+          {
+            id: '3',
+            orderNumber: 'OS-2024-098',
+            vehiclePlate: '12-AB-34',
+            service: 'Substituição de pastilhas',
+            status: 'Completed',
+            createdAt: new Date('2024-09-05T16:45:00')
+          },
+          {
+            id: '4',
+            orderNumber: 'OS-2024-067',
+            vehiclePlate: '56-CD-78',
+            service: 'Alinhamento e balanceamento',
+            status: 'Completed',
+            createdAt: new Date('2024-08-20T11:20:00')
+          },
+          {
+            id: '5',
+            orderNumber: 'OS-2024-023',
+            vehiclePlate: '12-AB-34',
+            service: 'Diagnóstico eletrónico',
+            status: 'Completed',
+            createdAt: new Date('2024-07-15T09:00:00')
+          }
+        ]
+      };
+
+      this.animateCounters();
+    }, 500); // Simular delay de rede
   }
 
   // Animar contadores
@@ -137,6 +235,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   // Atualizar dados
   refresh(): void {
     this.error = null;
+    this.stats = null; // Reset stats to show loading
     this.loadDashboardData();
   }
 
@@ -163,7 +262,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   getStatusLabel(status: string): string {
     const statusMap: { [key: string]: string } = {
       Pending: 'Pendente',
-      InProgress: 'Em Progresso',
+      InProgress: 'Em Curso',
       Completed: 'Concluída',
       Cancelled: 'Cancelada',
     };
@@ -182,5 +281,23 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     const totalParts = 100; // Assumindo 100 peças no total
     const healthyParts = totalParts - this.stats.lowStockPartsCount;
     return (healthyParts / totalParts) * 100;
+  }
+
+  // Métodos para gráfico de gastos
+  getExpensePercentage(amount: number): number {
+    if (!this.stats?.monthlyExpenses) return 0;
+    const maxExpense = Math.max(...this.stats.monthlyExpenses.map(e => e.amount));
+    return (amount / maxExpense) * 100;
+  }
+
+  getAverageExpense(): number {
+    if (!this.stats?.monthlyExpenses || this.stats.monthlyExpenses.length === 0) return 0;
+    const total = this.stats.monthlyExpenses.reduce((sum, e) => sum + e.amount, 0);
+    return total / this.stats.monthlyExpenses.length;
+  }
+
+  getTotalExpenses(): number {
+    if (!this.stats?.monthlyExpenses) return 0;
+    return this.stats.monthlyExpenses.reduce((sum, e) => sum + e.amount, 0);
   }
 }

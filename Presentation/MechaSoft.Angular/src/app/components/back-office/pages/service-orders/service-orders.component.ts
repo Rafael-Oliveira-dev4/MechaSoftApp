@@ -5,11 +5,19 @@ import { ServiceOrderService } from '../../../../core/services/service-order.ser
 import { CustomerService } from '../../../../core/services/customer.service';
 import { VehicleService } from '../../../../core/services/vehicle.service';
 import { EmployeeService } from '../../../../core/services/employee.service';
-import { ServiceOrder, Customer, Vehicle } from '../../../../core/models/api.models';
+import { ServiceOrder as BaseServiceOrder, Customer, Vehicle } from '../../../../core/models/api.models';
 import { Employee } from '../../../../core/models/employee.model';
 import { ErrorDetail } from '../../../../core/models/result.model';
 import { LoadingService } from '../../../../core/services/loading.service';
 import { ErrorMessageComponent } from '../../../../shared/components/error-message/error-message.component';
+
+// Extended interface for client view
+interface ServiceOrder extends BaseServiceOrder {
+  customerName?: string;
+  vehiclePlate?: string;
+  vehicleInfo?: string;
+  mechanicName?: string | null;
+}
 
 @Component({
   selector: 'app-service-orders',
@@ -39,7 +47,7 @@ export class ServiceOrdersComponent implements OnInit {
 
   statuses = [
     { value: 'Pending', label: 'Pendente', color: 'yellow' },
-    { value: 'InProgress', label: 'Em Progresso', color: 'blue' },
+    { value: 'InProgress', label: 'Em Curso', color: 'blue' },
     { value: 'Completed', label: 'Concluída', color: 'green' },
     { value: 'Cancelled', label: 'Cancelada', color: 'red' }
   ];
@@ -65,8 +73,8 @@ export class ServiceOrdersComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadOrders();
-    this.loadCustomers();
-    this.loadMechanics();
+    // this.loadCustomers(); // Comentado - cliente não precisa ver outros clientes
+    // this.loadMechanics(); // Comentado - cliente não precisa ver mecânicos
   }
 
   // Criar formulário
@@ -83,8 +91,130 @@ export class ServiceOrdersComponent implements OnInit {
     });
   }
 
-  // Carregar ordens
+  // Carregar ordens (Mock data para cliente)
   loadOrders(): void {
+    // Mock data - substituir com API real quando disponível
+    this.orders = [
+      {
+        id: '1',
+        orderNumber: 'OS-2024-156',
+        customerId: 'current-user',
+        customerName: 'rafael_oliveira',
+        vehicleId: '1',
+        vehiclePlate: '12-AB-34',
+        vehicleInfo: 'BMW 320d',
+        description: 'Troca de óleo e filtros + revisão geral dos 10.000 km',
+        priority: 'Normal',
+        status: 'InProgress',
+        estimatedCost: 320.50,
+        finalCost: 0,
+        estimatedDelivery: new Date('2024-10-12T17:00:00'),
+        actualDelivery: undefined,
+        requiresInspection: true,
+        mechanicId: 'mech-1',
+        mechanicName: 'João Silva',
+        createdAt: new Date('2024-10-09T09:00:00'),
+        updatedAt: new Date('2024-10-10T14:30:00'),
+        internalNotes: ''
+      },
+      {
+        id: '2',
+        orderNumber: 'OS-2024-142',
+        customerId: 'current-user',
+        customerName: 'rafael_oliveira',
+        vehicleId: '2',
+        vehiclePlate: '56-CD-78',
+        vehicleInfo: 'Volkswagen Golf 1.6 TDI',
+        description: 'Revisão periódica - Inspeção completa e troca de pastilhas de travão',
+        priority: 'Normal',
+        status: 'Pending',
+        estimatedCost: 450.00,
+        finalCost: 0,
+        estimatedDelivery: new Date('2024-10-15T16:00:00'),
+        actualDelivery: undefined,
+        requiresInspection: true,
+        mechanicId: undefined,
+        mechanicName: undefined,
+        createdAt: new Date('2024-09-28T11:00:00'),
+        updatedAt: new Date('2024-09-28T11:00:00'),
+        internalNotes: ''
+      },
+      {
+        id: '3',
+        orderNumber: 'OS-2024-098',
+        customerId: 'current-user',
+        customerName: 'rafael_oliveira',
+        vehicleId: '1',
+        vehiclePlate: '12-AB-34',
+        vehicleInfo: 'BMW 320d',
+        description: 'Substituição de pastilhas de travão dianteiras e discos',
+        priority: 'High',
+        status: 'Completed',
+        estimatedCost: 580.00,
+        finalCost: 654.50,
+        estimatedDelivery: new Date('2024-09-07T18:00:00'),
+        actualDelivery: new Date('2024-09-05T16:30:00'),
+        requiresInspection: false,
+        mechanicId: 'mech-2',
+        mechanicName: 'Pedro Costa',
+        createdAt: new Date('2024-09-03T10:00:00'),
+        updatedAt: new Date('2024-09-05T16:30:00'),
+        internalNotes: ''
+      },
+      {
+        id: '4',
+        orderNumber: 'OS-2024-067',
+        customerId: 'current-user',
+        customerName: 'rafael_oliveira',
+        vehicleId: '2',
+        vehiclePlate: '56-CD-78',
+        vehicleInfo: 'Volkswagen Golf 1.6 TDI',
+        description: 'Alinhamento e balanceamento das rodas',
+        priority: 'Low',
+        status: 'Completed',
+        estimatedCost: 80.00,
+        finalCost: 75.00,
+        estimatedDelivery: new Date('2024-08-22T12:00:00'),
+        actualDelivery: new Date('2024-08-20T11:00:00'),
+        requiresInspection: false,
+        mechanicId: 'mech-1',
+        mechanicName: 'João Silva',
+        createdAt: new Date('2024-08-19T09:00:00'),
+        updatedAt: new Date('2024-08-20T11:00:00'),
+        internalNotes: ''
+      },
+      {
+        id: '5',
+        orderNumber: 'OS-2024-023',
+        customerId: 'current-user',
+        customerName: 'rafael_oliveira',
+        vehicleId: '1',
+        vehiclePlate: '12-AB-34',
+        vehicleInfo: 'BMW 320d',
+        description: 'Diagnóstico eletrónico - Problema com sensor de oxigénio',
+        priority: 'Urgent',
+        status: 'Completed',
+        estimatedCost: 150.00,
+        finalCost: 180.00,
+        estimatedDelivery: new Date('2024-07-17T14:00:00'),
+        actualDelivery: new Date('2024-07-15T15:00:00'),
+        requiresInspection: true,
+        mechanicId: 'mech-3',
+        mechanicName: 'Carlos Mendes',
+        createdAt: new Date('2024-07-14T16:00:00'),
+        updatedAt: new Date('2024-07-15T15:00:00'),
+        internalNotes: ''
+      }
+    ];
+
+    // Filtrar por status se necessário
+    if (this.statusFilter) {
+      this.orders = this.orders.filter(o => o.status === this.statusFilter);
+    }
+
+    this.totalCount = this.orders.length;
+    
+    /* Código real API - descomentar quando backend estiver pronto
     this.serviceOrderService.getAll(
       this.currentPage,
       this.pageSize,
@@ -97,6 +227,7 @@ export class ServiceOrdersComponent implements OnInit {
         this.error = result.error || null;
       }
     });
+    */
   }
 
   // Carregar clientes

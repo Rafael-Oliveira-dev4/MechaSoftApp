@@ -324,3 +324,175 @@
     @apply w-16 h-16 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin;
   }
 }
+
+// Skeleton Loading
+@keyframes skeleton-pulse {
+  0%, 100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.skeleton-card {
+  @apply bg-slate-900/50 border-slate-800/50 animate-pulse;
+  opacity: 1 !important;
+
+  .skeleton-icon {
+    @apply w-16 h-16 rounded-2xl bg-slate-800/50 mb-4;
+    animation: skeleton-pulse 2s ease-in-out infinite;
+  }
+
+  .skeleton-content {
+    @apply space-y-3;
+  }
+
+  .skeleton-line {
+    @apply h-4 bg-slate-800/50 rounded;
+    animation: skeleton-pulse 2s ease-in-out infinite;
+
+    &.skeleton-title {
+      @apply w-3/4 h-5;
+    }
+
+    &.skeleton-value {
+      @apply w-1/2 h-8 mt-2;
+    }
+
+    &.skeleton-detail {
+      @apply w-full h-3 mt-4;
+    }
+  }
+}
+
+// Empty State
+.empty-state {
+  @apply relative flex flex-col items-center justify-center py-24 px-6 z-10;
+
+  .empty-icon {
+    @apply w-24 h-24 text-zinc-600 mb-6;
+  }
+
+  .empty-title {
+    @apply text-2xl font-bold text-white mb-3;
+  }
+
+  .empty-description {
+    @apply text-lg text-zinc-400 mb-8 text-center max-w-md;
+  }
+}
+
+// Vehicles Grid
+.vehicles-grid {
+  @apply grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6;
+}
+
+.vehicle-card {
+  @apply bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-xl p-5 transition-all duration-300 hover:border-emerald-500/30 hover:bg-slate-800/70 hover:-translate-y-1;
+}
+
+.vehicle-header {
+  @apply flex items-center gap-4 mb-4 pb-4 border-b border-slate-700/50;
+}
+
+.vehicle-icon {
+  @apply w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center;
+  
+  svg {
+    @apply w-6 h-6 text-emerald-400;
+  }
+}
+
+.vehicle-info {
+  @apply flex-1;
+}
+
+.vehicle-plate {
+  @apply text-lg font-bold text-white tracking-wide;
+}
+
+.vehicle-model {
+  @apply text-sm text-zinc-400 mt-1;
+}
+
+.vehicle-details {
+  @apply space-y-2;
+}
+
+.detail-item {
+  @apply flex justify-between items-center text-sm;
+}
+
+.detail-label {
+  @apply text-zinc-500;
+}
+
+.detail-value {
+  @apply text-white font-medium;
+}
+
+// Additional card colors for new cards
+.stat-card {
+  &.card-amber:hover .card-glow {
+    @apply from-amber-500/20 to-orange-600/20 opacity-100;
+  }
+}
+
+// Expenses Chart
+.expenses-chart {
+  @apply mt-6;
+}
+
+.chart-grid {
+  @apply grid grid-cols-6 gap-4 mb-6 h-64;
+}
+
+.chart-column {
+  @apply flex flex-col items-center justify-end gap-3;
+}
+
+.chart-bar-wrapper {
+  @apply relative w-full flex items-end justify-center h-full;
+}
+
+.chart-bar {
+  @apply w-full bg-gradient-to-t from-emerald-500 to-teal-400 rounded-t-lg relative transition-all duration-1000 ease-out;
+  min-height: 8%;
+  
+  &:hover {
+    @apply from-emerald-400 to-teal-300;
+    
+    .bar-value {
+      @apply opacity-100;
+    }
+  }
+}
+
+.bar-value {
+  @apply absolute -top-8 left-1/2 -translate-x-1/2 text-xs font-bold text-white bg-slate-800/90 px-2 py-1 rounded whitespace-nowrap opacity-0 transition-opacity duration-200;
+}
+
+.chart-label {
+  @apply text-xs font-medium text-zinc-400;
+}
+
+.chart-summary {
+  @apply flex flex-wrap justify-between items-center gap-4 pt-4 border-t border-slate-700/50;
+}
+
+.summary-item {
+  @apply flex flex-col gap-1;
+  
+  @media (max-width: 640px) {
+    @apply flex-1 min-w-[45%];
+  }
+}
+
+.summary-label {
+  @apply text-xs text-zinc-500;
+}
+
+.summary-value {
+  @apply text-base font-bold text-white;
+}

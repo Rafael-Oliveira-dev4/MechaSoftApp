@@ -45,7 +45,7 @@ export class VehiclesComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadVehicles();
-    this.loadCustomers();
+    // this.loadCustomers(); // Comentado - cliente não precisa ver outros clientes
   }
 
   // Criar formulário com validações
@@ -63,8 +63,55 @@ export class VehiclesComponent implements OnInit {
     });
   }
 
-  // Carregar veículos
+  // Carregar veículos (Mock data para cliente)
   loadVehicles(): void {
+    // Mock data - substituir com API real quando disponível
+    this.vehicles = [
+      {
+        id: '1',
+        customerId: 'current-user',
+        customerName: 'rafael_oliveira',
+        brand: 'BMW',
+        model: '320d',
+        licensePlate: '12-AB-34',
+        color: 'Preto',
+        year: 2020,
+        fuelType: 'Diesel',
+        vin: '1HGBH41JXMN109186',
+        engineType: '2.0L Turbo',
+        createdAt: new Date('2020-05-15'),
+        updatedAt: new Date('2024-09-05')
+      },
+      {
+        id: '2',
+        customerId: 'current-user',
+        customerName: 'rafael_oliveira',
+        brand: 'Volkswagen',
+        model: 'Golf 1.6 TDI',
+        licensePlate: '56-CD-78',
+        color: 'Cinzento',
+        year: 2018,
+        fuelType: 'Diesel',
+        vin: '2HGBH41JXMN109187',
+        engineType: '1.6L TDI',
+        createdAt: new Date('2018-03-20'),
+        updatedAt: new Date('2024-08-20')
+      }
+    ];
+    this.totalCount = this.vehicles.length;
+    
+    // Filtrar por termo de pesquisa se existir
+    if (this.searchTerm) {
+      const term = this.searchTerm.toLowerCase();
+      this.vehicles = this.vehicles.filter(v => 
+        v.licensePlate.toLowerCase().includes(term) ||
+        v.brand.toLowerCase().includes(term) ||
+        v.model.toLowerCase().includes(term)
+      );
+      this.totalCount = this.vehicles.length;
+    }
+    
+    /* Código real API - descomentar quando backend estiver pronto
     this.vehicleService.getAll({
       pageNumber: this.currentPage,
       pageSize: this.pageSize,
@@ -77,6 +124,7 @@ export class VehiclesComponent implements OnInit {
         this.error = result.error || null;
       }
     });
+    */
   }
 
   // Carregar clientes para o dropdown

@@ -4,15 +4,12 @@
   <!-- Header -->
   <div class="page-header">
     <div>
-      <h1 class="title">Veículos</h1>
-      <p class="subtitle">Gestão de veículos registados</p>
+      <h1 class="title">Os Meus Veículos</h1>
+      <p class="subtitle">Veja e acompanhe os seus veículos registados</p>
     </div>
-    <button (click)="openCreateModal()" class="btn-primary">
-      <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-      </svg>
-      Novo Veículo
-    </button>
+    <div class="header-info">
+      <span class="vehicle-count">{{ totalCount }} {{ totalCount === 1 ? 'veículo' : 'veículos' }}</span>
+    </div>
   </div>
 
   <!-- Search Bar -->
@@ -37,193 +34,53 @@
           <th>Matrícula</th>
           <th>Marca/Modelo</th>
           <th>Ano</th>
+          <th>Cor</th>
           <th>Combustível</th>
-          <th>Cliente</th>
-          <th class="text-right">Ações</th>
+          <th>Motor</th>
+          <th>VIN</th>
         </tr>
       </thead>
       <tbody>
         @if (vehicles.length === 0) {
           <tr>
-            <td colspan="6" class="text-center py-8 text-gray-500">
-              Nenhum veículo encontrado
+            <td colspan="7" class="text-center py-8 text-gray-500">
+              <div class="empty-state">
+                <svg class="empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                </svg>
+                <p class="empty-title">Nenhum veículo encontrado</p>
+                <p class="empty-subtitle">Entre em contacto com a oficina para registar os seus veículos</p>
+              </div>
             </td>
           </tr>
         }
         
         @for (vehicle of vehicles; track vehicle.id) {
-          <tr>
-            <td class="font-mono font-bold">{{ vehicle.licensePlate }}</td>
-            <td>{{ vehicle.brand }} {{ vehicle.model }}</td>
+          <tr class="vehicle-row">
+            <td class="font-mono font-bold text-teal-400">{{ vehicle.licensePlate }}</td>
+            <td class="vehicle-brand">{{ vehicle.brand }} {{ vehicle.model }}</td>
             <td>{{ vehicle.year }}</td>
+            <td>{{ vehicle.color }}</td>
             <td>
               <span class="badge badge-teal">{{ vehicle.fuelType }}</span>
             </td>
-            <td>{{ vehicle.customerName }}</td>
-            <td class="text-right">
-              <div class="action-buttons">
-                <button (click)="openEditModal(vehicle)" class="btn-icon btn-edit" title="Editar">
-                  <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                  </svg>
-                </button>
-              </div>
-            </td>
+            <td class="text-gray-400">{{ vehicle.engineType || '-' }}</td>
+            <td class="font-mono text-sm text-gray-500">{{ vehicle.vin || '-' }}</td>
           </tr>
         }
       </tbody>
     </table>
 
-    <!-- Pagination -->
-    @if (totalPages > 1) {
-      <div class="pagination">
-        <button 
-          (click)="onPageChange(currentPage - 1)" 
-          [disabled]="currentPage === 1"
-          class="btn-pagination"
-        >
-          Anterior
-        </button>
-        
-        <span class="pagination-info">
-          Página {{ currentPage }} de {{ totalPages }} ({{ totalCount }} veículos)
-        </span>
-        
-        <button 
-          (click)="onPageChange(currentPage + 1)" 
-          [disabled]="currentPage === totalPages"
-          class="btn-pagination"
-        >
-          Próxima
-        </button>
-      </div>
-    }
   </div>
 
-  <!-- Modal Create/Edit -->
-  @if (showModal) {
-    <div class="modal-overlay" (click)="closeModal()">
-      <div class="modal-content" (click)="$event.stopPropagation()">
-        <div class="modal-header">
-          <h2 class="modal-title">
-            {{ isEditMode ? 'Editar Veículo' : 'Novo Veículo' }}
-          </h2>
-          <button (click)="closeModal()" class="btn-close">
-            <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-            </svg>
-          </button>
-        </div>
-
-        <form [formGroup]="vehicleForm" (ngSubmit)="onSubmit()" class="modal-body">
-          <!-- Cliente -->
-          <div class="form-section">
-            <h3 class="form-section-title">Cliente</h3>
-            
-            <div class="form-group">
-              <label class="form-label">Cliente *</label>
-              <select formControlName="customerId" class="form-input" [class.input-error]="isFieldInvalid('customerId')">
-                <option value="">Selecione um cliente</option>
-                @for (customer of customers; track customer.id) {
-                  <option [value]="customer.id">{{ customer.name }}</option>
-                }
-              </select>
-              @if (isFieldInvalid('customerId')) {
-                <span class="error-text">{{ getFieldError('customerId') }}</span>
-              }
-            </div>
-          </div>
-
-          <!-- Informações do Veículo -->
-          <div class="form-section">
-            <h3 class="form-section-title">Informações do Veículo</h3>
-            
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label">Matrícula *</label>
-                <input type="text" formControlName="licensePlate" placeholder="AB-12-CD" class="form-input" [class.input-error]="isFieldInvalid('licensePlate')" />
-                @if (isFieldInvalid('licensePlate')) {
-                  <span class="error-text">{{ getFieldError('licensePlate') }}</span>
-                }
-              </div>
-              
-              <div class="form-group">
-                <label class="form-label">Ano *</label>
-                <input type="number" formControlName="year" placeholder="2024" class="form-input" [class.input-error]="isFieldInvalid('year')" />
-                @if (isFieldInvalid('year')) {
-                  <span class="error-text">{{ getFieldError('year') }}</span>
-                }
-              </div>
-            </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label">Marca *</label>
-                <input type="text" formControlName="brand" placeholder="Toyota" class="form-input" [class.input-error]="isFieldInvalid('brand')" />
-                @if (isFieldInvalid('brand')) {
-                  <span class="error-text">{{ getFieldError('brand') }}</span>
-                }
-              </div>
-              
-              <div class="form-group">
-                <label class="form-label">Modelo *</label>
-                <input type="text" formControlName="model" placeholder="Corolla" class="form-input" [class.input-error]="isFieldInvalid('model')" />
-                @if (isFieldInvalid('model')) {
-                  <span class="error-text">{{ getFieldError('model') }}</span>
-                }
-              </div>
-            </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label">Cor *</label>
-                <input type="text" formControlName="color" placeholder="Branco" class="form-input" [class.input-error]="isFieldInvalid('color')" />
-                @if (isFieldInvalid('color')) {
-                  <span class="error-text">{{ getFieldError('color') }}</span>
-                }
-              </div>
-              
-              <div class="form-group">
-                <label class="form-label">Combustível *</label>
-                <select formControlName="fuelType" class="form-input" [class.input-error]="isFieldInvalid('fuelType')">
-                  <option value="">Selecione</option>
-                  @for (fuel of fuelTypes; track fuel) {
-                    <option [value]="fuel">{{ fuel }}</option>
-                  }
-                </select>
-                @if (isFieldInvalid('fuelType')) {
-                  <span class="error-text">{{ getFieldError('fuelType') }}</span>
-                }
-              </div>
-            </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label">VIN (17 caracteres)</label>
-                <input type="text" formControlName="vin" placeholder="1HGBH41JXMN109186" class="form-input" [class.input-error]="isFieldInvalid('vin')" />
-                @if (isFieldInvalid('vin')) {
-                  <span class="error-text">{{ getFieldError('vin') }}</span>
-                }
-              </div>
-              
-              <div class="form-group">
-                <label class="form-label">Tipo de Motor</label>
-                <input type="text" formControlName="engineType" placeholder="1.6L Turbo" class="form-input" />
-              </div>
-            </div>
-          </div>
-
-          <!-- Actions -->
-          <div class="modal-footer">
-            <button type="button" (click)="closeModal()" class="btn-secondary">
-              Cancelar
-            </button>
-            <button type="submit" [disabled]="vehicleForm.invalid" class="btn-primary">
-              {{ isEditMode ? 'Guardar' : 'Criar' }}
-            </button>
-          </div>
-        </form>
-      </div>
+  <!-- Info Box -->
+  <div class="info-box">
+    <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+    </svg>
+    <div class="info-content">
+      <p class="info-title">Precisa de registar um novo veículo?</p>
+      <p class="info-text">Entre em contacto com a oficina para adicionar ou atualizar informações dos seus veículos.</p>
     </div>
-  }
+  </div>
 </div>

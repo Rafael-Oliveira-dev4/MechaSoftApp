@@ -173,9 +173,9 @@ export class RegisterComponent {
       return `Mínimo ${field.errors['minlength'].requiredLength} caracteres`;
     if (field.errors['maxlength'])
       return `Máximo ${field.errors['maxlength'].requiredLength} caracteres`;
-    if (field.errors['email']) return 'Email inválido';
-    if (field.errors['emailTaken']) return 'Este email já está registado';
-    if (field.errors['passwordMismatch']) return 'As passwords não coincidem';
+    if (field.errors['email']) return 'E-mail inválido';
+    if (field.errors['emailTaken']) return 'Este e-mail já está registado';
+    if (field.errors['passwordMismatch']) return 'As palavras-passe não coincidem';
     if (field.errors['usernameTaken']) return 'Este nome de utilizador já está em uso';
     if (field.errors['pattern']) {
       if (fieldName === 'username') {
@@ -238,7 +238,7 @@ export class RegisterComponent {
     if (error.code === 'UsernameAlreadyExists') {
       this.fieldErrors['username'] = 'Este nome de utilizador já está em uso';
     } else if (error.code === 'EmailAlreadyExists') {
-      this.fieldErrors['email'] = 'Este email já está registado';
+      this.fieldErrors['email'] = 'Este e-mail já está registado';
     }
   }
 }

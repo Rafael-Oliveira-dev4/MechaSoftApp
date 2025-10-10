@@ -1,105 +1,196 @@
-<div class="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
-    <div class="mb-8">
-      <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 class="text-4xl font-bold text-white mb-2">Inspeções</h1>
-          <p class="text-zinc-300">Gestão de inspeções técnicas e agendamentos</p>
-        </div>
-        <div class="flex gap-3">
-          <input type="date" class="rounded-xl border border-slate-700 bg-slate-800/50 px-4 py-3 text-sm text-white placeholder-zinc-400 shadow-sm focus:border-emerald-500 focus:outline-none backdrop-blur-sm" />
-          <button class="inline-flex items-center rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-6 py-3 text-sm font-semibold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:shadow-emerald-500/25 hover:from-emerald-500 hover:to-teal-600">
-            <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-            </svg>
-            Agendar inspeção
-          </button>
-        </div>
+<div class="inspections-container">
+    <div class="page-header">
+      <div>
+        <h1 class="title">As Minhas Inspeções</h1>
+        <p class="subtitle">Acompanhe as inspeções técnicas dos seus veículos</p>
+      </div>
+      <div class="header-info">
+        <span class="inspection-count">{{ inspections.length }} {{ inspections.length === 1 ? 'inspeção' : 'inspeções' }}</span>
       </div>
     </div>
     
-    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+    <div class="inspections-grid">
       <!-- Próximas Inspeções -->
-      <div class="rounded-2xl border border-slate-800/50 bg-slate-900/50 backdrop-blur-sm shadow-lg glass-enhanced">
-        <div class="border-b border-slate-800/50 bg-slate-800/50 px-6 py-4">
-          <h3 class="text-lg font-semibold text-white">Próximas Inspeções</h3>
-          <p class="text-sm text-zinc-400">Inspeções agendadas para os próximos dias</p>
+      <div class="inspection-section">
+        <div class="section-header">
+          <div>
+            <h3 class="section-title">Próximas Inspeções</h3>
+            <p class="section-subtitle">Agendadas para breve</p>
+          </div>
+          <span class="section-badge">{{ upcomingInspections.length }}</span>
         </div>
-        <div class="divide-y divide-slate-800/50">
-          <div class="flex items-center justify-between px-6 py-4 hover:bg-slate-800/30 transition-colors">
-            <div class="flex items-center space-x-4">
-              <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
-                <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        <div class="inspections-list">
+          @if (upcomingInspections.length === 0) {
+            <div class="empty-card">
+              <svg class="empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <p class="empty-text">Sem inspeções agendadas</p>
+            </div>
+          }
+          
+          @for (inspection of upcomingInspections; track inspection.id) {
+            <div class="inspection-card">
+              <div class="card-icon-wrapper" [class]="inspection.status === 'Próxima' ? 'icon-warning' : 'icon-info'">
+                <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                 </svg>
               </div>
-              <div>
-                <p class="text-sm font-medium text-white">Inspeção Técnica</p>
-                <p class="text-sm text-zinc-400">AA-00-BB • João Silva • 2025-09-10</p>
+              <div class="card-content">
+                <div class="card-header">
+                  <h4 class="card-title">{{ inspection.inspectionType }}</h4>
+                  <span [class]="'badge ' + getStatusBadgeClass(inspection.status)">
+                    {{ inspection.status }}
+                  </span>
+                </div>
+                <div class="card-info">
+                  <span class="info-plate">{{ inspection.vehiclePlate }}</span>
+                  <span class="info-separator">•</span>
+                  <span class="info-vehicle">{{ inspection.vehicleInfo }}</span>
+                </div>
+                <div class="card-details">
+                  <div class="detail">
+                    <svg class="detail-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    <span>{{ formatDate(inspection.scheduledDate) }}</span>
+                  </div>
+                  <div class="detail">
+                    <svg class="detail-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                    <span>{{ inspection.inspectorName }}</span>
+                  </div>
+                </div>
               </div>
             </div>
-            <button class="rounded-xl border border-slate-700 bg-slate-800/50 px-4 py-2 text-sm text-white hover:bg-slate-700/50 transition-colors backdrop-blur-sm">
-              Ver
-            </button>
-          </div>
-          <div class="flex items-center justify-between px-6 py-4 hover:bg-slate-800/30 transition-colors">
-            <div class="flex items-center space-x-4">
-              <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
-                <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-              </div>
-              <div>
-                <p class="text-sm font-medium text-white">Inspeção Anual</p>
-                <p class="text-sm text-zinc-400">BB-11-CC • Maria Santos • 2025-09-15</p>
-              </div>
-            </div>
-            <button class="rounded-xl border border-slate-700 bg-slate-800/50 px-4 py-2 text-sm text-white hover:bg-slate-700/50 transition-colors backdrop-blur-sm">
-              Ver
-            </button>
-          </div>
+          }
         </div>
       </div>
 
-      <!-- Inspeções Pendentes -->
-      <div class="rounded-2xl border border-slate-800/50 bg-slate-900/50 backdrop-blur-sm shadow-lg glass-enhanced">
-        <div class="border-b border-slate-800/50 bg-slate-800/50 px-6 py-4">
-          <h3 class="text-lg font-semibold text-white">Inspeções Pendentes</h3>
-          <p class="text-sm text-zinc-400">Veículos com inspeções em atraso</p>
+      <!-- Inspeções Vencidas/Atenção -->
+      <div class="inspection-section">
+        <div class="section-header">
+          <div>
+            <h3 class="section-title">Requer Atenção</h3>
+            <p class="section-subtitle">Inspeções vencidas ou próximas do vencimento</p>
+          </div>
+          <span class="section-badge badge-red">{{ overdueInspections.length }}</span>
         </div>
-        <div class="divide-y divide-slate-800/50">
-          <div class="flex items-center justify-between px-6 py-4 hover:bg-slate-800/30 transition-colors">
-            <div class="flex items-center space-x-4">
-              <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-red-500 to-rose-600 flex items-center justify-center">
-                <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 19.5c-.77.833.192 2.5 1.732 2.5z"></path>
+        <div class="inspections-list">
+          @if (overdueInspections.length === 0) {
+            <div class="empty-card success">
+              <svg class="empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <p class="empty-text">Todas as inspeções em dia</p>
+            </div>
+          }
+          
+          @for (inspection of overdueInspections; track inspection.id) {
+            <div class="inspection-card alert">
+              <div class="card-icon-wrapper icon-danger">
+                <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1-1.924-1-2.732 0L3.732 16c-.77 1.333.192 3 1.732 3z"/>
                 </svg>
               </div>
-              <div>
-                <p class="text-sm font-medium text-white">Inspeção Vencida</p>
-                <p class="text-sm text-zinc-400">CC-22-DD • Pedro Costa • Vencida há 5 dias</p>
+              <div class="card-content">
+                <div class="card-header">
+                  <h4 class="card-title">{{ inspection.inspectionType }}</h4>
+                  <span class="badge badge-red">Vencida</span>
+                </div>
+                <div class="card-info">
+                  <span class="info-plate">{{ inspection.vehiclePlate }}</span>
+                  <span class="info-separator">•</span>
+                  <span class="info-vehicle">{{ inspection.vehicleInfo }}</span>
+                </div>
+                <div class="alert-message">
+                  <svg class="alert-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                  <span>Vencida há {{ getDaysSinceExpiry(inspection.expiryDate) }} dias - Contacte a oficina</span>
+                </div>
               </div>
             </div>
-            <button class="rounded-xl border border-slate-700 bg-slate-800/50 px-4 py-2 text-sm text-white hover:bg-slate-700/50 transition-colors backdrop-blur-sm">
-              Agendar
-            </button>
-          </div>
-          <div class="flex items-center justify-between px-6 py-4 hover:bg-slate-800/30 transition-colors">
-            <div class="flex items-center space-x-4">
-              <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center">
-                <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-              </div>
-              <div>
-                <p class="text-sm font-medium text-white">Inspeção Próxima</p>
-                <p class="text-sm text-zinc-400">DD-33-EE • Ana Ferreira • Vence em 3 dias</p>
-              </div>
-            </div>
-            <button class="rounded-xl border border-slate-700 bg-slate-800/50 px-4 py-2 text-sm text-white hover:bg-slate-700/50 transition-colors backdrop-blur-sm">
-              Agendar
-            </button>
-          </div>
+          }
         </div>
+      </div>
+
+      <!-- Histórico de Inspeções -->
+      <div class="inspection-section full-width">
+        <div class="section-header">
+          <div>
+            <h3 class="section-title">Histórico de Inspeções</h3>
+            <p class="section-subtitle">Inspeções concluídas</p>
+          </div>
+          <span class="section-badge">{{ completedInspections.length }}</span>
+        </div>
+        <div class="history-table-wrapper">
+          <table class="history-table">
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Veículo</th>
+                <th>Tipo</th>
+                <th>Resultado</th>
+                <th>Validade</th>
+                <th>Observações</th>
+              </tr>
+            </thead>
+            <tbody>
+              @if (completedInspections.length === 0) {
+                <tr>
+                  <td colspan="6" class="text-center py-8">
+                    <div class="empty-state">
+                      <svg class="empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                      </svg>
+                      <p class="empty-title">Sem inspeções concluídas</p>
+                    </div>
+                  </td>
+                </tr>
+              }
+              
+              @for (inspection of completedInspections; track inspection.id) {
+                <tr class="history-row">
+                  <td class="date-col">{{ formatDate(inspection.completedDate) }}</td>
+                  <td class="vehicle-col">
+                    <span class="vehicle-plate">{{ inspection.vehiclePlate }}</span>
+                    <span class="vehicle-model">{{ inspection.vehicleInfo }}</span>
+                  </td>
+                  <td>{{ inspection.inspectionType }}</td>
+                  <td>
+                    <span [class]="'badge ' + getResultBadgeClass(inspection.result)">
+                      {{ inspection.result }}
+                    </span>
+                  </td>
+                  <td class="expiry-col">
+                    @if (getDaysUntilExpiry(inspection.expiryDate) < 0) {
+                      <span class="text-red-400">Vencida</span>
+                    } @else if (getDaysUntilExpiry(inspection.expiryDate) < 30) {
+                      <span class="text-amber-400">{{ formatDate(inspection.expiryDate) }}</span>
+                    } @else {
+                      <span class="text-emerald-400">{{ formatDate(inspection.expiryDate) }}</span>
+                    }
+                  </td>
+                  <td class="observations-col">{{ inspection.observations || '-' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Info Box -->
+    <div class="info-box">
+      <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+      <div class="info-content">
+        <p class="info-title">Precisa de agendar uma inspeção?</p>
+        <p class="info-text">Entre em contacto com a oficina para agendar inspeções técnicas para os seus veículos.</p>
       </div>
     </div>
 </div>

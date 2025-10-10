@@ -4,15 +4,12 @@
   <!-- Header -->
   <div class="page-header">
     <div>
-      <h1 class="title">Ordens de Serviço</h1>
-      <p class="subtitle">Gestão de ordens e workflow da oficina</p>
+      <h1 class="title">As Minhas Ordens de Serviço</h1>
+      <p class="subtitle">Acompanhe o estado dos seus serviços</p>
     </div>
-    <button (click)="openCreateModal()" class="btn-primary">
-      <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-      </svg>
-      Nova Ordem
-    </button>
+    <div class="header-info">
+      <span class="order-count">{{ totalCount }} {{ totalCount === 1 ? 'ordem' : 'ordens' }}</span>
+    </div>
   </div>
 
   <!-- Status Filters -->
@@ -37,41 +34,61 @@
       <thead>
         <tr>
           <th>Nº Ordem</th>
-          <th>Cliente</th>
           <th>Veículo</th>
-          <th>Descrição</th>
-          <th>Prioridade</th>
+          <th>Serviço</th>
           <th>Estado</th>
-          <th>Valor Estimado</th>
-          <th class="text-right">Ações</th>
+          <th>Data Prevista</th>
+          <th>Valor</th>
+          <th class="text-right">Detalhes</th>
         </tr>
       </thead>
       <tbody>
         @if (orders.length === 0) {
           <tr>
-            <td colspan="8" class="text-center py-8 text-gray-500">
-              Nenhuma ordem encontrada
+            <td colspan="7" class="text-center py-8">
+              <div class="empty-state">
+                <svg class="empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                </svg>
+                <p class="empty-title">Nenhuma ordem encontrada</p>
+                <p class="empty-subtitle">Ainda não tem ordens de serviço registadas</p>
+              </div>
             </td>
           </tr>
         }
         
         @for (order of orders; track order.id) {
-          <tr [class.row-urgent]="order.priority === 'Urgent'">
-            <td class="font-mono font-bold">{{ order.orderNumber }}</td>
-            <td>{{ order.customerId }}</td>
-            <td>{{ order.vehicleId }}</td>
-            <td class="max-w-xs truncate">{{ order.description }}</td>
-            <td>
-              <span [class]="'badge badge-' + (order.priority === 'Urgent' ? 'red' : order.priority === 'High' ? 'orange' : 'gray')">
-                {{ getPriorityLabel(order.priority) }}
-              </span>
+          <tr class="order-row">
+            <td class="font-mono font-bold text-teal-400">{{ order.orderNumber }}</td>
+            <td class="vehicle-info">
+              <span class="vehicle-plate">{{ order.vehiclePlate }}</span>
+              <span class="vehicle-model">{{ order.vehicleInfo }}</span>
             </td>
+            <td class="service-desc">{{ order.description }}</td>
             <td>
               <span [class]="'badge badge-' + getStatusColor(order.status)">
                 {{ getStatusLabel(order.status) }}
               </span>
             </td>
-            <td class="font-medium">{{ formatCurrency(order.estimatedCost) }}</td>
+            <td class="date-cell">
+              @if (order.status === 'Completed' && order.actualDelivery) {
+                <span class="completed-date">{{ order.actualDelivery | date: 'dd/MM/yyyy HH:mm' }}</span>
+              } @else {
+                {{ order.estimatedDelivery | date: 'dd/MM/yyyy HH:mm' }}
+              }
+            </td>
+            <td class="cost-cell">
+              @if (order.finalCost && order.finalCost > 0) {
+                <div class="cost-breakdown">
+                  <span class="final-cost">{{ formatCurrency(order.finalCost) }}</span>
+                  @if (order.finalCost !== order.estimatedCost) {
+                    <span class="estimated-cost">Est: {{ formatCurrency(order.estimatedCost) }}</span>
+                  }
+                </div>
+              } @else {
+                <span class="estimated-label">{{ formatCurrency(order.estimatedCost) }}</span>
+              }
+            </td>
             <td class="text-right">
               <button (click)="viewDetails(order)" class="btn-icon btn-view" title="Ver Detalhes">
                 <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -85,129 +102,7 @@
       </tbody>
     </table>
 
-    <!-- Pagination -->
-    @if (totalPages > 1) {
-      <div class="pagination">
-        <button (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 1" class="btn-pagination">
-          Anterior
-        </button>
-        <span class="pagination-info">
-          Página {{ currentPage }} de {{ totalPages }} ({{ totalCount }} ordens)
-        </span>
-        <button (click)="onPageChange(currentPage + 1)" [disabled]="currentPage === totalPages" class="btn-pagination">
-          Próxima
-        </button>
-      </div>
-    }
   </div>
-
-  <!-- Modal Create -->
-  @if (showCreateModal) {
-    <div class="modal-overlay" (click)="closeCreateModal()">
-      <div class="modal-content" (click)="$event.stopPropagation()">
-        <div class="modal-header">
-          <h2 class="modal-title">Nova Ordem de Serviço</h2>
-          <button (click)="closeCreateModal()" class="btn-close">
-            <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-            </svg>
-          </button>
-        </div>
-
-        <form [formGroup]="orderForm" (ngSubmit)="onSubmit()" class="modal-body">
-          <!-- Cliente e Veículo -->
-          <div class="form-section">
-            <h3 class="form-section-title">Cliente e Veículo</h3>
-            
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label">Cliente *</label>
-                <select formControlName="customerId" (change)="onCustomerChange($any($event.target).value)" class="form-input" [class.input-error]="isFieldInvalid('customerId')">
-                  <option value="">Selecione um cliente</option>
-                  @for (customer of customers; track customer.id) {
-                    <option [value]="customer.id">{{ customer.name }}</option>
-                  }
-                </select>
-                @if (isFieldInvalid('customerId')) {
-                  <span class="error-text">{{ getFieldError('customerId') }}</span>
-                }
-              </div>
-              
-              <div class="form-group">
-                <label class="form-label">Veículo *</label>
-                <select formControlName="vehicleId" class="form-input" [class.input-error]="isFieldInvalid('vehicleId')" [disabled]="vehicles.length === 0">
-                  <option value="">Selecione um veículo</option>
-                  @for (vehicle of vehicles; track vehicle.id) {
-                    <option [value]="vehicle.id">{{ vehicle.brand }} {{ vehicle.model }} - {{ vehicle.licensePlate }}</option>
-                  }
-                </select>
-                @if (isFieldInvalid('vehicleId')) {
-                  <span class="error-text">{{ getFieldError('vehicleId') }}</span>
-                }
-              </div>
-            </div>
-          </div>
-
-          <!-- Detalhes do Serviço -->
-          <div class="form-section">
-            <h3 class="form-section-title">Detalhes do Serviço</h3>
-            
-            <div class="form-group">
-              <label class="form-label">Descrição *</label>
-              <textarea formControlName="description" rows="3" placeholder="Descreva o problema ou serviço necessário..." class="form-input" [class.input-error]="isFieldInvalid('description')"></textarea>
-              @if (isFieldInvalid('description')) {
-                <span class="error-text">{{ getFieldError('description') }}</span>
-              }
-            </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label">Prioridade *</label>
-                <select formControlName="priority" class="form-input">
-                  @for (priority of priorities; track priority.value) {
-                    <option [value]="priority.value">{{ priority.label }}</option>
-                  }
-                </select>
-              </div>
-              
-              <div class="form-group">
-                <label class="form-label">Valor Estimado (€) *</label>
-                <input type="number" formControlName="estimatedCost" placeholder="0.00" step="0.01" class="form-input" [class.input-error]="isFieldInvalid('estimatedCost')" />
-                @if (isFieldInvalid('estimatedCost')) {
-                  <span class="error-text">{{ getFieldError('estimatedCost') }}</span>
-                }
-              </div>
-            </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label">Entrega Estimada</label>
-                <input type="datetime-local" formControlName="estimatedDelivery" class="form-input" />
-              </div>
-              
-              <div class="form-group">
-                <label class="form-label flex items-center gap-2">
-                  <input type="checkbox" formControlName="requiresInspection" class="form-checkbox" />
-                  <span>Requer Inspeção</span>
-                </label>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label class="form-label">Notas Internas</label>
-              <textarea formControlName="internalNotes" rows="2" placeholder="Notas privadas (não visíveis ao cliente)..." class="form-input"></textarea>
-            </div>
-          </div>
-
-          <!-- Actions -->
-          <div class="modal-footer">
-            <button type="button" (click)="closeCreateModal()" class="btn-secondary">Cancelar</button>
-            <button type="submit" [disabled]="orderForm.invalid" class="btn-primary">Criar Ordem</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  }
 
   <!-- Modal Details -->
   @if (showDetailsModal && selectedOrder) {
@@ -216,7 +111,7 @@
         <div class="modal-header">
           <div>
             <h2 class="modal-title">Ordem {{ selectedOrder.orderNumber }}</h2>
-            <p class="text-sm text-gray-500">{{ selectedOrder.description }}</p>
+            <p class="text-sm text-zinc-400">{{ selectedOrder.vehicleInfo }} - {{ selectedOrder.vehiclePlate }}</p>
           </div>
           <button (click)="closeDetailsModal()" class="btn-close">
             <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -226,70 +121,108 @@
         </div>
 
         <div class="modal-body">
-          <!-- Status e Info -->
-          <div class="details-grid">
-            <div class="detail-card">
-              <h3 class="detail-title">Estado Atual</h3>
-              <span [class]="'badge badge-large badge-' + getStatusColor(selectedOrder.status)">
-                {{ getStatusLabel(selectedOrder.status) }}
-              </span>
-            </div>
-
-            <div class="detail-card">
-              <h3 class="detail-title">Prioridade</h3>
-              <span [class]="'badge badge-large badge-' + (selectedOrder.priority === 'Urgent' ? 'red' : 'gray')">
-                {{ getPriorityLabel(selectedOrder.priority) }}
-              </span>
-            </div>
-
-            <div class="detail-card">
-              <h3 class="detail-title">Valor Estimado</h3>
-              <p class="detail-value">{{ formatCurrency(selectedOrder.estimatedCost) }}</p>
-            </div>
-
-            @if (selectedOrder.finalCost) {
-              <div class="detail-card">
-                <h3 class="detail-title">Valor Final</h3>
-                <p class="detail-value">{{ formatCurrency(selectedOrder.finalCost) }}</p>
+          <!-- Informações Principais -->
+          <div class="detail-section">
+            <h3 class="detail-section-title">Informações do Serviço</h3>
+            <div class="detail-info-grid">
+              <div class="detail-item">
+                <span class="detail-label">Estado:</span>
+                <span [class]="'badge badge-' + getStatusColor(selectedOrder.status)">
+                  {{ getStatusLabel(selectedOrder.status) }}
+                </span>
               </div>
-            }
+              
+              <div class="detail-item">
+                <span class="detail-label">Data de Criação:</span>
+                <span class="detail-value">{{ selectedOrder.createdAt | date: 'dd/MM/yyyy HH:mm' }}</span>
+              </div>
+
+              @if (selectedOrder.mechanicName) {
+                <div class="detail-item">
+                  <span class="detail-label">Mecânico Responsável:</span>
+                  <span class="detail-value">{{ selectedOrder.mechanicName }}</span>
+                </div>
+              }
+
+              <div class="detail-item">
+                <span class="detail-label">Data Prevista:</span>
+                <span class="detail-value">{{ selectedOrder.estimatedDelivery | date: 'dd/MM/yyyy HH:mm' }}</span>
+              </div>
+
+              @if (selectedOrder.actualDelivery) {
+                <div class="detail-item">
+                  <span class="detail-label">Data de Conclusão:</span>
+                  <span class="detail-value text-emerald-400">{{ selectedOrder.actualDelivery | date: 'dd/MM/yyyy HH:mm' }}</span>
+                </div>
+              }
+            </div>
           </div>
 
-          <!-- Atualizar Estado -->
-          @if (selectedOrder.status !== 'Completed' && selectedOrder.status !== 'Cancelled') {
-            <div class="action-section">
-              <h3 class="section-title">Atualizar Estado</h3>
-              <div class="flex gap-2 flex-wrap">
-                @for (status of statuses; track status.value) {
-                  @if (status.value !== selectedOrder.status && status.value !== 'Cancelled') {
-                    <button (click)="updateStatus(selectedOrder, status.value)" [class]="'btn-status btn-' + status.color">
-                      {{ status.label }}
-                    </button>
-                  }
-                }
-                <button (click)="cancelOrder(selectedOrder)" class="btn-status btn-red">
-                  Cancelar Ordem
-                </button>
+          <!-- Descrição -->
+          <div class="detail-section">
+            <h3 class="detail-section-title">Descrição do Serviço</h3>
+            <p class="service-description">{{ selectedOrder.description }}</p>
+          </div>
+
+          <!-- Valores -->
+          <div class="detail-section">
+            <h3 class="detail-section-title">Valores</h3>
+            <div class="cost-details">
+              <div class="cost-item">
+                <span class="cost-label">Valor Estimado:</span>
+                <span class="cost-value">{{ formatCurrency(selectedOrder.estimatedCost) }}</span>
               </div>
+              
+              @if (selectedOrder.finalCost && selectedOrder.finalCost > 0) {
+                <div class="cost-item final">
+                  <span class="cost-label">Valor Final:</span>
+                  <span class="cost-value final-value">{{ formatCurrency(selectedOrder.finalCost) }}</span>
+                </div>
+                
+                @if (selectedOrder.finalCost !== selectedOrder.estimatedCost) {
+                  <div class="cost-item difference">
+                    <span class="cost-label">Diferença:</span>
+                    <span [class]="selectedOrder.finalCost > selectedOrder.estimatedCost ? 'cost-value text-red-400' : 'cost-value text-emerald-400'">
+                      {{ formatCurrency(selectedOrder.finalCost - selectedOrder.estimatedCost) }}
+                      ({{ selectedOrder.finalCost > selectedOrder.estimatedCost ? '+' : '' }}{{ ((selectedOrder.finalCost - selectedOrder.estimatedCost) / selectedOrder.estimatedCost * 100).toFixed(1) }}%)
+                    </span>
+                  </div>
+                }
+              }
+            </div>
+          </div>
+
+          <!-- Info Box -->
+          @if (selectedOrder.status === 'Pending') {
+            <div class="info-banner info">
+              <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <span>A sua ordem está pendente. Será processada em breve.</span>
             </div>
           }
 
-          <!-- Atribuir Mecânico -->
-          @if (!selectedOrder.mechanicId && selectedOrder.status !== 'Cancelled') {
-            <div class="action-section">
-              <h3 class="section-title">Atribuir Mecânico</h3>
-              <select (change)="assignMechanic(selectedOrder, $any($event.target).value)" class="form-input">
-                <option value="">Selecione um mecânico</option>
-                @for (mechanic of mechanics; track mechanic.id) {
-                  <option [value]="mechanic.id">{{ mechanic.fullName }} - {{ mechanic.role }}</option>
-                }
-              </select>
+          @if (selectedOrder.status === 'InProgress') {
+            <div class="info-banner progress">
+              <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <span>O seu veículo está atualmente a ser trabalhado{{ selectedOrder.mechanicName ? ' por ' + selectedOrder.mechanicName : '' }}.</span>
+            </div>
+          }
+
+          @if (selectedOrder.status === 'Completed') {
+            <div class="info-banner success">
+              <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <span>Serviço concluído! O seu veículo está pronto para levantamento.</span>
             </div>
           }
         </div>
 
         <div class="modal-footer">
-          <button (click)="closeDetailsModal()" class="btn-secondary">Fechar</button>
+          <button (click)="closeDetailsModal()" class="btn-primary">Fechar</button>
         </div>
       </div>
     </div>
