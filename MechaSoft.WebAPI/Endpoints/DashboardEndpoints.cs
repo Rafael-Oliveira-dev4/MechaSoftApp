@@ -1,4 +1,5 @@
 using MechaSoft.Application.CQ.Dashboard.Queries.GetDashboardStats;
+using MechaSoft.Application.CQ.Dashboard.Queries.GetCustomerDashboardStats;
 using MechaSoft.Application.CQ.Reports.Queries.GetLowStockReport;
 using MechaSoft.Application.Common.Responses;
 using MediatR;
@@ -16,6 +17,9 @@ public static class DashboardEndpoints
         // GET /api/dashboard/stats - Dashboard overview statistics
         dashboard.MapGet("/stats", Queries.GetDashboardStats);
 
+        // GET /api/dashboard/customer/{customerId} - Customer dashboard stats
+        dashboard.MapGet("/customer/{customerId:guid}", Queries.GetCustomerDashboardStats);
+
         // GET /api/dashboard/reports/low-stock - Low stock report
         dashboard.MapGet("/reports/low-stock", Queries.GetLowStockReport);
     }
@@ -26,6 +30,18 @@ public static class DashboardEndpoints
             [FromServices] ISender sender)
         {
             var query = new GetDashboardStatsQuery();
+            var result = await sender.Send(query);
+
+            return result.IsSuccess
+                ? TypedResults.Ok(result.Value!)
+                : TypedResults.BadRequest(result.Error!);
+        }
+
+        public static async Task<Results<Ok<CustomerDashboardStatsResponse>, BadRequest<Error>>> GetCustomerDashboardStats(
+            [FromRoute] Guid customerId,
+            [FromServices] ISender sender)
+        {
+            var query = new GetCustomerDashboardStatsQuery(customerId);
             var result = await sender.Send(query);
 
             return result.IsSuccess

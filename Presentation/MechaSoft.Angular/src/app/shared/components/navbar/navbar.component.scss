@@ -3,17 +3,26 @@
 // ============================================
 
 .navbar {
-  position: sticky;
+  position: fixed; // FIXA no topo, não desce com scroll
   top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
   z-index: 1000;
-  background: rgba(15, 23, 42, 0.85); // slate-900 with opacity
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(148, 163, 184, 0.1); // slate-400 with opacity
+  background: rgb(15, 23, 42); // Totalmente opaco
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   transition: all 0.3s ease;
 
-  &:hover {
-    background: rgba(15, 23, 42, 0.95);
+  // Garantir que não há espaços transparentes
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgb(15, 23, 42);
+    z-index: -1;
   }
 }
 

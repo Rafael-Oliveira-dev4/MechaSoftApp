@@ -23,6 +23,7 @@ import { ServiceOrdersComponent } from './pages/service-orders/service-orders.co
 import { ServicesComponent } from './pages/services/services.component';
 import { SettingsComponent } from './pages/settings/settings.component';
 import { VehiclesComponent } from './pages/vehicles/vehicles.component';
+import { EmployeesComponent } from './pages/employees/employees.component';
 
 const routes: Routes = [
   {
@@ -50,6 +51,14 @@ const routes: Routes = [
 
       // Inspeções (todos os funcionários)
       { path: 'inspections', component: InspectionsComponent },
+
+      // Funcionários (Owner+)
+      {
+        path: 'employees',
+        component: EmployeesComponent,
+        canActivate: [roleGuard],
+        data: { roles: ['Admin', 'Owner'] },
+      },
 
       // Serviços de Oficina (Manager+)
       {

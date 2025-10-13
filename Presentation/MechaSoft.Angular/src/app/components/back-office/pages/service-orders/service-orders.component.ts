@@ -1,14 +1,18 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { ServiceOrderService } from '../../../../core/services/service-order.service';
+import { ServiceOrderService, AddServiceToOrderRequest, AddPartToOrderRequest } from '../../../../core/services/service-order.service';
 import { CustomerService } from '../../../../core/services/customer.service';
 import { VehicleService } from '../../../../core/services/vehicle.service';
 import { EmployeeService } from '../../../../core/services/employee.service';
+import { AuthService } from '../../../../core/services/auth.service';
+import { MechanicServiceService } from '../../../../core/services/mechanic-service.service';
+import { PartService } from '../../../../core/services/part.service';
 import { ServiceOrder as BaseServiceOrder, Customer, Vehicle } from '../../../../core/models/api.models';
 import { Employee } from '../../../../core/models/employee.model';
 import { ErrorDetail } from '../../../../core/models/result.model';
 import { LoadingService } from '../../../../core/services/loading.service';
+import { ToastService } from '../../../../core/services/toast.service';
 import { ErrorMessageComponent } from '../../../../shared/components/error-message/error-message.component';
 
 // Extended interface for client view
@@ -31,6 +35,8 @@ export class ServiceOrdersComponent implements OnInit {
   customers: Customer[] = [];
   vehicles: Vehicle[] = [];
   mechanics: Employee[] = [];
+  availableServices: any[] = [];
+  availableParts: any[] = [];
   
   totalCount: number = 0;
   currentPage: number = 1;
@@ -39,9 +45,13 @@ export class ServiceOrdersComponent implements OnInit {
   
   showCreateModal: boolean = false;
   showDetailsModal: boolean = false;
+  showAddServiceModal: boolean = false;
+  showAddPartModal: boolean = false;
   selectedOrder: ServiceOrder | null = null;
   
   orderForm: FormGroup;
+  addServiceForm: FormGroup;
+  addPartForm: FormGroup;
   error: ErrorDetail | null = null;
   loading$;
 
@@ -52,9 +62,10 @@ export class ServiceOrdersComponent implements OnInit {
     { value: 'Cancelled', label: 'Cancelada', color: 'red' }
   ];
 
+  // Priority enum aligned with backend
   priorities = [
     { value: 'Low', label: 'Baixa' },
-    { value: 'Normal', label: 'Normal' },
+    { value: 'Medium', label: 'Média' },
     { value: 'High', label: 'Alta' },
     { value: 'Urgent', label: 'Urgente' }
   ];
@@ -64,17 +75,24 @@ export class ServiceOrdersComponent implements OnInit {
     private customerService: CustomerService,
     private vehicleService: VehicleService,
     private employeeService: EmployeeService,
+    private mechanicServiceService: MechanicServiceService,
+    private partService: PartService,
+    private authService: AuthService,
     private loadingService: LoadingService,
-    private fb: FormBuilder
+    private toastService: ToastService,
+    private fb: FormBuilder,
+    private cdr: ChangeDetectorRef
   ) {
     this.orderForm = this.createForm();
+    this.addServiceForm = this.createAddServiceForm();
+    this.addPartForm = this.createAddPartForm();
     this.loading$ = this.loadingService.loading$;
   }
 
   ngOnInit(): void {
     this.loadOrders();
-    // this.loadCustomers(); // Comentado - cliente não precisa ver outros clientes
-    // this.loadMechanics(); // Comentado - cliente não precisa ver mecânicos
+    this.loadCustomers(); // Admin/Owner precisa ver clientes
+    this.loadMechanics(); // Admin/Owner precisa atribuir mecânicos
   }
 
   // Criar formulário
@@ -83,167 +101,88 @@ export class ServiceOrdersComponent implements OnInit {
       customerId: ['', Validators.required],
       vehicleId: ['', Validators.required],
       description: ['', [Validators.required, Validators.minLength(10)]],
-      priority: ['Normal', Validators.required],
+      priority: ['Medium', Validators.required],
       estimatedCost: [0, [Validators.required, Validators.min(0)]],
       estimatedDelivery: [''],
+      mechanicId: [''],
       requiresInspection: [false],
       internalNotes: ['']
     });
   }
 
-  // Carregar ordens (Mock data para cliente)
+  private createAddServiceForm(): FormGroup {
+    return this.fb.group({
+      serviceId: ['', Validators.required],
+      quantity: [1, [Validators.required, Validators.min(1)]],
+      estimatedHours: [1, [Validators.required, Validators.min(0.1)]],
+      discountPercentage: [0, [Validators.min(0), Validators.max(100)]],
+      mechanicId: ['']
+    });
+  }
+
+  private createAddPartForm(): FormGroup {
+    return this.fb.group({
+      partId: ['', Validators.required],
+      quantity: [1, [Validators.required, Validators.min(1)]],
+      discountPercentage: [0, [Validators.min(0), Validators.max(100)]]
+    });
+  }
+
+  // Carregar ordens da API
   loadOrders(): void {
-    // Mock data - substituir com API real quando disponível
-    this.orders = [
-      {
-        id: '1',
-        orderNumber: 'OS-2024-156',
-        customerId: 'current-user',
-        customerName: 'rafael_oliveira',
-        vehicleId: '1',
-        vehiclePlate: '12-AB-34',
-        vehicleInfo: 'BMW 320d',
-        description: 'Troca de óleo e filtros + revisão geral dos 10.000 km',
-        priority: 'Normal',
-        status: 'InProgress',
-        estimatedCost: 320.50,
-        finalCost: 0,
-        estimatedDelivery: new Date('2024-10-12T17:00:00'),
-        actualDelivery: undefined,
-        requiresInspection: true,
-        mechanicId: 'mech-1',
-        mechanicName: 'João Silva',
-        createdAt: new Date('2024-10-09T09:00:00'),
-        updatedAt: new Date('2024-10-10T14:30:00'),
-        internalNotes: ''
-      },
-      {
-        id: '2',
-        orderNumber: 'OS-2024-142',
-        customerId: 'current-user',
-        customerName: 'rafael_oliveira',
-        vehicleId: '2',
-        vehiclePlate: '56-CD-78',
-        vehicleInfo: 'Volkswagen Golf 1.6 TDI',
-        description: 'Revisão periódica - Inspeção completa e troca de pastilhas de travão',
-        priority: 'Normal',
-        status: 'Pending',
-        estimatedCost: 450.00,
-        finalCost: 0,
-        estimatedDelivery: new Date('2024-10-15T16:00:00'),
-        actualDelivery: undefined,
-        requiresInspection: true,
-        mechanicId: undefined,
-        mechanicName: undefined,
-        createdAt: new Date('2024-09-28T11:00:00'),
-        updatedAt: new Date('2024-09-28T11:00:00'),
-        internalNotes: ''
-      },
-      {
-        id: '3',
-        orderNumber: 'OS-2024-098',
-        customerId: 'current-user',
-        customerName: 'rafael_oliveira',
-        vehicleId: '1',
-        vehiclePlate: '12-AB-34',
-        vehicleInfo: 'BMW 320d',
-        description: 'Substituição de pastilhas de travão dianteiras e discos',
-        priority: 'High',
-        status: 'Completed',
-        estimatedCost: 580.00,
-        finalCost: 654.50,
-        estimatedDelivery: new Date('2024-09-07T18:00:00'),
-        actualDelivery: new Date('2024-09-05T16:30:00'),
-        requiresInspection: false,
-        mechanicId: 'mech-2',
-        mechanicName: 'Pedro Costa',
-        createdAt: new Date('2024-09-03T10:00:00'),
-        updatedAt: new Date('2024-09-05T16:30:00'),
-        internalNotes: ''
-      },
-      {
-        id: '4',
-        orderNumber: 'OS-2024-067',
-        customerId: 'current-user',
-        customerName: 'rafael_oliveira',
-        vehicleId: '2',
-        vehiclePlate: '56-CD-78',
-        vehicleInfo: 'Volkswagen Golf 1.6 TDI',
-        description: 'Alinhamento e balanceamento das rodas',
-        priority: 'Low',
-        status: 'Completed',
-        estimatedCost: 80.00,
-        finalCost: 75.00,
-        estimatedDelivery: new Date('2024-08-22T12:00:00'),
-        actualDelivery: new Date('2024-08-20T11:00:00'),
-        requiresInspection: false,
-        mechanicId: 'mech-1',
-        mechanicName: 'João Silva',
-        createdAt: new Date('2024-08-19T09:00:00'),
-        updatedAt: new Date('2024-08-20T11:00:00'),
-        internalNotes: ''
-      },
-      {
-        id: '5',
-        orderNumber: 'OS-2024-023',
-        customerId: 'current-user',
-        customerName: 'rafael_oliveira',
-        vehicleId: '1',
-        vehiclePlate: '12-AB-34',
-        vehicleInfo: 'BMW 320d',
-        description: 'Diagnóstico eletrónico - Problema com sensor de oxigénio',
-        priority: 'Urgent',
-        status: 'Completed',
-        estimatedCost: 150.00,
-        finalCost: 180.00,
-        estimatedDelivery: new Date('2024-07-17T14:00:00'),
-        actualDelivery: new Date('2024-07-15T15:00:00'),
-        requiresInspection: true,
-        mechanicId: 'mech-3',
-        mechanicName: 'Carlos Mendes',
-        createdAt: new Date('2024-07-14T16:00:00'),
-        updatedAt: new Date('2024-07-15T15:00:00'),
-        internalNotes: ''
-      }
-    ];
+    const currentUser = this.authService.getCurrentUser();
+    const customerId = currentUser?.role === 'Customer' ? currentUser.customerId : undefined;
 
-    // Filtrar por status se necessário
-    if (this.statusFilter) {
-      this.orders = this.orders.filter(o => o.status === this.statusFilter);
-    }
-
-    this.totalCount = this.orders.length;
-    
-    /* Código real API - descomentar quando backend estiver pronto
-    this.serviceOrderService.getAll(
-      this.currentPage,
-      this.pageSize,
-      this.statusFilter || undefined
-    ).subscribe(result => {
+    this.serviceOrderService.getAll(this.currentPage, this.pageSize, this.statusFilter, customerId).subscribe(result => {
       if (result.isSuccess && result.value) {
-        this.orders = result.value.items || [];
-        this.totalCount = result.value.totalCount || 0;
+        this.orders = result.value.items;
+        this.totalCount = result.value.totalCount;
+        this.cdr.detectChanges();
       } else {
         this.error = result.error || null;
       }
     });
-    */
   }
 
-  // Carregar clientes
+  // Carregar clientes para dropdown (Admin/Owner)
   loadCustomers(): void {
-    this.customerService.getAll({ pageSize: 100 }).subscribe(result => {
+    const currentUser = this.authService.getCurrentUser();
+    if (currentUser?.role === 'Owner' || currentUser?.role === 'Admin') {
+      this.customerService.getAll({ pageNumber: 1, pageSize: 100 }).subscribe(result => {
+        if (result.isSuccess && result.value) {
+          this.customers = result.value.items;
+        }
+      });
+    }
+  }
+
+  // Carregar mecânicos para dropdown (Admin/Owner)
+  loadMechanics(): void {
+    const currentUser = this.authService.getCurrentUser();
+    if (currentUser?.role === 'Owner' || currentUser?.role === 'Admin') {
+      this.employeeService.getAll(1, 100).subscribe(result => {
+        if (result.isSuccess && result.value) {
+          // Filter only mechanics/active employees
+          this.mechanics = result.value.items.filter(e => e.isActive);
+        }
+      });
+    }
+  }
+
+  // Carregar serviços disponíveis
+  loadServices(): void {
+    this.mechanicServiceService.getAll(1, 100).subscribe(result => {
       if (result.isSuccess && result.value) {
-        this.customers = result.value.items;
+        this.availableServices = result.value.items.filter((s: any) => s.isActive);
       }
     });
   }
 
-  // Carregar mecânicos
-  loadMechanics(): void {
-    this.employeeService.getMechanics().subscribe(result => {
+  // Carregar peças disponíveis
+  loadParts(): void {
+    this.partService.getAll(1, 100).subscribe(result => {
       if (result.isSuccess && result.value) {
-        this.mechanics = result.value;
+        this.availableParts = result.value.items.filter((p: any) => p.isActive && p.stockQuantity > 0);
       }
     });
   }
@@ -274,25 +213,6 @@ export class ServiceOrdersComponent implements OnInit {
     this.showCreateModal = false;
     this.orderForm.reset();
     this.error = null;
-  }
-
-  // Submeter formulário
-  onSubmit(): void {
-    if (this.orderForm.invalid) {
-      this.orderForm.markAllAsTouched();
-      return;
-    }
-
-    const request = this.orderForm.value;
-    
-    this.serviceOrderService.create(request).subscribe(result => {
-      if (result.isSuccess) {
-        this.closeCreateModal();
-        this.loadOrders();
-      } else {
-        this.error = result.error || null;
-      }
-    });
   }
 
   // Ver detalhes da ordem
@@ -367,19 +287,7 @@ export class ServiceOrdersComponent implements OnInit {
     return Math.ceil(this.totalCount / this.pageSize);
   }
 
-  // Helpers
-  getStatusLabel(status: string): string {
-    return this.statuses.find(s => s.value === status)?.label || status;
-  }
-
-  getStatusColor(status: string): string {
-    return this.statuses.find(s => s.value === status)?.color || 'gray';
-  }
-
-  getPriorityLabel(priority: string): string {
-    return this.priorities.find(p => p.value === priority)?.label || priority;
-  }
-
+  // Helper para validação
   isFieldInvalid(fieldName: string): boolean {
     const field = this.orderForm.get(fieldName);
     return !!(field && field.invalid && (field.dirty || field.touched));
@@ -401,5 +309,265 @@ export class ServiceOrdersComponent implements OnInit {
       style: 'currency',
       currency: 'EUR'
     }).format(value);
+  }
+
+  // Check if user can manage service orders (Admin/Owner)
+  canManageOrders(): boolean {
+    const user = this.authService.getCurrentUser();
+    return user?.role === 'Owner' || user?.role === 'Admin';
+  }
+
+  // Traduzir Status do enum para português
+  getStatusLabel(status: string): string {
+    const statusMap: { [key: string]: string } = {
+      'Pending': 'Pendente',
+      'InProgress': 'Em Curso',
+      'WaitingParts': 'Aguarda Peças',
+      'WaitingApproval': 'Aguarda Aprovação',
+      'WaitingInspection': 'Aguarda Inspeção',
+      'Completed': 'Concluída',
+      'Delivered': 'Entregue',
+      'Cancelled': 'Cancelada'
+    };
+    return statusMap[status] || status;
+  }
+
+  // Get status color for badges (from statuses array)
+  getStatusColor(status: string): string {
+    return this.statuses.find(s => s.value === status)?.color || 'gray';
+  }
+
+  getServiceStatusColor(status: string): string {
+    const colorMap: { [key: string]: string } = {
+      'Pending': 'gray',
+      'InProgress': 'blue',
+      'Paused': 'yellow',
+      'Completed': 'green',
+      'Cancelled': 'red'
+    };
+    return colorMap[status] || 'gray';
+  }
+
+  // Traduzir Priority do enum para português
+  getPriorityLabel(priority: string): string {
+    const priorityMap: { [key: string]: string } = {
+      'Low': 'Baixa',
+      'Medium': 'Média',
+      'High': 'Alta',
+      'Urgent': 'Urgente'
+    };
+    return priorityMap[priority] || priority;
+  }
+
+  // Get priority color class
+  getPriorityColorClass(priority: string): string {
+    const colorMap: { [key: string]: string } = {
+      'Low': 'badge-gray',
+      'Medium': 'badge-blue',
+      'High': 'badge-orange',
+      'Urgent': 'badge-red'
+    };
+    return colorMap[priority] || 'badge-gray';
+  }
+
+  // Get status color class
+  getStatusColorClass(status: string): string {
+    const colorMap: { [key: string]: string } = {
+      'Pending': 'badge-yellow',
+      'InProgress': 'badge-blue',
+      'WaitingParts': 'badge-purple',
+      'WaitingApproval': 'badge-orange',
+      'WaitingInspection': 'badge-teal',
+      'Completed': 'badge-green',
+      'Delivered': 'badge-green',
+      'Cancelled': 'badge-red'
+    };
+    return colorMap[status] || 'badge-gray';
+  }
+
+  // ========== MODAIS DE ADICIONAR SERVIÇOS/PEÇAS ==========
+
+  // Abrir modal para adicionar serviço
+  openAddServiceModal(order: ServiceOrder): void {
+    this.selectedOrder = order;
+    this.loadServices();
+    this.loadMechanics();
+    this.addServiceForm.reset({
+      serviceId: '',
+      quantity: 1,
+      estimatedHours: 1,
+      discountPercentage: 0,
+      mechanicId: ''
+    });
+    this.showAddServiceModal = true;
+  }
+
+  // Fechar modal de adicionar serviço
+  closeAddServiceModal(): void {
+    this.showAddServiceModal = false;
+    this.addServiceForm.reset();
+    this.selectedOrder = null;
+  }
+
+  // Submeter formulário de adicionar serviço
+  submitAddService(): void {
+    if (this.addServiceForm.invalid || !this.selectedOrder) {
+      this.addServiceForm.markAllAsTouched();
+      return;
+    }
+
+    const formValue = this.addServiceForm.value;
+    const request: AddServiceToOrderRequest = {
+      serviceId: formValue.serviceId,
+      quantity: formValue.quantity,
+      estimatedHours: formValue.estimatedHours,
+      discountPercentage: formValue.discountPercentage || undefined,
+      mechanicId: formValue.mechanicId || undefined
+    };
+
+    this.serviceOrderService.addService(this.selectedOrder.id, request).subscribe(result => {
+      if (result.isSuccess) {
+        this.toastService.success('Serviço adicionado à ordem com sucesso!');
+        this.closeAddServiceModal();
+        this.loadOrders(); // Refresh list
+        // Optionally reload order details if modal is open
+        if (this.showDetailsModal && this.selectedOrder) {
+          this.viewDetails(this.selectedOrder);
+        }
+      } else {
+        this.toastService.error('Erro ao adicionar serviço à ordem.');
+        this.error = result.error || null;
+      }
+    });
+  }
+
+  // Abrir modal para adicionar peça
+  openAddPartModal(order: ServiceOrder): void {
+    this.selectedOrder = order;
+    this.loadParts();
+    this.addPartForm.reset({
+      partId: '',
+      quantity: 1,
+      discountPercentage: 0
+    });
+    this.showAddPartModal = true;
+  }
+
+  // Fechar modal de adicionar peça
+  closeAddPartModal(): void {
+    this.showAddPartModal = false;
+    this.addPartForm.reset();
+    this.selectedOrder = null;
+  }
+
+  // Submeter formulário de adicionar peça
+  submitAddPart(): void {
+    if (this.addPartForm.invalid || !this.selectedOrder) {
+      this.addPartForm.markAllAsTouched();
+      return;
+    }
+
+    const formValue = this.addPartForm.value;
+    const request: AddPartToOrderRequest = {
+      partId: formValue.partId,
+      quantity: formValue.quantity,
+      discountPercentage: formValue.discountPercentage || undefined
+    };
+
+    this.serviceOrderService.addPart(this.selectedOrder.id, request).subscribe(result => {
+      if (result.isSuccess) {
+        this.toastService.success('Peça adicionada à ordem com sucesso!');
+        this.closeAddPartModal();
+        this.loadOrders(); // Refresh list
+        // Optionally reload order details if modal is open
+        if (this.showDetailsModal && this.selectedOrder) {
+          this.viewDetails(this.selectedOrder);
+        }
+      } else {
+        this.toastService.error('Erro ao adicionar peça à ordem.');
+        this.error = result.error || null;
+      }
+    });
+  }
+
+  // ========== FIM MODAIS SERVIÇOS/PEÇAS ==========
+
+  // ========== STATUS MANAGEMENT ==========
+
+  // Mudar status da ordem
+  changeOrderStatus(order: ServiceOrder, newStatus: string): void {
+    if (!order || !newStatus) return;
+
+    this.serviceOrderService.updateStatus(order.id, newStatus).subscribe(result => {
+      if (result.isSuccess) {
+        this.toastService.success('Estado da ordem atualizado!');
+        this.loadOrders(); // Refresh list
+        // Update selectedOrder if details modal is open
+        if (this.showDetailsModal && this.selectedOrder?.id === order.id) {
+          this.selectedOrder.status = newStatus;
+          this.cdr.detectChanges();
+        }
+      } else {
+        this.toastService.error('Erro ao atualizar estado da ordem.');
+        this.error = result.error || null;
+      }
+    });
+  }
+
+  // Atribuir mecânico à ordem
+  assignMechanicToOrder(order: ServiceOrder, mechanicId: string): void {
+    if (!order || !mechanicId) return;
+
+    this.serviceOrderService.assignMechanic(order.id, mechanicId).subscribe(result => {
+      if (result.isSuccess) {
+        this.toastService.success('Mecânico atribuído com sucesso!');
+        this.loadOrders(); // Refresh list
+        // Update selectedOrder if details modal is open
+        if (this.showDetailsModal && this.selectedOrder?.id === order.id) {
+          const mechanic = this.mechanics.find(m => m.id === mechanicId);
+          if (mechanic) {
+            this.selectedOrder.mechanicName = mechanic.fullName;
+          }
+          this.cdr.detectChanges();
+        }
+      } else {
+        this.toastService.error('Erro ao atribuir mecânico.');
+        this.error = result.error || null;
+      }
+    });
+  }
+
+  // ========== FIM STATUS MANAGEMENT ==========
+
+  // Submeter formulário para criar/editar ordem
+  onSubmit(): void {
+    if (this.orderForm.invalid) {
+      this.orderForm.markAllAsTouched();
+      return;
+    }
+
+    const formValue = this.orderForm.value;
+    const request = {
+      customerId: formValue.customerId,
+      vehicleId: formValue.vehicleId,
+      description: formValue.description,
+      priority: formValue.priority,
+      estimatedCost: formValue.estimatedCost,
+      estimatedDelivery: formValue.estimatedDelivery || null,
+      mechanicId: formValue.mechanicId || null,
+      requiresInspection: formValue.requiresInspection,
+      internalNotes: formValue.internalNotes || null
+    };
+
+    this.serviceOrderService.create(request).subscribe(result => {
+      if (result.isSuccess) {
+        this.toastService.successCreate('Ordem de serviço');
+        this.closeCreateModal();
+        this.loadOrders();
+      } else {
+        this.toastService.errorCreate('ordem de serviço');
+        this.error = result.error || null;
+      }
+    });
   }
 }

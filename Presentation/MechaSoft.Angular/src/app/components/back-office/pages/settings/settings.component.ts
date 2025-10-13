@@ -73,19 +73,51 @@ export class SettingsComponent implements OnInit {
       return;
     }
 
-    if (this.passwordForm.newPassword.length < 6) {
+    if (this.passwordForm.newPassword.length < 8) {
       this.error = {
         code: 'PASSWORD_TOO_SHORT',
-        message: 'A senha deve ter pelo menos 6 caracteres',
+        message: 'A senha deve ter pelo menos 8 caracteres',
       };
       return;
     }
 
-    // TODO: Implementar mudança de senha
-    this.successMessage = 'Senha alterada com sucesso!';
-    this.resetPasswordForm();
-    this.showPasswordForm = false;
-    setTimeout(() => (this.successMessage = null), 3000);
+    // Validate password complexity
+    const password = this.passwordForm.newPassword;
+    if (!/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password) || !/[\W_]/.test(password)) {
+      this.error = {
+        code: 'PASSWORD_TOO_WEAK',
+        message: 'A senha deve conter maiúsculas, minúsculas, números e caracteres especiais',
+      };
+      return;
+    }
+
+    if (!this.currentUser?.id) {
+      this.error = {
+        code: 'USER_NOT_FOUND',
+        message: 'Utilizador não encontrado',
+      };
+      return;
+    }
+
+    // Call API to change password
+    this.authService.changePassword(
+      this.currentUser.id,
+      this.passwordForm.currentPassword,
+      this.passwordForm.newPassword
+    ).subscribe(result => {
+      if (result.isSuccess) {
+        this.successMessage = 'Senha alterada com sucesso!';
+        this.resetPasswordForm();
+        this.showPasswordForm = false;
+        setTimeout(() => (this.successMessage = null), 3000);
+        this.error = null;
+      } else {
+        this.error = result.error || {
+          code: 'CHANGE_PASSWORD_FAILED',
+          message: 'Erro ao alterar senha'
+        };
+      }
+    });
   }
 
   // Reset password form

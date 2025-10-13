@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { PartService } from '../../../../core/services/part.service';
 import { Part, CreatePartRequest, UpdatePartRequest } from '../../../../core/models/part.model';
 import { ErrorDetail } from '../../../../core/models/result.model';
 import { LoadingService } from '../../../../core/services/loading.service';
+import { ToastService } from '../../../../core/services/toast.service';
 import { ErrorMessageComponent } from '../../../../shared/components/error-message/error-message.component';
 
 @Component({
@@ -36,7 +37,9 @@ export class PartsComponent implements OnInit {
   constructor(
     private partService: PartService,
     private loadingService: LoadingService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private cdr: ChangeDetectorRef,
+    private toastService: ToastService
   ) {
     this.partForm = this.createPartForm();
     this.stockForm = this.createStockForm();
@@ -50,16 +53,17 @@ export class PartsComponent implements OnInit {
   // Criar formulário de peça
   private createPartForm(): FormGroup {
     return this.fb.group({
-      partNumber: ['', [Validators.required, Validators.minLength(3)]],
+      code: ['', [Validators.required, Validators.minLength(3)]],
       name: ['', [Validators.required, Validators.minLength(3)]],
       description: ['', Validators.required],
       brand: ['', Validators.required],
       category: ['', Validators.required],
-      unitPrice: [0, [Validators.required, Validators.min(0)]],
-      quantityInStock: [0, [Validators.required, Validators.min(0)]],
-      minimumStock: [0, [Validators.required, Validators.min(0)]],
+      unitCost: [0, [Validators.required, Validators.min(0)]],
+      salePrice: [0, [Validators.required, Validators.min(0)]],
+      stockQuantity: [0, [Validators.required, Validators.min(0)]],
+      minStockLevel: [0, [Validators.required, Validators.min(0)]],
       location: ['', Validators.required],
-      supplier: ['']
+      supplierName: ['']
     });
   }
 
@@ -77,6 +81,7 @@ export class PartsComponent implements OnInit {
       if (result.isSuccess && result.value) {
         this.parts = result.value.items;
         this.totalCount = result.value.totalCount;
+        this.cdr.detectChanges(); // Force change detection
       } else {
         this.error = result.error || null;
       }
@@ -87,7 +92,7 @@ export class PartsComponent implements OnInit {
   openCreateModal(): void {
     this.isEditMode = false;
     this.selectedPartId = null;
-    this.partForm.reset({ quantityInStock: 0, minimumStock: 0 });
+    this.partForm.reset({ stockQuantity: 0, minStockLevel: 0, unitCost: 0, salePrice: 0 });
     this.showModal = true;
   }
 
@@ -96,14 +101,15 @@ export class PartsComponent implements OnInit {
     this.isEditMode = true;
     this.selectedPartId = part.id;
     this.partForm.patchValue({
-      partNumber: part.partNumber,
+      code: part.code,
       name: part.name,
       description: part.description,
       brand: part.brand,
       category: part.category,
-      unitPrice: part.unitPrice,
+      unitCost: part.unitCost,
+      salePrice: part.salePrice,
       location: part.location,
-      supplier: part.supplier
+      supplierName: part.supplierName
     });
     this.showModal = true;
   }
@@ -144,9 +150,19 @@ export class PartsComponent implements OnInit {
 
     operation$.subscribe(result => {
       if (result.isSuccess) {
+        if (this.isEditMode) {
+          this.toastService.successUpdate('Peça');
+        } else {
+          this.toastService.successCreate('Peça');
+        }
         this.closeModal();
         this.loadParts();
       } else {
+        if (this.isEditMode) {
+          this.toastService.errorUpdate('peça');
+        } else {
+          this.toastService.errorCreate('peça');
+        }
         this.error = result.error || null;
       }
     });
@@ -198,9 +214,9 @@ export class PartsComponent implements OnInit {
     return Math.ceil(this.totalCount / this.pageSize);
   }
 
-  // Verificar se stock está baixo
+  // Verificar se stock está baixo (API já retorna este valor calculado)
   isLowStock(part: Part): boolean {
-    return part.quantityInStock <= part.minimumStock;
+    return part.isLowStock || part.stockQuantity <= part.minStockLevel;
   }
 
   // Helpers de validação

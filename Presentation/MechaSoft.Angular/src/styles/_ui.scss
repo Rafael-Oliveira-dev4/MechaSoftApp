@@ -4,7 +4,7 @@
 
 // Base Container for all pages
 .page-container {
-  @apply relative min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950 p-6 overflow-hidden;
+  @apply relative min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950 p-6 overflow-y-auto;
 }
 
 // Background Grid Pattern (for all pages)

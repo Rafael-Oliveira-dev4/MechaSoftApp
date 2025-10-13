@@ -54,4 +54,35 @@ export class DashboardService {
       catchError(error => of(failure<any[]>(error)))
     );
   }
+
+  // Obter estatísticas do dashboard do cliente
+  getCustomerStats(customerId: string): Observable<Result<CustomerDashboardStats>> {
+    return this.http.get<CustomerDashboardStats>(`${this.apiUrl}/customer/${customerId}`).pipe(
+      map(stats => success(stats)),
+      catchError(error => of(failure<CustomerDashboardStats>(error)))
+    );
+  }
+}
+
+export interface CustomerDashboardStats {
+  totalVehicles: number;
+  totalOrders: number;
+  pendingOrders: number;
+  inProgressOrders: number;
+  completedOrders: number;
+  totalSpent: number;
+  recentOrders: RecentServiceOrder[];
+}
+
+export interface RecentServiceOrder {
+  id: string;
+  orderNumber: string;
+  vehicleBrand: string;
+  vehicleModel: string;
+  vehiclePlate: string;
+  description: string;
+  status: string;
+  estimatedCost: number;
+  createdAt: Date;
+  estimatedDelivery?: Date;
 }

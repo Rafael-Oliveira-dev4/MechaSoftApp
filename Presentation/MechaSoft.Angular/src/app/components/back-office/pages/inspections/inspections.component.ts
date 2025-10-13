@@ -1,20 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
-interface Inspection {
-  id: string;
-  vehicleId: string;
-  vehiclePlate: string;
-  vehicleInfo: string;
-  inspectionType: string;
-  scheduledDate: Date;
-  completedDate?: Date;
-  expiryDate: Date;
-  status: 'Agendada' | 'Concluída' | 'Vencida' | 'Próxima';
-  result?: 'Aprovado' | 'Reprovado';
-  observations?: string;
-  inspectorName?: string;
-}
+import { InspectionService, Inspection } from '../../../../core/services/inspection.service';
+import { AuthService } from '../../../../core/services/auth.service';
+import { ErrorDetail } from '../../../../core/models/result.model';
 
 @Component({
   selector: 'app-inspections',
@@ -29,70 +17,57 @@ export class InspectionsComponent implements OnInit {
   completedInspections: Inspection[] = [];
   overdueInspections: Inspection[] = [];
 
+  totalCount: number = 0;
+  currentPage: number = 1;
+  pageSize: number = 10;
+  error: ErrorDetail | null = null;
+
+  constructor(
+    private inspectionService: InspectionService,
+    private authService: AuthService,
+    private cdr: ChangeDetectorRef
+  ) {}
+
   ngOnInit(): void {
     this.loadInspections();
   }
 
+  // Carregar inspeções da API
   loadInspections(): void {
-    // Mock data - substituir com API real quando disponível
-    this.inspections = [
-      {
-        id: '1',
-        vehicleId: '1',
-        vehiclePlate: '12-AB-34',
-        vehicleInfo: 'BMW 320d',
-        inspectionType: 'Inspeção Periódica Obrigatória',
-        scheduledDate: new Date('2024-11-20T10:00:00'),
-        expiryDate: new Date('2024-11-30'),
-        status: 'Agendada',
-        inspectorName: 'Centro de Inspeções MechaSoft'
-      },
-      {
-        id: '2',
-        vehicleId: '2',
-        vehiclePlate: '56-CD-78',
-        vehicleInfo: 'Volkswagen Golf 1.6 TDI',
-        inspectionType: 'Inspeção Periódica Obrigatória',
-        scheduledDate: new Date('2024-10-18T14:00:00'),
-        expiryDate: new Date('2024-10-20'),
-        status: 'Próxima',
-        inspectorName: 'Centro de Inspeções MechaSoft'
-      },
-      {
-        id: '3',
-        vehicleId: '1',
-        vehiclePlate: '12-AB-34',
-        vehicleInfo: 'BMW 320d',
-        inspectionType: 'Inspeção Periódica Obrigatória',
-        scheduledDate: new Date('2023-11-15T09:00:00'),
-        completedDate: new Date('2023-11-15T10:30:00'),
-        expiryDate: new Date('2024-11-15'),
-        status: 'Concluída',
-        result: 'Aprovado',
-        observations: 'Veículo em bom estado geral',
-        inspectorName: 'Centro de Inspeções MechaSoft'
-      },
-      {
-        id: '4',
-        vehicleId: '2',
-        vehiclePlate: '56-CD-78',
-        vehicleInfo: 'Volkswagen Golf 1.6 TDI',
-        inspectionType: 'Inspeção Periódica Obrigatória',
-        scheduledDate: new Date('2022-10-10T11:00:00'),
-        completedDate: new Date('2022-10-10T12:15:00'),
-        expiryDate: new Date('2023-10-10'),
-        status: 'Vencida',
-        result: 'Aprovado',
-        observations: 'Necessário agendar nova inspeção',
-        inspectorName: 'Centro de Inspeções MechaSoft'
-      }
-    ];
+    const currentUser = this.authService.getCurrentUser();
+    const vehicleId = currentUser?.role === 'Customer' ? undefined : undefined; // Admin vê todas
 
-    // Categorizar inspeções
-    this.upcomingInspections = this.inspections.filter(i => i.status === 'Agendada' || i.status === 'Próxima');
-    this.completedInspections = this.inspections.filter(i => i.status === 'Concluída');
-    this.overdueInspections = this.inspections.filter(i => i.status === 'Vencida');
+    this.inspectionService.getAll(this.currentPage, this.pageSize, vehicleId).subscribe(result => {
+      if (result.isSuccess && result.value) {
+        this.inspections = result.value.items;
+        this.totalCount = result.value.totalCount;
+        this.categorizeInspections();
+        this.cdr.detectChanges();
+      } else {
+        this.error = result.error || null;
+      }
+    });
   }
+
+  // Categorizar inspeções por status
+  categorizeInspections(): void {
+    const today = new Date();
+    
+    this.upcomingInspections = this.inspections.filter(i => {
+      const inspDate = new Date(i.inspectionDate);
+      return i.result === 'Pending' && inspDate > today;
+    });
+
+    this.completedInspections = this.inspections.filter(i => 
+      i.result === 'Approved' || i.result === 'Rejected' || i.result === 'Conditional'
+    );
+
+    this.overdueInspections = this.inspections.filter(i => {
+      const expiry = new Date(i.expiryDate);
+      return expiry < today && i.result === 'Pending';
+    });
+  }
+
 
   getDaysUntilExpiry(expiryDate: Date): number {
     const today = new Date();
@@ -105,27 +80,46 @@ export class InspectionsComponent implements OnInit {
     return Math.abs(this.getDaysUntilExpiry(expiryDate));
   }
 
-  getStatusBadgeClass(status: string): string {
-    switch (status) {
-      case 'Agendada':
-        return 'badge-blue';
-      case 'Próxima':
-        return 'badge-amber';
-      case 'Concluída':
-        return 'badge-green';
-      case 'Vencida':
-        return 'badge-red';
-      default:
-        return 'badge-gray';
-    }
+  // Traduzir InspectionType do enum para português
+  getTypeLabel(type: string): string {
+    const typeMap: { [key: string]: string } = {
+      'Periodic': 'Inspeção Periódica',
+      'Extraordinary': 'Inspeção Extraordinária',
+      'Recheck': 'Reinspeção'
+    };
+    return typeMap[type] || type;
   }
 
-  getResultBadgeClass(result?: string): string {
-    return result === 'Aprovado' ? 'badge-green' : 'badge-red';
+  // Traduzir InspectionResult do enum para português
+  getResultLabel(result: string): string {
+    const resultMap: { [key: string]: string } = {
+      'Pending': 'Pendente',
+      'Approved': 'Aprovado',
+      'Rejected': 'Reprovado',
+      'Conditional': 'Condicional'
+    };
+    return resultMap[result] || result;
   }
 
-  formatDate(date: Date | undefined): string {
-    if (!date) return '-';
+  // Get result badge color class
+  getResultBadgeClass(result: string): string {
+    const colorMap: { [key: string]: string } = {
+      'Pending': 'badge-yellow',
+      'Approved': 'badge-green',
+      'Rejected': 'badge-red',
+      'Conditional': 'badge-orange'
+    };
+    return colorMap[result] || 'badge-gray';
+  }
+
+  formatCurrency(value: number): string {
+    return new Intl.NumberFormat('pt-PT', {
+      style: 'currency',
+      currency: 'EUR'
+    }).format(value);
+  }
+
+  formatDate(date: Date): string {
     return new Date(date).toLocaleDateString('pt-PT', {
       year: 'numeric',
       month: '2-digit',

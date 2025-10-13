@@ -1,33 +1,53 @@
 export interface DashboardStats {
-  // Service Orders
-  totalOrders: number;
-  pendingOrders: number;
-  inProgressOrders: number;
-  completedOrders: number;
-  
-  // Revenue
-  todayRevenue: number;
-  monthRevenue: number;
-  yearRevenue: number;
-  
-  // Customers & Vehicles
   totalCustomers: number;
+  activeCustomers: number;
   totalVehicles: number;
+  totalEmployees: number;
+  activeMechanics: number;
+  serviceOrders: ServiceOrderStats;
+  parts: PartStats;
+  monthRevenue: number;
+  todayRevenue: number;
   
-  // Parts
-  lowStockPartsCount: number;
-  totalPartsValue: number;
-  
-  // Inspections
-  pendingInspections: number;
-  
-  // Recent activity (últimas 5)
-  recentOrders: RecentOrder[];
-  
-  // Cliente specific
+  // Legacy properties for backward compatibility (optional)
+  totalOrders?: number;
+  pendingOrders?: number;
+  inProgressOrders?: number;
+  completedOrders?: number;
+  yearRevenue?: number;
+  lowStockPartsCount?: number;
+  totalPartsValue?: number;
+  pendingInspections?: number;
+  recentOrders?: RecentOrder[];
   nextAppointment?: NextAppointment;
   vehicles?: DashboardVehicle[];
   monthlyExpenses?: MonthlyExpense[];
+}
+
+export interface ServiceOrderStats {
+  total: number;
+  pending: number;
+  inProgress: number;
+  waitingParts: number;
+  waitingInspection: number;
+  completedToday: number;
+  completedThisMonth: number;
+}
+
+export interface PartStats {
+  totalParts: number;
+  lowStockParts: number;
+  totalInventoryValue: number;
+  criticalLowStock: CriticalLowStockPart[];
+}
+
+export interface CriticalLowStockPart {
+  partId: string;
+  code: string;
+  name: string;
+  currentStock: number;
+  minStock: number;
+  deficit: number;
 }
 
 export interface RecentOrder {

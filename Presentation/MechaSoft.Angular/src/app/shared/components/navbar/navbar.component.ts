@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { filter } from 'rxjs/operators';
@@ -21,6 +21,7 @@ interface NavLink {
   imports: [CommonModule, RouterModule],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.scss'],
+  encapsulation: ViewEncapsulation.None // Forçar estilos globais
 })
 export class NavbarComponent implements OnInit, OnDestroy {
   currentUser: User | null = null;
@@ -74,6 +75,12 @@ export class NavbarComponent implements OnInit, OnDestroy {
       path: '/admin/customers',
       icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z',
       roles: ['Employee', 'Admin', 'Owner'],
+    },
+    {
+      label: 'Funcionários',
+      path: '/admin/employees',
+      icon: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z',
+      roles: ['Admin', 'Owner'],
     },
     {
       label: 'Serviços',

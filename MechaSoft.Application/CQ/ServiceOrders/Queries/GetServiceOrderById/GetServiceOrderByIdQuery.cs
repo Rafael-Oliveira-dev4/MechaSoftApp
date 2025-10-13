@@ -26,6 +26,32 @@ public record ServiceOrderResponse(
     bool RequiresInspection,
     string? InternalNotes,
     DateTime CreatedAt,
-    DateTime? UpdatedAt
+    DateTime? UpdatedAt,
+    List<ServiceItemDto> Services,
+    List<PartItemDto> Parts
+);
+
+public record ServiceItemDto(
+    Guid Id,
+    Guid ServiceId,
+    string ServiceName,
+    int Quantity,
+    decimal EstimatedHours,
+    decimal UnitPrice,
+    decimal? DiscountPercentage,
+    decimal TotalPrice,
+    string Status,
+    Guid? MechanicId,
+    string? MechanicName
+);
+
+public record PartItemDto(
+    Guid PartId,
+    string PartName,
+    string PartCode,
+    int Quantity,
+    decimal UnitPrice,
+    decimal? DiscountPercentage,
+    decimal TotalPrice
 );
 

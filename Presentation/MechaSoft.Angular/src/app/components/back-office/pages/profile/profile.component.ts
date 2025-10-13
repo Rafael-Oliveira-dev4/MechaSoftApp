@@ -1,11 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { User } from '../../../../core/models/api.models';
 import { ErrorDetail } from '../../../../core/models/result.model';
 import { AuthService } from '../../../../core/services/auth.service';
 import { CustomerService, CompleteCustomerProfileRequest } from '../../../../core/services/customer.service';
+import { EmployeeService } from '../../../../core/services/employee.service';
+import { Employee } from '../../../../core/models/employee.model';
 import { usernameAvailabilityExcludeValidator } from '../../../../core/validators/username-availability-exclude.validator';
 import { emailAvailabilityExcludeValidator } from '../../../../core/validators/email-availability-exclude.validator';
 import { ErrorMessageComponent } from '../../../../shared/components/error-message/error-message.component';
@@ -31,9 +33,11 @@ import { CustomerProfileFormComponent, CustomerProfileFormData } from '../../com
 })
 export class ProfileComponent implements OnInit {
   currentUser: User | null = null;
+  employeeData: Employee | null = null;
   isEditingProfile: boolean = false;
   isEditingCustomerProfile: boolean = false;
   isLoadingCustomerProfile: boolean = false;
+  isLoadingEmployeeProfile: boolean = false;
   isLoadingProfileUpdate: boolean = false;
   error: ErrorDetail | null = null;
   successMessage: string | null = null;
@@ -44,7 +48,9 @@ export class ProfileComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private customerService: CustomerService
+    private customerService: CustomerService,
+    private employeeService: EmployeeService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -52,6 +58,23 @@ export class ProfileComponent implements OnInit {
       this.currentUser = user;
       if (user?.username && user?.email) {
         this.initializeEditForm(user);
+      }
+      
+      // Load employee data if user has employeeId
+      if (user?.employeeId) {
+        this.loadEmployeeData(user.employeeId);
+      }
+    });
+  }
+
+  // Load employee data
+  private loadEmployeeData(employeeId: string): void {
+    this.isLoadingEmployeeProfile = true;
+    this.employeeService.getById(employeeId).subscribe(result => {
+      this.isLoadingEmployeeProfile = false;
+      if (result.isSuccess && result.value) {
+        this.employeeData = result.value;
+        this.cdr.detectChanges(); // Force change detection to render employee section
       }
     });
   }
@@ -224,6 +247,63 @@ export class ProfileComponent implements OnInit {
   // Check if user has customer profile
   hasCustomerProfile(): boolean {
     return !!this.currentUser?.customerId;
+  }
+
+  // Check if user is employee/owner
+  isEmployeeUser(): boolean {
+    return this.currentUser?.role === 'Employee' || this.currentUser?.role === 'Owner' || this.currentUser?.role === 'Admin';
+  }
+
+  // Check if user has employee profile
+  hasEmployeeProfile(): boolean {
+    return !!this.currentUser?.employeeId && !!this.employeeData;
+  }
+
+  // Get employee specialties as Portuguese labels
+  getEmployeeSpecialties(): string {
+    if (!this.employeeData?.specialties || this.employeeData.specialties.length === 0) return 'Nenhuma';
+    
+    const specialtyMap: { [key: string]: string } = {
+      'Engine': 'Motor',
+      'Transmission': 'Transmissão',
+      'Brakes': 'Travões',
+      'Suspension': 'Suspensão',
+      'Electrical': 'Elétrico',
+      'AirConditioning': 'Ar Condicionado',
+      'Bodywork': 'Chapa/Pintura',
+      'Maintenance': 'Manutenção',
+      'Diagnostic': 'Diagnóstico',
+      'Inspection': 'Inspeção',
+      'Tires': 'Pneus',
+      'Exhaust': 'Escape',
+      'Cooling': 'Arrefecimento',
+      'Fuel': 'Combustível'
+    };
+    
+    return this.employeeData.specialties
+      .map(s => specialtyMap[s] || s)
+      .join(', ');
+  }
+
+  // Get employee role label
+  getEmployeeRoleLabel(): string {
+    const roleMap: { [key: string]: string } = {
+      'Owner': 'Proprietário',
+      'Mechanic': 'Mecânico',
+      'Manager': 'Gerente',
+      'Receptionist': 'Rececionista',
+      'PartsClerk': 'Responsável de Peças'
+    };
+    return roleMap[this.employeeData?.role || ''] || this.employeeData?.role || '';
+  }
+
+  // Format currency
+  formatCurrency(value?: number): string {
+    if (!value) return '-';
+    return new Intl.NumberFormat('pt-PT', {
+      style: 'currency',
+      currency: 'EUR'
+    }).format(value);
   }
 
   // Toggle customer profile edit mode

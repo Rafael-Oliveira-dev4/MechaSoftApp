@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MechanicServiceService } from '../../../../core/services/mechanic-service.service';
 import { MechanicService, CreateServiceRequest, UpdateServiceRequest } from '../../../../core/models/service.model';
 import { ErrorDetail } from '../../../../core/models/result.model';
 import { LoadingService } from '../../../../core/services/loading.service';
+import { ToastService } from '../../../../core/services/toast.service';
 import { ErrorMessageComponent } from '../../../../shared/components/error-message/error-message.component';
 
 @Component({
@@ -28,12 +29,30 @@ export class ServicesComponent implements OnInit {
   error: ErrorDetail | null = null;
   loading$;
 
-  categories = ['Manutenção', 'Reparação', 'Revisão', 'Diagnóstico', 'Inspeção', 'Pintura', 'Chapa'];
+  // Categorias alinhadas com o enum ServiceCategory do backend
+  categories = [
+    'Engine',           // Motor
+    'Transmission',     // Transmissão
+    'Brakes',          // Travões
+    'Suspension',      // Suspensão
+    'Electrical',      // Elétrico
+    'AirConditioning', // Ar Condicionado
+    'Bodywork',        // Chapa/Pintura
+    'Maintenance',     // Manutenção
+    'Diagnostic',      // Diagnóstico
+    'Inspection',      // Inspeção
+    'Tires',          // Pneus
+    'Exhaust',        // Escape
+    'Cooling',        // Arrefecimento
+    'Fuel'            // Combustível
+  ];
 
   constructor(
     private mechanicServiceService: MechanicServiceService,
     private loadingService: LoadingService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private cdr: ChangeDetectorRef,
+    private toastService: ToastService
   ) {
     this.serviceForm = this.createForm();
     this.loading$ = this.loadingService.loading$;
@@ -49,9 +68,9 @@ export class ServicesComponent implements OnInit {
       name: ['', [Validators.required, Validators.minLength(3)]],
       description: ['', Validators.required],
       category: ['', Validators.required],
-      estimatedHours: [0, [Validators.required, Validators.min(0)]],
-      pricePerHour: [0],
-      fixedPrice: [0],
+      estimatedHours: [0, [Validators.required, Validators.min(0.1)]],
+      pricePerHour: [0, [Validators.min(0)]],
+      fixedPrice: [0, [Validators.min(0)]],
       requiresInspection: [false]
     });
   }
@@ -62,6 +81,7 @@ export class ServicesComponent implements OnInit {
       if (result.isSuccess && result.value) {
         this.services = result.value.items;
         this.totalCount = result.value.totalCount;
+        this.cdr.detectChanges(); // Force change detection
       } else {
         this.error = result.error || null;
       }
@@ -114,9 +134,19 @@ export class ServicesComponent implements OnInit {
 
     operation$.subscribe(result => {
       if (result.isSuccess) {
+        if (this.isEditMode) {
+          this.toastService.successUpdate('Serviço');
+        } else {
+          this.toastService.successCreate('Serviço');
+        }
         this.closeModal();
         this.loadServices();
       } else {
+        if (this.isEditMode) {
+          this.toastService.errorUpdate('serviço');
+        } else {
+          this.toastService.errorCreate('serviço');
+        }
         this.error = result.error || null;
       }
     });
@@ -141,6 +171,27 @@ export class ServicesComponent implements OnInit {
       return service.pricePerHour * service.estimatedHours;
     }
     return 0;
+  }
+
+  // Traduzir categoria do enum para português
+  getCategoryLabel(category: string): string {
+    const categoryMap: { [key: string]: string } = {
+      'Engine': 'Motor',
+      'Transmission': 'Transmissão',
+      'Brakes': 'Travões',
+      'Suspension': 'Suspensão',
+      'Electrical': 'Elétrico',
+      'AirConditioning': 'Ar Condicionado',
+      'Bodywork': 'Chapa/Pintura',
+      'Maintenance': 'Manutenção',
+      'Diagnostic': 'Diagnóstico',
+      'Inspection': 'Inspeção',
+      'Tires': 'Pneus',
+      'Exhaust': 'Escape',
+      'Cooling': 'Arrefecimento',
+      'Fuel': 'Combustível'
+    };
+    return categoryMap[category] || category;
   }
 
   // Helpers de validação

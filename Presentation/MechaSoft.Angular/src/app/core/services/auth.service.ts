@@ -291,6 +291,20 @@ export class AuthService {
     }
   }
 
+  // Change password
+  changePassword(userId: string, currentPassword: string, newPassword: string): Observable<Result<any>> {
+    const request = {
+      userId,
+      currentPassword,
+      newPassword
+    };
+
+    return this.http.put<any>(`${this.apiUrl}/accounts/change-password`, request).pipe(
+      map(response => success(response)),
+      catchError(error => of(failure<any>(error)))
+    );
+  }
+
   private decodeToken(token: string): any {
     try {
       const base64Url = token.split('.')[1];

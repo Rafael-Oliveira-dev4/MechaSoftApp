@@ -1,6 +1,7 @@
 // Main content area - Dark elegant theme
 .main-content {
   min-height: 100vh;
+  padding-top: 64px; // Compensar altura da navbar fixa
   background: linear-gradient(135deg, #0f172a 0%, #020617 100%);
   position: relative;
   overflow-x: hidden;

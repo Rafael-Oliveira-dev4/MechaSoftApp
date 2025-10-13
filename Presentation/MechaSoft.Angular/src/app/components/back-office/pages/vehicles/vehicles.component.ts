@@ -1,11 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { VehicleService } from '../../../../core/services/vehicle.service';
 import { CustomerService } from '../../../../core/services/customer.service';
+import { AuthService } from '../../../../core/services/auth.service';
 import { Vehicle, CreateVehicleRequest, Customer } from '../../../../core/models/api.models';
 import { ErrorDetail } from '../../../../core/models/result.model';
 import { LoadingService } from '../../../../core/services/loading.service';
+import { ToastService } from '../../../../core/services/toast.service';
 import { ErrorMessageComponent } from '../../../../shared/components/error-message/error-message.component';
 
 @Component({
@@ -31,13 +33,24 @@ export class VehiclesComponent implements OnInit {
   error: ErrorDetail | null = null;
   loading$;
 
-  fuelTypes = ['Gasolina', 'Diesel', 'Elétrico', 'Híbrido', 'GPL'];
+  // Enum FuelType do backend (EN) com labels PT
+  fuelTypes = [
+    { value: 'Gasoline', label: 'Gasolina' },
+    { value: 'Diesel', label: 'Diesel' },
+    { value: 'Electric', label: 'Elétrico' },
+    { value: 'Hybrid', label: 'Híbrido' },
+    { value: 'LPG', label: 'GPL' },
+    { value: 'CNG', label: 'GNC' }
+  ];
 
   constructor(
     private vehicleService: VehicleService,
     private customerService: CustomerService,
+    private authService: AuthService,
     private loadingService: LoadingService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private cdr: ChangeDetectorRef,
+    private toastService: ToastService
   ) {
     this.vehicleForm = this.createForm();
     this.loading$ = this.loadingService.loading$;
@@ -45,7 +58,7 @@ export class VehiclesComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadVehicles();
-    // this.loadCustomers(); // Comentado - cliente não precisa ver outros clientes
+    this.loadCustomers(); // Owner/Admin precisa ver clientes para criar veículos
   }
 
   // Criar formulário com validações
@@ -63,77 +76,32 @@ export class VehiclesComponent implements OnInit {
     });
   }
 
-  // Carregar veículos (Mock data para cliente)
+  // Carregar veículos da API
   loadVehicles(): void {
-    // Mock data - substituir com API real quando disponível
-    this.vehicles = [
-      {
-        id: '1',
-        customerId: 'current-user',
-        customerName: 'rafael_oliveira',
-        brand: 'BMW',
-        model: '320d',
-        licensePlate: '12-AB-34',
-        color: 'Preto',
-        year: 2020,
-        fuelType: 'Diesel',
-        vin: '1HGBH41JXMN109186',
-        engineType: '2.0L Turbo',
-        createdAt: new Date('2020-05-15'),
-        updatedAt: new Date('2024-09-05')
-      },
-      {
-        id: '2',
-        customerId: 'current-user',
-        customerName: 'rafael_oliveira',
-        brand: 'Volkswagen',
-        model: 'Golf 1.6 TDI',
-        licensePlate: '56-CD-78',
-        color: 'Cinzento',
-        year: 2018,
-        fuelType: 'Diesel',
-        vin: '2HGBH41JXMN109187',
-        engineType: '1.6L TDI',
-        createdAt: new Date('2018-03-20'),
-        updatedAt: new Date('2024-08-20')
-      }
-    ];
-    this.totalCount = this.vehicles.length;
-    
-    // Filtrar por termo de pesquisa se existir
-    if (this.searchTerm) {
-      const term = this.searchTerm.toLowerCase();
-      this.vehicles = this.vehicles.filter(v => 
-        v.licensePlate.toLowerCase().includes(term) ||
-        v.brand.toLowerCase().includes(term) ||
-        v.model.toLowerCase().includes(term)
-      );
-      this.totalCount = this.vehicles.length;
-    }
-    
-    /* Código real API - descomentar quando backend estiver pronto
-    this.vehicleService.getAll({
-      pageNumber: this.currentPage,
-      pageSize: this.pageSize,
-      searchTerm: this.searchTerm || undefined
-    }).subscribe(result => {
+    const currentUser = this.authService.getCurrentUser();
+    const customerId = currentUser?.role === 'Customer' ? currentUser.customerId : undefined;
+
+    this.vehicleService.getAll(this.currentPage, this.pageSize, customerId).subscribe(result => {
       if (result.isSuccess && result.value) {
         this.vehicles = result.value.items;
         this.totalCount = result.value.totalCount;
+        this.cdr.detectChanges();
       } else {
         this.error = result.error || null;
       }
     });
-    */
   }
 
-  // Carregar clientes para o dropdown
+  // Carregar clientes para dropdown (Admin/Owner)
   loadCustomers(): void {
-    this.customerService.getAll({ pageSize: 100 }).subscribe(result => {
-      if (result.isSuccess && result.value) {
-        this.customers = result.value.items;
-      }
-    });
+    const currentUser = this.authService.getCurrentUser();
+    if (currentUser?.role === 'Owner' || currentUser?.role === 'Admin') {
+      this.customerService.getAll({ pageNumber: 1, pageSize: 100 }).subscribe(result => {
+        if (result.isSuccess && result.value) {
+          this.customers = result.value.items;
+        }
+      });
+    }
   }
 
   // Abrir modal para criar
@@ -184,9 +152,19 @@ export class VehiclesComponent implements OnInit {
 
     operation$.subscribe(result => {
       if (result.isSuccess) {
+        if (this.isEditMode) {
+          this.toastService.successUpdate('Veículo');
+        } else {
+          this.toastService.successCreate('Veículo');
+        }
         this.closeModal();
         this.loadVehicles();
       } else {
+        if (this.isEditMode) {
+          this.toastService.errorUpdate('veículo');
+        } else {
+          this.toastService.errorCreate('veículo');
+        }
         this.error = result.error || null;
       }
     });
@@ -235,5 +213,24 @@ export class VehiclesComponent implements OnInit {
   getCustomerName(customerId: string): string {
     const customer = this.customers.find(c => c.id === customerId);
     return customer?.name || 'Desconhecido';
+  }
+
+  // Check if user can create vehicles (Admin/Owner)
+  canManageVehicles(): boolean {
+    const user = this.authService.getCurrentUser();
+    return user?.role === 'Owner' || user?.role === 'Admin';
+  }
+
+  // Traduzir FuelType do enum para português
+  getFuelTypeLabel(fuelType: string): string {
+    const fuelMap: { [key: string]: string } = {
+      'Gasoline': 'Gasolina',
+      'Diesel': 'Diesel',
+      'Electric': 'Elétrico',
+      'Hybrid': 'Híbrido',
+      'LPG': 'GPL',
+      'CNG': 'GNC'
+    };
+    return fuelMap[fuelType] || fuelType;
   }
 }

@@ -49,23 +49,23 @@
         }
         
         @for (part of parts; track part.id) {
-          <tr [class.row-inactive]="!part.isActive" [class.row-warning]="isLowStock(part) && part.isActive">
-            <td class="font-mono">{{ part.partNumber }}</td>
+          <tr [class.row-inactive]="!part.isActive" [class.row-warning]="part.isLowStock && part.isActive">
+            <td class="font-mono">{{ part.code }}</td>
             <td class="font-medium">{{ part.name }}</td>
             <td>{{ part.brand }}</td>
             <td>
               <span class="badge badge-teal">{{ part.category }}</span>
             </td>
-            <td>{{ formatCurrency(part.unitPrice) }}</td>
-            <td [class.text-red-600]="isLowStock(part)" [class.font-bold]="isLowStock(part)">
-              {{ part.quantityInStock }}
-              @if (isLowStock(part)) {
+            <td>{{ formatCurrency(part.salePrice) }}</td>
+            <td [class.text-red-600]="part.isLowStock" [class.font-bold]="part.isLowStock">
+              {{ part.stockQuantity }}
+              @if (part.isLowStock) {
                 <svg class="inline w-4 h-4 ml-1" fill="currentColor" viewBox="0 0 20 20">
                   <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
                 </svg>
               }
             </td>
-            <td>{{ part.minimumStock }}</td>
+            <td>{{ part.minStockLevel }}</td>
             <td>
               <span [class]="part.isActive ? 'badge badge-green' : 'badge badge-gray'">
                 {{ part.isActive ? 'Ativo' : 'Inativo' }}
@@ -135,9 +135,9 @@
             <div class="form-row">
               <div class="form-group">
                 <label class="form-label">Código da Peça *</label>
-                <input type="text" formControlName="partNumber" placeholder="PT-001" class="form-input" [class.input-error]="isFieldInvalid('partNumber')" />
-                @if (isFieldInvalid('partNumber')) {
-                  <span class="error-text">{{ getFieldError('partNumber') }}</span>
+                <input type="text" formControlName="code" placeholder="PT-001" class="form-input" [class.input-error]="isFieldInvalid('code')" />
+                @if (isFieldInvalid('code')) {
+                  <span class="error-text">{{ getFieldError('code') }}</span>
                 }
               </div>
               
@@ -178,13 +178,23 @@
 
             <div class="form-row">
               <div class="form-group">
-                <label class="form-label">Preço Unitário (€) *</label>
-                <input type="number" formControlName="unitPrice" step="0.01" class="form-input" [class.input-error]="isFieldInvalid('unitPrice')" />
-                @if (isFieldInvalid('unitPrice')) {
-                  <span class="error-text">{{ getFieldError('unitPrice') }}</span>
+                <label class="form-label">Custo Unitário (€) *</label>
+                <input type="number" formControlName="unitCost" step="0.01" class="form-input" [class.input-error]="isFieldInvalid('unitCost')" />
+                @if (isFieldInvalid('unitCost')) {
+                  <span class="error-text">{{ getFieldError('unitCost') }}</span>
                 }
               </div>
               
+              <div class="form-group">
+                <label class="form-label">Preço de Venda (€) *</label>
+                <input type="number" formControlName="salePrice" step="0.01" class="form-input" [class.input-error]="isFieldInvalid('salePrice')" />
+                @if (isFieldInvalid('salePrice')) {
+                  <span class="error-text">{{ getFieldError('salePrice') }}</span>
+                }
+              </div>
+            </div>
+            
+            <div class="form-row">
               <div class="form-group">
                 <label class="form-label">Localização *</label>
                 <input type="text" formControlName="location" placeholder="Prateleira A-12" class="form-input" [class.input-error]="isFieldInvalid('location')" />
@@ -192,32 +202,32 @@
                   <span class="error-text">{{ getFieldError('location') }}</span>
                 }
               </div>
+
+              <div class="form-group">
+                <label class="form-label">Fornecedor</label>
+                <input type="text" formControlName="supplierName" placeholder="Nome do fornecedor" class="form-input" />
+              </div>
             </div>
 
             @if (!isEditMode) {
               <div class="form-row">
                 <div class="form-group">
                   <label class="form-label">Quantidade em Stock *</label>
-                  <input type="number" formControlName="quantityInStock" class="form-input" [class.input-error]="isFieldInvalid('quantityInStock')" />
-                  @if (isFieldInvalid('quantityInStock')) {
-                    <span class="error-text">{{ getFieldError('quantityInStock') }}</span>
+                  <input type="number" formControlName="stockQuantity" class="form-input" [class.input-error]="isFieldInvalid('stockQuantity')" />
+                  @if (isFieldInvalid('stockQuantity')) {
+                    <span class="error-text">{{ getFieldError('stockQuantity') }}</span>
                   }
                 </div>
                 
                 <div class="form-group">
                   <label class="form-label">Stock Mínimo *</label>
-                  <input type="number" formControlName="minimumStock" class="form-input" [class.input-error]="isFieldInvalid('minimumStock')" />
-                  @if (isFieldInvalid('minimumStock')) {
-                    <span class="error-text">{{ getFieldError('minimumStock') }}</span>
+                  <input type="number" formControlName="minStockLevel" class="form-input" [class.input-error]="isFieldInvalid('minStockLevel')" />
+                  @if (isFieldInvalid('minStockLevel')) {
+                    <span class="error-text">{{ getFieldError('minStockLevel') }}</span>
                   }
                 </div>
               </div>
             }
-
-            <div class="form-group">
-              <label class="form-label">Fornecedor</label>
-              <input type="text" formControlName="supplier" placeholder="Nome do fornecedor" class="form-input" />
-            </div>
           </div>
 
           <div class="modal-footer">

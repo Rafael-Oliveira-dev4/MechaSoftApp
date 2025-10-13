@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { CustomerService } from '../../../../core/services/customer.service';
 import { Customer, CreateCustomerRequest } from '../../../../core/models/api.models';
 import { ErrorDetail } from '../../../../core/models/result.model';
 import { LoadingService } from '../../../../core/services/loading.service';
+import { ToastService } from '../../../../core/services/toast.service';
 import { ErrorMessageComponent } from '../../../../shared/components/error-message/error-message.component';
 
 @Component({
@@ -32,7 +33,9 @@ export class CustomersComponent implements OnInit {
   constructor(
     private customerService: CustomerService,
     private loadingService: LoadingService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private cdr: ChangeDetectorRef,
+    private toastService: ToastService
   ) {
     this.customerForm = this.createForm();
     this.loading$ = this.loadingService.loading$;
@@ -68,6 +71,7 @@ export class CustomersComponent implements OnInit {
       if (result.isSuccess && result.value) {
         this.customers = result.value.items;
         this.totalCount = result.value.totalCount;
+        this.cdr.detectChanges(); // Force change detection
       } else {
         this.error = result.error || null;
       }
@@ -123,9 +127,19 @@ export class CustomersComponent implements OnInit {
 
     operation$.subscribe(result => {
       if (result.isSuccess) {
+        if (this.isEditMode) {
+          this.toastService.successUpdate('Cliente');
+        } else {
+          this.toastService.successCreate('Cliente');
+        }
         this.closeModal();
         this.loadCustomers();
       } else {
+        if (this.isEditMode) {
+          this.toastService.errorUpdate('cliente');
+        } else {
+          this.toastService.errorCreate('cliente');
+        }
         this.error = result.error || null;
       }
     });
