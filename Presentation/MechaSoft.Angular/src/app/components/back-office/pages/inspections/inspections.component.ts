@@ -112,6 +112,11 @@ export class InspectionsComponent implements OnInit {
     return colorMap[result] || 'badge-gray';
   }
 
+  // Get status badge color class (alias for getResultBadgeClass)
+  getStatusBadgeClass(status: string): string {
+    return this.getResultBadgeClass(status);
+  }
+
   formatCurrency(value: number): string {
     return new Intl.NumberFormat('pt-PT', {
       style: 'currency',

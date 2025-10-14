@@ -1,5 +1,5 @@
 .orders-container {
-  @apply relative min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-6 overflow-y-auto;
+  @apply relative min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-4 md:p-6 overflow-y-auto;
 }
 
 // Background Grid Pattern
@@ -339,5 +339,52 @@
 
   .icon {
     @apply w-5 h-5;
+  }
+}
+
+// ===== MELHORIAS DE RESPONSIVIDADE =====
+
+// Melhorias na tabela
+.data-table {
+  @apply w-full;
+  
+  thead {
+    th {
+      @apply px-4 py-3;
+      white-space: nowrap;
+      
+      @media (max-width: 768px) {
+        @apply px-3 py-2 text-[10px];
+      }
+    }
+  }
+  
+  tbody {
+    tr {
+      td {
+        @apply px-4 py-3;
+        white-space: nowrap;
+        
+        @media (max-width: 768px) {
+          @apply px-3 py-2 text-xs;
+        }
+      }
+    }
+  }
+}
+
+// Melhorias no header da página  
+.page-header {
+  @apply flex-col sm:flex-row gap-4;
+}
+
+// Melhorias para mobile - ocultar colunas menos importantes
+@media (max-width: 768px) {
+  .data-table {
+    th:nth-child(5),
+    td:nth-child(5) {
+      // Data Prevista - ocultar em mobile
+      display: none;
+    }
   }
 }

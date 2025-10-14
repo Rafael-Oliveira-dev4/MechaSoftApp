@@ -1,5 +1,5 @@
 .inspections-container {
-  @apply relative min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-6 overflow-y-auto;
+  @apply relative min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-4 md:p-6 overflow-y-auto;
 }
 
 // Background Grid Pattern
@@ -345,5 +345,58 @@
 
   &.badge-gray {
     @apply bg-gray-500/20 text-gray-400 border border-gray-500/30;
+  }
+}
+
+// ===== MELHORIAS DE RESPONSIVIDADE =====
+
+// Melhorias no header da página  
+.page-header {
+  @apply flex-col sm:flex-row gap-4;
+  
+  .title {
+    @apply text-2xl md:text-3xl;
+  }
+}
+
+// Melhorias na history table
+.history-table {
+  thead {
+    tr th {
+      @apply px-4 md:px-6 py-3 md:py-4;
+      white-space: nowrap;
+      
+      @media (max-width: 768px) {
+        @apply px-3 py-2 text-[10px];
+      }
+    }
+  }
+  
+  tbody {
+    tr {
+      td {
+        @apply px-4 md:px-6 py-3 md:py-4;
+        white-space: nowrap;
+        
+        @media (max-width: 768px) {
+          @apply px-3 py-2 text-xs;
+        }
+      }
+    }
+  }
+}
+
+// Melhorias para mobile - ocultar colunas menos importantes
+@media (max-width: 768px) {
+  .history-table {
+    th:nth-child(6),
+    td:nth-child(6) {
+      // Observações - ocultar em mobile
+      display: none;
+    }
+  }
+  
+  .inspections-grid {
+    @apply grid-cols-1;
   }
 }

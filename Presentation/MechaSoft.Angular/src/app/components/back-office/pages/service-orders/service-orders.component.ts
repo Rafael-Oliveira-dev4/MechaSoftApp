@@ -21,6 +21,32 @@ interface ServiceOrder extends BaseServiceOrder {
   vehiclePlate?: string;
   vehicleInfo?: string;
   mechanicName?: string | null;
+  services?: ServiceItemDto[];
+  parts?: PartItemDto[];
+}
+
+interface ServiceItemDto {
+  id: string;
+  serviceId: string;
+  serviceName: string;
+  quantity: number;
+  estimatedHours: number;
+  unitPrice: number;
+  discountPercentage?: number;
+  totalPrice: number;
+  status: string;
+  mechanicId?: string;
+  mechanicName?: string;
+}
+
+interface PartItemDto {
+  partId: string;
+  partName: string;
+  partCode: string;
+  quantity: number;
+  unitPrice: number;
+  discountPercentage?: number;
+  totalPrice: number;
 }
 
 @Component({
