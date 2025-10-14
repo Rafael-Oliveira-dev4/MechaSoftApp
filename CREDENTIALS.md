@@ -71,41 +71,90 @@ API:     http://localhost:5039
 Swagger: http://localhost:5039/swagger
 ```
 
-### Base de Dados (SQL Server)
+### Base de Dados (SQL Server Local - LEGACY)
 ```
 Server:   localhost,1433
 Database: DV_RO_MechaSoft
 User:     sa
 Password: CHANGE_ME_PASSWORD
 ```
+> ⚠️ **DESCONTINUADO:** Apenas para desenvolvimento local sem Azure.
+
+### Base de Dados (Azure SQL - PRODUÇÃO/CLOUD)
+```
+Server:   mechasoft-server-2025.database.windows.net,1433
+Database: DV_RO_MechaSoft
+User:     mechasoft_admin
+Password: Azure2025@Secure!
+
+Connection String:
+Server=tcp:mechasoft-server-2025.database.windows.net,1433;
+Initial Catalog=DV_RO_MechaSoft;
+Persist Security Info=False;
+User ID=mechasoft_admin;
+Password=Azure2025@Secure!;
+MultipleActiveResultSets=True;
+Encrypt=True;
+TrustServerCertificate=False;
+Connection Timeout=30;
+```
+
+**Características:**
+- ✅ **Região:** West Europe (próximo de Portugal)
+- ✅ **Limites Gratuitos:** 100.000 vCore seconds + 32GB dados/mês
+- ✅ **Acessível:** De qualquer computador com internet
+- ✅ **Backup:** Automático pelo Azure
+
+**Portal Azure:**
+- 🌐 https://portal.azure.com
+- 📧 Login: rafaeloliveirarafa04@gmail.com
+- 📁 Resource Group: `mechasoft-rg`
+- 💾 Server: `mechasoft-server-2025`
 
 ---
 
 ## 🚀 Como Iniciar o Projeto
 
-### Opção 1: Script Automatizado (Linux)
-```bash
-./start-mechasoft.sh
-```
+### Opção 1: Com Azure SQL (Recomendado)
+**Já está configurado! Basta iniciar:**
 
-### Opção 2: Manual
-
-**1. Iniciar SQL Server (Docker):**
-```bash
-./setup-sqlserver.sh
-```
-
-**2. Iniciar Backend (.NET 8):**
+**1. Iniciar Backend (.NET 8):**
 ```bash
 cd MechaSoft.WebAPI
 dotnet run
 ```
 
-**3. Iniciar Frontend (Angular 20):**
+**2. Iniciar Frontend (Angular 19):**
 ```bash
 cd Presentation/MechaSoft.Angular
 npm start
 ```
+
+**3. (Opcional) Alimentar Base de Dados:**
+```powershell
+.\SeedCompleteDatabase.ps1
+```
+
+### Opção 2: Com SQL Server Local (Docker - Linux)
+```bash
+./start-mechasoft.sh
+```
+
+---
+
+## 📊 Dados de Seed
+
+Execute o script para popular a base de dados:
+```powershell
+.\SeedCompleteDatabase.ps1
+```
+
+**Dados criados:**
+- 2 Utilizadores (Admin + Cliente)
+- 3 Clientes
+- 3 Funcionários
+- 17 Serviços de Oficina
+- 47 Peças em Stock
 
 ---
 
@@ -113,10 +162,11 @@ npm start
 
 - ⚠️ **NUNCA** commitar este ficheiro com credenciais reais em produção
 - 🔒 As passwords devem ser alteradas em ambiente de produção
-- 🧪 Estas credenciais são apenas para desenvolvimento/teste local
-- 📊 Os dados de seed estão em: `scripts/seed-data.sql` e `scripts/seed-services.sql`
+- 🧪 Estas credenciais são para desenvolvimento/teste
+- 🌐 **Azure SQL Database** é a configuração ATIVA (já configurada nos appsettings)
+- 💾 Connection strings já atualizadas em `appsettings.json` e `appsettings.Development.json`
 
 ---
 
-**Última Atualização:** 13 de Outubro de 2025
+**Última Atualização:** 14 de Outubro de 2025
 
