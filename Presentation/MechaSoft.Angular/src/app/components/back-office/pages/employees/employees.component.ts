@@ -7,11 +7,14 @@ import { ErrorDetail } from '../../../../core/models/result.model';
 import { LoadingService } from '../../../../core/services/loading.service';
 import { ToastService } from '../../../../core/services/toast.service';
 import { ErrorMessageComponent } from '../../../../shared/components/error-message/error-message.component';
+import { phonePortugueseValidator } from '../../../../core/validators';
+import { FormFieldErrorComponent } from '../../../../shared/components/form-field-error/form-field-error.component';
+import { RealTimeValidationDirective } from '../../../../shared/directives/real-time-validation.directive';
 
 @Component({
   selector: 'app-employees',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, ErrorMessageComponent],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, ErrorMessageComponent, FormFieldErrorComponent, RealTimeValidationDirective],
   templateUrl: './employees.component.html',
   styleUrls: ['./employees.component.scss']
 })
@@ -80,7 +83,7 @@ export class EmployeesComponent implements OnInit {
       firstName: ['', [Validators.required, Validators.minLength(2)]],
       lastName: ['', [Validators.required, Validators.minLength(2)]],
       email: ['', [Validators.required, Validators.email]],
-      phone: ['', [Validators.required, Validators.pattern(/^\+?[0-9\s\-()]{9,}$/)]],
+      phone: ['', [Validators.required, phonePortugueseValidator()]],
       role: ['Mechanic', Validators.required],
       hourlyRate: [0, [Validators.required, Validators.min(0)]],
       specialties: [[]],
