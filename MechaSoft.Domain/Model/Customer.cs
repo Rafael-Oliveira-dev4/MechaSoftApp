@@ -1,5 +1,6 @@
 ﻿using MechaSoft.Domain.Common;
 using MechaSoft.Domain.Interfaces;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MechaSoft.Domain.Model;
 
@@ -13,6 +14,7 @@ public class Customer : AuditableEntity, IEntity<Guid>
     public string? CitizenCard { get; set; } // Cartão de Cidadão
     public required Address Address { get; set; }
     public CustomerType Type { get; set; }
+    public bool IsActive { get; set; } = true;
     public string? Notes { get; set; } // Notas sobre o cliente
 
     // Navigation Properties
@@ -26,6 +28,7 @@ public class Customer : AuditableEntity, IEntity<Guid>
         ServiceOrders = [];
     }
 
+    [SetsRequiredMembers]
     public Customer(string firstName, string lastName, string email, string phone,
                    Address address, CustomerType type, string? nif = null, string? citizenCard = null)
     {
@@ -35,6 +38,7 @@ public class Customer : AuditableEntity, IEntity<Guid>
         Phone = ValidatePhone(phone);
         Address = address ?? throw new ArgumentNullException(nameof(address));
         Type = type;
+        IsActive = true;
         Nif = ValidateNif(nif);
         CitizenCard = citizenCard;
         Vehicles = [];

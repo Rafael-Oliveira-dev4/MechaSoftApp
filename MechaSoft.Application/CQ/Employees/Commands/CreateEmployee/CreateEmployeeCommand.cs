@@ -22,6 +22,8 @@ public record CreateEmployeeResponse(
     string Email,
     string Phone,
     EmployeeRole Role,
-    DateTime CreatedAt
+    DateTime CreatedAt,
+    string? GeneratedUsername,      // Username gerado automaticamente
+    string? GeneratedPassword       // Senha temporária (apenas retornada uma vez)
 );
 

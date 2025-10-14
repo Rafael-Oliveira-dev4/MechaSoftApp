@@ -36,8 +36,18 @@ export class PartService {
       params = params.set('lowStock', lowStock.toString());
     }
 
-    return this.http.get<PartsResponse>(this.apiUrl, { params }).pipe(
-      map(response => success(response)),
+    return this.http.get<any>(this.apiUrl, { params }).pipe(
+      map(response => {
+        // Transform backend response (uses 'parts' property) to PartsResponse (uses 'items')
+        const transformed: PartsResponse = {
+          items: response.parts || [],
+          totalCount: response.totalCount || 0,
+          pageNumber: response.pageNumber || 1,
+          pageSize: response.pageSize || 10,
+          totalPages: response.totalPages || 0
+        };
+        return success(transformed);
+      }),
       catchError(error => of(failure<PartsResponse>(error)))
     );
   }

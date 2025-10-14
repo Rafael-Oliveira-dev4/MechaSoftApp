@@ -1,0 +1,239 @@
+.profile-image-upload {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.5rem;
+}
+
+// Image Container
+.image-container {
+  position: relative;
+}
+
+.image-wrapper {
+  position: relative;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3), 0 0 0 4px rgba(16, 185, 129, 0.2);
+  border: 4px solid rgba(16, 185, 129, 0.3);
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(20, 184, 166, 0.1));
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4), 0 0 0 4px rgba(16, 185, 129, 0.4);
+    border-color: rgba(16, 185, 129, 0.5);
+  }
+}
+
+.profile-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+
+  &.preview {
+    border: 3px solid #10b981;
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
+  }
+}
+
+// Loading Overlay
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Upload Area
+.upload-area {
+  width: 100%;
+  max-width: 400px;
+  border: 2px dashed rgba(16, 185, 129, 0.3);
+  border-radius: 0.75rem;
+  padding: 2rem;
+  text-align: center;
+  transition: all 0.3s ease;
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(10px);
+  cursor: pointer;
+
+  &:hover {
+    border-color: rgba(16, 185, 129, 0.6);
+    background: rgba(16, 185, 129, 0.05);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);
+  }
+
+  &.dragging {
+    border-color: #10b981;
+    background: rgba(16, 185, 129, 0.1);
+    transform: scale(1.02);
+    box-shadow: 0 8px 20px rgba(16, 185, 129, 0.2);
+  }
+}
+
+.file-input {
+  display: none;
+}
+
+.upload-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+}
+
+.upload-icon {
+  width: 48px;
+  height: 48px;
+  color: #10b981;
+  filter: drop-shadow(0 0 6px rgba(16, 185, 129, 0.3));
+}
+
+.upload-text {
+  font-size: 1rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  background: linear-gradient(135deg, #10b981, #14b8a6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.upload-hint {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+// Preview Actions
+.preview-actions {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+  max-width: 400px;
+}
+
+.btn-cancel,
+.btn-upload {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.btn-cancel {
+  background: rgba(15, 23, 42, 0.6);
+  color: rgba(255, 255, 255, 0.9);
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+
+  &:hover:not(:disabled) {
+    background: rgba(15, 23, 42, 0.8);
+    border-color: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+  }
+}
+
+.btn-upload {
+  background: linear-gradient(135deg, #10b981, #14b8a6);
+  color: white;
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.25);
+
+  &:hover:not(:disabled) {
+    background: linear-gradient(135deg, #059669, #0d9488);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.35);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+}
+
+// Error Message
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 0.625rem;
+  color: #fca5a5;
+  font-size: 0.875rem;
+  font-weight: 500;
+  width: 100%;
+  max-width: 400px;
+  backdrop-filter: blur(10px);
+
+  svg {
+    width: 1.5rem;
+    height: 1.5rem;
+    flex-shrink: 0;
+  }
+}
+
+// Responsive
+@media (max-width: 640px) {
+  .profile-image-upload {
+    padding: 1rem;
+  }
+
+  .image-wrapper {
+    width: 120px;
+    height: 120px;
+  }
+
+  .upload-area {
+    padding: 1.5rem;
+  }
+
+  .preview-actions {
+    flex-direction: column;
+
+    button {
+      width: 100%;
+    }
+  }
+}

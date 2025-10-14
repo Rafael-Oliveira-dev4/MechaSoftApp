@@ -10,6 +10,5 @@ export interface UserModel {
   lastLoginAt?: string;
   customerId?: string;
   employeeId?: string;
+  profileImageUrl?: string;
 }
-
-

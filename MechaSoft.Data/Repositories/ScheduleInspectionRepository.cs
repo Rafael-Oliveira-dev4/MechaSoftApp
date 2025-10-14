@@ -13,10 +13,10 @@ namespace MechaSoft.Data.Repositories;
 
 public class ScheduleInspectionRepository : IScheduleInspectionUseCase
 {
-    private readonly DbContext _context;
+    private readonly ApplicationDbContext _context;
     private readonly DbSet<Inspection> _dbSet;
 
-    public ScheduleInspectionRepository(DbContext context)
+    public ScheduleInspectionRepository(ApplicationDbContext context)
     {
         _context = context;
         _dbSet = _context.Set<Inspection>();

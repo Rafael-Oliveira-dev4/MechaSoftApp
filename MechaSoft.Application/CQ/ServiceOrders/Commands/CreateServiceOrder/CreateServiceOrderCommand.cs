@@ -9,9 +9,11 @@ public record CreateServiceOrderCommand(
     Guid VehicleId,
     string Description,
     Priority Priority,
+    decimal EstimatedCost,
     DateTime? EstimatedDelivery,
     Guid? MechanicId,
-    bool RequiresInspection
+    bool RequiresInspection,
+    string? InternalNotes
 ) : IRequest<Result<CreateServiceOrderResponse, Success, Error>>;
 
 public record CreateServiceOrderResponse(

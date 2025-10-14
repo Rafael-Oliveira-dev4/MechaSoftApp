@@ -19,20 +19,13 @@ public class GetDashboardStatsQueryHandler : IRequestHandler<GetDashboardStatsQu
 
     public async Task<Result<DashboardStatsResponse, Success, Error>> Handle(GetDashboardStatsQuery request, CancellationToken cancellationToken)
     {
-        // Get all data in parallel for better performance
-        var customersTask = _unitOfWork.CustomerRepository.GetAllAsync();
-        var vehiclesTask = _unitOfWork.VehicleRepository.GetAllAsync();
-        var employeesTask = _unitOfWork.EmployeeRepository.GetAllAsync();
-        var serviceOrdersTask = _unitOfWork.ServiceOrderRepository.GetAllAsync();
-        var partsTask = _unitOfWork.PartRepository.GetAllAsync();
-
-        await Task.WhenAll(customersTask, vehiclesTask, employeesTask, serviceOrdersTask, partsTask);
-
-        var customers = await customersTask;
-        var vehicles = await vehiclesTask;
-        var employees = await employeesTask;
-        var serviceOrders = await serviceOrdersTask;
-        var parts = await partsTask;
+        // Get all data sequentially to respect DbContext thread-safety
+        // DbContext is not thread-safe, so we cannot run parallel queries
+        var customers = await _unitOfWork.CustomerRepository.GetAllAsync();
+        var vehicles = await _unitOfWork.VehicleRepository.GetAllAsync();
+        var employees = await _unitOfWork.EmployeeRepository.GetAllAsync();
+        var serviceOrders = await _unitOfWork.ServiceOrderRepository.GetAllAsync();
+        var parts = await _unitOfWork.PartRepository.GetAllAsync();
 
         // Calculate customer stats
         var totalCustomers = customers.Count();
@@ -96,8 +89,8 @@ public class GetDashboardStatsQueryHandler : IRequestHandler<GetDashboardStatsQu
                    so.UpdatedAt.HasValue && so.UpdatedAt.Value.Date == today)
             .ToList();
 
-        var monthRevenue = completedThisMonth.Sum(so => so.FinalCost?.Amount ?? so.EstimatedCost.Amount);
-        var todayRevenue = completedToday.Sum(so => so.FinalCost?.Amount ?? so.EstimatedCost.Amount);
+        var monthRevenue = completedThisMonth.Sum(so => so.FinalCost?.Amount ?? so.EstimatedCost?.Amount ?? 0);
+        var todayRevenue = completedToday.Sum(so => so.FinalCost?.Amount ?? so.EstimatedCost?.Amount ?? 0);
 
         var response = new DashboardStatsResponse(
             totalCustomers,

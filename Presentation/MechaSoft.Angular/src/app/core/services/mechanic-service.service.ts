@@ -30,8 +30,18 @@ export class MechanicServiceService {
       .set('pageNumber', pageNumber.toString())
       .set('pageSize', pageSize.toString());
 
-    return this.http.get<ServicesResponse>(this.apiUrl, { params }).pipe(
-      map(response => success(response)),
+    return this.http.get<any>(this.apiUrl, { params }).pipe(
+      map(response => {
+        // Transform backend response (uses 'services' property) to ServicesResponse (uses 'items')
+        const transformed: ServicesResponse = {
+          items: response.services || [],
+          totalCount: response.totalCount || 0,
+          pageNumber: response.pageNumber || 1,
+          pageSize: response.pageSize || 10,
+          totalPages: response.totalPages || 0
+        };
+        return success(transformed);
+      }),
       catchError(error => of(failure<ServicesResponse>(error)))
     );
   }

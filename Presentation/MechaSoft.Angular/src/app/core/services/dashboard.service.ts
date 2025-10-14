@@ -29,7 +29,7 @@ export class DashboardService {
 
   // Obter relatório de peças com stock baixo
   getLowStockReport(): Observable<Result<LowStockReport>> {
-    return this.http.get<LowStockReport>(`${this.apiUrl}/low-stock-report`).pipe(
+    return this.http.get<LowStockReport>(`${this.apiUrl}/reports/low-stock`).pipe(
       map(report => success(report)),
       catchError(error => of(failure<LowStockReport>(error)))
     );
@@ -54,4 +54,35 @@ export class DashboardService {
       catchError(error => of(failure<any[]>(error)))
     );
   }
+
+  // Obter estatísticas do dashboard do cliente
+  getCustomerStats(customerId: string): Observable<Result<CustomerDashboardStats>> {
+    return this.http.get<CustomerDashboardStats>(`${this.apiUrl}/customer/${customerId}`).pipe(
+      map(stats => success(stats)),
+      catchError(error => of(failure<CustomerDashboardStats>(error)))
+    );
+  }
+}
+
+export interface CustomerDashboardStats {
+  totalVehicles: number;
+  totalOrders: number;
+  pendingOrders: number;
+  inProgressOrders: number;
+  completedOrders: number;
+  totalSpent: number;
+  recentOrders: RecentServiceOrder[];
+}
+
+export interface RecentServiceOrder {
+  id: string;
+  orderNumber: string;
+  vehicleBrand: string;
+  vehicleModel: string;
+  vehiclePlate: string;
+  description: string;
+  status: string;
+  estimatedCost: number;
+  createdAt: Date;
+  estimatedDelivery?: Date;
 }

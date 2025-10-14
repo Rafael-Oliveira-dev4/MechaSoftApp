@@ -1,5 +1,3 @@
-import { Result } from './result.model';
-
 export interface ApiResponse<T> {
   isSuccess: boolean;
   value?: T;
@@ -133,6 +131,9 @@ export interface User {
   emailConfirmed: boolean;
   lastLoginAt?: Date;
   createdAt: Date;
+  profileImageUrl?: string;
+  customerId?: string;
+  employeeId?: string;
 }
 
 export interface LoginRequest {
@@ -141,9 +142,16 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
-  token: string;
+  userId: string;
+  username: string;
+  email: string;
+  role: string;
+  accessToken: string;
   refreshToken: string;
-  user: User;
+  expiresAt: string;
+  customerId?: string;
+  employeeId?: string;
+  profileImageUrl?: string;
 }
 
 export interface RegisterRequest {

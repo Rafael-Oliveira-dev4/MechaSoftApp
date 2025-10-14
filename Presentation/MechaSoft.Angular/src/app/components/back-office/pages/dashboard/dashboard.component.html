@@ -1,0 +1,20 @@
+<!-- Dashboard Wrapper - Roteamento baseado em Role -->
+
+@if (isCustomer) {
+  <!-- Dashboard para Clientes -->
+  <app-customer-dashboard></app-customer-dashboard>
+}
+
+@if (isAdmin) {
+  <!-- Dashboard para Admin/Owner/Employee -->
+  <app-admin-dashboard></app-admin-dashboard>
+}
+
+@if (!isCustomer && !isAdmin) {
+  <!-- Fallback -->
+  <div class="flex items-center justify-center min-h-screen">
+    <div class="text-center">
+      <p class="text-zinc-400">A carregar dashboard...</p>
+    </div>
+  </div>
+}

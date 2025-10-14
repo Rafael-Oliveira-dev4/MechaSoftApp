@@ -29,6 +29,16 @@ public class CustomerRepository : Repository<Customer>, ICustomerRepository
         return await _dbSet
             .FirstOrDefaultAsync(c => c.Phone == phone);
     }
+
+    public async Task<Customer?> GetByEmailAsync(string email)
+    {
+        if (string.IsNullOrWhiteSpace(email))
+            throw new ArgumentException("Email cannot be null or empty", nameof(email));
+        
+        return await _dbSet
+            .FirstOrDefaultAsync(c => c.Email == email);
+    }
+
     public async Task<Customer?> GetByNifAsync(string nif)
     {
         if (string.IsNullOrWhiteSpace(nif))
@@ -43,7 +53,8 @@ public class CustomerRepository : Repository<Customer>, ICustomerRepository
             throw new ArgumentException("Name cannot be null or empty", nameof(name));
         
         return await _dbSet
-            .Where(c => c.Name.FirstName.Contains(name) || c.Name.LastName.Contains(name))
+            .Where(c => c.Name.FirstName.Contains(name) || 
+                       (!string.IsNullOrEmpty(c.Name.LastName) && c.Name.LastName.Contains(name)))
             .ToListAsync();
     }
     public override async Task<Customer> UpdateAsync(Customer customer)
@@ -83,6 +94,19 @@ public class CustomerRepository : Repository<Customer>, ICustomerRepository
         return await query.AnyAsync();
     }
 
+    public async Task<bool> EmailExistsAsync(string email, Guid? excludeCustomerId = null)
+    {
+        if (string.IsNullOrWhiteSpace(email))
+            return false;
+
+        var query = _dbSet.Where(c => c.Email == email);
+
+        if (excludeCustomerId.HasValue)
+            query = query.Where(c => c.Id != excludeCustomerId.Value);
+
+        return await query.AnyAsync();
+    }
+
     public async Task<(IEnumerable<Customer> Itens, int TotalCount)> GetPagedCustomerAsync(
         int pageNumber,
         int pageSize,
@@ -99,7 +123,7 @@ public class CustomerRepository : Repository<Customer>, ICustomerRepository
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
             query = query.Where(c => c.Name.FirstName.Contains(searchTerm) || 
-                                     c.Name.LastName.Contains(searchTerm) ||
+                                     (!string.IsNullOrEmpty(c.Name.LastName) && c.Name.LastName.Contains(searchTerm)) ||
                                      c.Email.Contains(searchTerm) ||
                                      c.Phone.Contains(searchTerm));
         }
@@ -116,6 +140,14 @@ public class CustomerRepository : Repository<Customer>, ICustomerRepository
     }
     private async Task ValidateCustomerAsync(Customer customer, bool isUpdate = false)
     {
+        // Validação de email único
+        if (!string.IsNullOrWhiteSpace(customer.Email))
+        {
+            var emailExists = await EmailExistsAsync(customer.Email, isUpdate ? customer.Id : null);
+            if (emailExists)
+                throw new InvalidOperationException($"A customer with email '{customer.Email}' already exists.");
+        }
+
         // Validação de telefone único
         if (!string.IsNullOrWhiteSpace(customer.Phone))
         {

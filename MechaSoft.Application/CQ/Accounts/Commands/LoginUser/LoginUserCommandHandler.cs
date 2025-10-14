@@ -26,11 +26,18 @@ public class LoginUserCommandHandler : IRequestHandler<LoginUserCommand, Result<
 
     public async Task<Result<LoginUserResponse, Success, Error>> Handle(LoginUserCommand request, CancellationToken cancellationToken)
     {
-        // Get user by username
+        // Get user by username or email (try both)
         var user = await _unitOfWork.UserRepository.GetByUsernameAsync(request.Username);
+        
+        // If not found by username, try by email
+        if (user == null && request.Username.Contains("@"))
+        {
+            user = await _unitOfWork.UserRepository.GetByEmailAsync(request.Username);
+        }
+        
         if (user == null)
         {
-            _logger.LogWarning("Login attempt with non-existent username: {Username}", request.Username);
+            _logger.LogWarning("Login attempt with non-existent username or email: {Username}", request.Username);
             return Error.InvalidCredentials;
         }
 
@@ -65,7 +72,7 @@ public class LoginUserCommandHandler : IRequestHandler<LoginUserCommand, Result<
         if (!string.IsNullOrEmpty(user.Salt))
         {
             var newHash = _passwordHasher.HashPassword(request.Password);
-            user.ChangePassword(newHash, string.Empty); // Empty salt for BCrypt
+            user.ChangePassword(newHash, null); // Null salt for BCrypt
             _logger.LogInformation("Upgraded password hash to BCrypt for user: {Username}", request.Username);
         }
 
@@ -91,7 +98,10 @@ public class LoginUserCommandHandler : IRequestHandler<LoginUserCommand, Result<
             user.Role,
             accessToken,
             refreshToken,
-            expiresAt
+            expiresAt,
+            user.CustomerId,
+            user.EmployeeId,
+            user.ProfileImageUrl
         );
 
         return response;

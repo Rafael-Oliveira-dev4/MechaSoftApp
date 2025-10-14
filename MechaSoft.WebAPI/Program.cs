@@ -9,7 +9,16 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    // Evita conflitos de nomes de schemas (ex.: VehicleResponse duplicado em queries diferentes)
+    c.CustomSchemaIds(type => type.FullName);
+});
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+    options.SerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
+});
 
 // CORS Configuration
 var allowedOrigins = builder.Configuration.GetSection("CorsSettings:AllowedOrigins").Get<string[]>() 
@@ -26,7 +35,7 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Services.AddIoCServices(builder.Configuration);
+builder.Services.AddIoCServices(builder.Configuration, builder.Environment);
 builder.Services.AddSecurityServices(builder.Configuration);
 
 // JWT Authentication
@@ -37,6 +46,8 @@ builder.Services.AddAuthentication(options =>
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 });
 builder.Services.AddAuthorization();
+builder.Services.AddHealthChecks();
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 
@@ -52,6 +63,9 @@ app.UseMiddleware<GlobalExceptionMiddleware>();
 
 // CORS
 app.UseCors("AllowAngularApp");
+
+// Static Files (for serving uploaded images)
+app.UseStaticFiles();
 
 app.UseHttpsRedirection();
 

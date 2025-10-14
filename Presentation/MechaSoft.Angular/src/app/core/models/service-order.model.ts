@@ -17,6 +17,32 @@ export interface ServiceOrderModel {
   actualHours?: number;
   requiresInspection: boolean;
   internalNotes?: string;
+  services?: ServiceItemDto[];
+  parts?: PartItemDto[];
+}
+
+export interface ServiceItemDto {
+  id: string;
+  serviceId: string;
+  serviceName: string;
+  quantity: number;
+  estimatedHours: number;
+  unitPrice: number;
+  discountPercentage?: number;
+  totalPrice: number;
+  status: string;
+  mechanicId?: string;
+  mechanicName?: string;
+}
+
+export interface PartItemDto {
+  partId: string;
+  partName: string;
+  partCode: string;
+  quantity: number;
+  unitPrice: number;
+  discountPercentage?: number;
+  totalPrice: number;
 }
 
 

@@ -6,6 +6,7 @@ using MechaSoft.Domain.Model;
 using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using MechaSoft.Application.CQ.Services.Common;
 
 namespace MechaSoft.WebAPI.Endpoints;
 
@@ -16,13 +17,22 @@ public static class ServiceEndpoints
         var services = routes.MapGroup("api/services").WithTags("Services");
 
         // GET /api/services - List services with pagination
-        services.MapGet("/", Queries.GetServices);
+        services.MapGet("/", Queries.GetServices)
+                .WithName("GetServices")
+                .Produces<GetServicesResponse>(200)
+                .Produces<Error>(400);
 
         // GET /api/services/{id} - Get service by ID
-        services.MapGet("/{id:guid}", Queries.GetServiceById);
+        services.MapGet("/{id:guid}", Queries.GetServiceById)
+                .WithName("GetServiceById")
+                .Produces<ServiceResponse>(200)
+                .Produces<Error>(404);
 
         // POST /api/services - Create new service
-        services.MapPost("/", Commands.CreateService);
+        services.MapPost("/", Commands.CreateService)
+                .WithName("CreateService")
+                .Produces<CreateServiceResponse>(201)
+                .Produces<Error>(400);
     }
 
     private static class Commands
@@ -85,15 +95,4 @@ public static class ServiceEndpoints
         }
     }
 }
-
-// DTOs for Service Endpoints
-public record CreateServiceRequest(
-    string Name,
-    string Description,
-    ServiceCategory Category,
-    decimal EstimatedHours,
-    decimal PricePerHour,
-    decimal? FixedPrice,
-    bool RequiresInspection
-);
 

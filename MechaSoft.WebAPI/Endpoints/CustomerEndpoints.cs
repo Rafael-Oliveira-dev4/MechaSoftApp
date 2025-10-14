@@ -1,6 +1,7 @@
 using MechaSoft.Application.Common.Responses;
 using MechaSoft.Application.CQ.Customers.Commands.CreateCustomer;
 using MechaSoft.Application.CQ.Customers.Commands.UpdateCustomer;
+using MechaSoft.Application.CQ.Customers.Commands.CompleteCustomerProfile;
 using MechaSoft.Application.CQ.Customers.Queries.GetCustomers;
 using MechaSoft.Application.CQ.Customers.Queries.GetCustomerById;
 using MechaSoft.Application.CQ.Customers.Common;
@@ -14,7 +15,7 @@ public static class CustomerEndpoints
 {
     public static void RegisterCustomerEndpoints(this IEndpointRouteBuilder routes)
     {
-        var customers = routes.MapGroup("api/customers");
+        var customers = routes.MapGroup("api/customers").WithTags("Customers");
 
         // GET /api/customers - Listar clientes com paginação
         customers.MapGet("/", Queries.GetCustomers)
@@ -39,15 +40,34 @@ public static class CustomerEndpoints
             .WithName("UpdateCustomer")
             .Produces<UpdateCustomerResponse>(200)
             .Produces<Error>(400);
+
+        // POST /api/customers/complete-profile - Completar perfil de cliente
+        customers.MapPost("/complete-profile", Commands.CompleteCustomerProfile)
+            .WithName("CompleteCustomerProfile")
+            .Produces<CompleteCustomerProfileResponse>(201)
+            .Produces<Error>(400);
     }
 
     private static class Commands
     {
         public static async Task<Results<CreatedAtRoute<CreateCustomerResponse>, BadRequest<Error>>> CreateCustomer(
             [FromServices] ISender sender,
-            [FromBody] CreateCustomerCommand command,
+            [FromBody] CreateCustomerRequest request,
             CancellationToken cancellationToken = default)
         {
+            var command = new CreateCustomerCommand
+            {
+                Name = request.Name,
+                Email = request.Email,
+                Phone = request.Phone,
+                Nif = request.Nif,
+                Street = request.Street,
+                Number = request.Number,
+                Parish = request.Parish,
+                City = request.City,
+                PostalCode = request.PostalCode,
+                Country = "Portugal" // Default country
+            };
             var result = await sender.Send(command, cancellationToken);
             
             return result.IsSuccess
@@ -83,6 +103,41 @@ public static class CustomerEndpoints
 
             return result.IsSuccess
                 ? TypedResults.Ok(result.Value!)
+                : TypedResults.BadRequest(result.Error!);
+        }
+
+        public static async Task<Results<Created<CompleteCustomerProfileResponse>, BadRequest<Error>>> CompleteCustomerProfile(
+            [FromServices] ISender sender,
+            [FromBody] CompleteCustomerProfileRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            if (request == null)
+            {
+                return TypedResults.BadRequest(Error.InvalidInput);
+            }
+
+            var command = new CompleteCustomerProfileCommand
+            {
+                UserId = request.UserId,
+                FirstName = request.FirstName,
+                LastName = request.LastName,
+                Phone = request.Phone,
+                Type = request.Type,
+                Street = request.Street,
+                Number = request.Number,
+                Parish = request.Parish,
+                Municipality = request.Municipality,
+                District = request.District,
+                PostalCode = request.PostalCode,
+                Complement = request.Complement,
+                Nif = request.Nif,
+                CitizenCard = request.CitizenCard
+            };
+
+            var result = await sender.Send(command, cancellationToken);
+
+            return result.IsSuccess
+                ? TypedResults.Created($"/api/customers/{result.Value!.CustomerId}", result.Value!)
                 : TypedResults.BadRequest(result.Error!);
         }
     }
@@ -123,16 +178,3 @@ public static class CustomerEndpoints
         }
     }
 }
-
-// DTOs for Customer Endpoints
-public record UpdateCustomerRequest(
-    string Name,
-    string Email,
-    string Phone,
-    string? Nif,
-    string Street,
-    string Number,
-    string Parish,
-    string City,
-    string PostalCode
-);

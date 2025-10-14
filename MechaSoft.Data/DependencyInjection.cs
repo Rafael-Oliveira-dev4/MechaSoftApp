@@ -16,11 +16,15 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddDataServices(this IServiceCollection services, IConfiguration configuration)
     {
+        // Infra - HttpContext for interceptors/auditing
+        services.AddHttpContextAccessor();
+
         // Get connection string from configuration
         var connectionString = configuration.GetConnectionString("MechaSoftCS") 
             ?? throw new InvalidOperationException("Connection string 'MechaSoftCS' not found.");
 
         // Interceptors and Context
+        // Re-enabled with optional IHttpContextAccessor
         services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
         services.AddDbContext<ApplicationDbContext>((sp, options) =>
         {
@@ -28,10 +32,6 @@ public static class DependencyInjection
             options.UseSqlServer(connectionString, sqlOptions =>
             {
                 // Configure SQL Server options
-                sqlOptions.EnableRetryOnFailure(
-                    maxRetryCount: 3,
-                    maxRetryDelay: TimeSpan.FromSeconds(30),
-                    errorNumbersToAdd: null);
                 sqlOptions.CommandTimeout(30);
             });
         });
@@ -63,12 +63,8 @@ public static class DependencyInjection
         // services.AddScoped<IFileStorageService, FileStorageService>();
         //services.AddScoped<INotificationService, NotificationService>();
 
-        // Health Checks
-        services.AddHealthChecks()
-            .AddSqlServer(
-                connectionString,
-                name: "sqlserver",
-                tags: new[] { "db", "sql", "sqlserver" });
+        // Health Checks (registered in WebAPI Program)
+        services.AddHealthChecks();
 
         return services;
     }

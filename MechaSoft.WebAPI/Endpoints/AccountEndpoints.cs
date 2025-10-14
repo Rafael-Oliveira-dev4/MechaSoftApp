@@ -4,8 +4,13 @@ using MechaSoft.Application.CQ.Accounts.Commands.ChangePassword;
 using MechaSoft.Application.CQ.Accounts.Commands.ResetPassword;
 using MechaSoft.Application.CQ.Accounts.Commands.ForgotPassword;
 using MechaSoft.Application.CQ.Accounts.Commands.RefreshToken;
+using MechaSoft.Application.CQ.Accounts.Commands.UploadProfileImage;
+using MechaSoft.Application.CQ.Accounts.Commands.UpdateUserProfile;
 using MechaSoft.Application.CQ.Accounts.Queries.GetUserProfile;
 using MechaSoft.Application.CQ.Accounts.Queries.GetUsers;
+using MechaSoft.Application.CQ.Accounts.Queries.CheckUsernameAvailability;
+using MechaSoft.Application.CQ.Accounts.Queries.CheckEmailAvailability;
+using MechaSoft.Application.CQ.Accounts.Queries.SuggestUsername;
 using MechaSoft.Application.Common.Responses;
 using MechaSoft.Domain.Model;
 using MediatR;
@@ -21,28 +26,83 @@ public static class AccountEndpoints
         var accounts = routes.MapGroup("api/accounts");
 
         // POST /api/accounts/register - Registrar novo usuário
-        accounts.MapPost("/register", Commands.RegisterUser);
+        accounts.MapPost("/register", Commands.RegisterUser)
+                .WithName("RegisterUser")
+                .Produces<RegisterUserResponse>(201)
+                .Produces<Error>(400);
 
         // POST /api/accounts/login - Fazer login
-        accounts.MapPost("/login", Commands.LoginUser);
+        accounts.MapPost("/login", Commands.LoginUser)
+                .WithName("LoginUser")
+                .Produces<LoginUserResponse>(200)
+                .Produces<Error>(400);
 
         // PUT /api/accounts/change-password - Alterar senha
-        accounts.MapPut("/change-password", Commands.ChangePassword);
+        accounts.MapPut("/change-password", Commands.ChangePassword)
+                .WithName("ChangePassword")
+                .Produces<ChangePasswordResponse>(200)
+                .Produces<Error>(400);
 
         // POST /api/accounts/forgot-password - Solicitar reset de senha
-        accounts.MapPost("/forgot-password", Commands.ForgotPassword);
+        accounts.MapPost("/forgot-password", Commands.ForgotPassword)
+                .WithName("ForgotPassword")
+                .Produces<ForgotPasswordResponse>(200)
+                .Produces<Error>(400);
 
         // POST /api/accounts/reset-password - Resetar senha
-        accounts.MapPost("/reset-password", Commands.ResetPassword);
+        accounts.MapPost("/reset-password", Commands.ResetPassword)
+                .WithName("ResetPassword")
+                .Produces<ResetPasswordResponse>(200)
+                .Produces<Error>(400);
 
         // POST /api/accounts/refresh-token - Renovar tokens
-        accounts.MapPost("/refresh-token", Commands.RefreshToken);
+        accounts.MapPost("/refresh-token", Commands.RefreshToken)
+                .WithName("RefreshToken")
+                .Produces<RefreshTokenResponse>(200)
+                .Produces<Error>(400);
 
         // GET /api/accounts/profile/{userId} - Obter perfil do usuário
-        accounts.MapGet("/profile/{userId:guid}", Queries.GetUserProfile);
+        accounts.MapGet("/profile/{userId:guid}", Queries.GetUserProfile)
+                .WithName("GetUserProfile")
+                .Produces<GetUserProfileResponse>(200)
+                .Produces<Error>(404);
+
+        // PUT /api/accounts/profile/{userId} - Atualizar perfil do usuário
+        accounts.MapPut("/profile/{userId:guid}", Commands.UpdateUserProfile)
+                .WithName("UpdateUserProfile")
+                .Produces<UpdateUserProfileResponse>(200)
+                .Produces<Error>(400);
 
         // GET /api/accounts/users - Listar usuários com paginação
-        accounts.MapGet("/users", Queries.GetUsers);
+        accounts.MapGet("/users", Queries.GetUsers)
+                .WithName("GetUsers")
+                .Produces<GetUsersResponse>(200)
+                .Produces<Error>(400);
+
+        // GET /api/accounts/check-username/{username} - Verificar disponibilidade de username
+        accounts.MapGet("/check-username/{username}", Queries.CheckUsernameAvailability)
+                .WithName("CheckUsernameAvailability")
+                .Produces<CheckUsernameAvailabilityResponse>(200)
+                .Produces<Error>(400);
+
+        // GET /api/accounts/check-email/{email} - Verificar disponibilidade de email
+        accounts.MapGet("/check-email/{email}", Queries.CheckEmailAvailability)
+                .WithName("CheckEmailAvailability")
+                .Produces<CheckEmailAvailabilityResponse>(200)
+                .Produces<Error>(400);
+
+        // GET /api/accounts/suggest-username/{username} - Sugerir usernames disponíveis
+        accounts.MapGet("/suggest-username/{username}", Queries.SuggestUsername)
+                .WithName("SuggestUsername")
+                .Produces<SuggestUsernameResponse>(200)
+                .Produces<Error>(400);
+
+        // POST /api/accounts/{userId}/upload-profile-image - Upload de imagem de perfil
+        accounts.MapPost("/{userId:guid}/upload-profile-image", Commands.UploadProfileImage)
+                .WithName("UploadProfileImage")
+                .Produces<UploadProfileImageResponse>(200)
+                .Produces<Error>(400)
+                .DisableAntiforgery(); // Allow file upload
     }
 
     private static class Commands
@@ -167,6 +227,55 @@ public static class AccountEndpoints
                 ? TypedResults.Ok(result.Value)
                 : TypedResults.BadRequest(result.Error);
         }
+
+        public static async Task<Results<Ok<UpdateUserProfileResponse>, BadRequest<Error>>> UpdateUserProfile(
+            [FromServices] ISender sender,
+            Guid userId,
+            [FromBody] UpdateUserProfileRequest request)
+        {
+            if (request == null)
+            {
+                return TypedResults.BadRequest(Error.InvalidInput);
+            }
+
+            var command = new UpdateUserProfileCommand
+            {
+                UserId = userId,
+                Username = request.Username,
+                Email = request.Email
+            };
+
+            var result = await sender.Send(command);
+
+            return result.IsSuccess
+                ? TypedResults.Ok(result.Value!)
+                : TypedResults.BadRequest(result.Error!);
+        }
+
+        public static async Task<Results<Ok<UploadProfileImageResponse>, BadRequest<Error>>> UploadProfileImage(
+            [FromServices] ISender sender,
+            Guid userId,
+            IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return TypedResults.BadRequest(new Error("NoFile", "No file provided"));
+            }
+
+            using var stream = file.OpenReadStream();
+            var command = new UploadProfileImageCommand(
+                userId,
+                stream,
+                file.FileName,
+                file.Length
+            );
+
+            var result = await sender.Send(command);
+            
+            return result.IsSuccess
+                ? TypedResults.Ok(result.Value)
+                : TypedResults.BadRequest(result.Error);
+        }
     }
 
     private static class Queries
@@ -196,6 +305,57 @@ public static class AccountEndpoints
             return result.IsSuccess
                 ? TypedResults.Ok(result.Value)
                 : TypedResults.BadRequest(result.Error);
+        }
+
+        public static async Task<Results<Ok<CheckUsernameAvailabilityResponse>, BadRequest<Error>>> CheckUsernameAvailability(
+            [FromServices] ISender sender,
+            string username)
+        {
+            if (string.IsNullOrWhiteSpace(username))
+            {
+                return TypedResults.BadRequest(new Error("InvalidInput", "Username é obrigatório"));
+            }
+
+            var query = new CheckUsernameAvailabilityQuery(username);
+            var result = await sender.Send(query);
+            
+            return result.IsSuccess
+                ? TypedResults.Ok(result.Value)
+                : TypedResults.BadRequest(new Error("ValidationError", result.Error ?? "Invalid username"));
+        }
+
+        public static async Task<Results<Ok<CheckEmailAvailabilityResponse>, BadRequest<Error>>> CheckEmailAvailability(
+            [FromServices] ISender sender,
+            string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                return TypedResults.BadRequest(new Error("InvalidInput", "Email é obrigatório"));
+            }
+
+            var query = new CheckEmailAvailabilityQuery(email);
+            var result = await sender.Send(query);
+            
+            return result.IsSuccess
+                ? TypedResults.Ok(result.Value)
+                : TypedResults.BadRequest(new Error("ValidationError", result.Error ?? "Invalid email"));
+        }
+
+        public static async Task<Results<Ok<SuggestUsernameResponse>, BadRequest<Error>>> SuggestUsername(
+            [FromServices] ISender sender,
+            string username)
+        {
+            if (string.IsNullOrWhiteSpace(username))
+            {
+                return TypedResults.BadRequest(new Error("InvalidInput", "Username é obrigatório"));
+            }
+
+            var query = new SuggestUsernameQuery(username);
+            var result = await sender.Send(query);
+            
+            return result.IsSuccess
+                ? TypedResults.Ok(result.Value)
+                : TypedResults.BadRequest(new Error("ValidationError", result.Error ?? "Erro ao gerar sugestões"));
         }
     }
 }
@@ -230,3 +390,7 @@ public record ResetPasswordRequest(
 public record RefreshTokenRequest(
     string AccessToken,
     string RefreshToken);
+
+public record UpdateUserProfileRequest(
+    string Username,
+    string Email);

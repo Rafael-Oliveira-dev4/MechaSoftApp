@@ -25,17 +25,26 @@ export class VehicleService {
   }
 
   // Listar veículos com paginação
-  getAll(params?: PaginationParams): Observable<Result<PaginatedResponse<Vehicle>>> {
-    let httpParams = new HttpParams();
+  getAll(pageNumber: number = 1, pageSize: number = 10, customerId?: string, searchTerm?: string): Observable<Result<PaginatedResponse<Vehicle>>> {
+    let httpParams = new HttpParams()
+      .set('pageNumber', pageNumber.toString())
+      .set('pageSize', pageSize.toString());
     
-    if (params) {
-      if (params.pageNumber) httpParams = httpParams.set('pageNumber', params.pageNumber.toString());
-      if (params.pageSize) httpParams = httpParams.set('pageSize', params.pageSize.toString());
-      if (params.searchTerm) httpParams = httpParams.set('searchTerm', params.searchTerm);
-    }
+    if (customerId) httpParams = httpParams.set('customerId', customerId);
+    if (searchTerm) httpParams = httpParams.set('searchTerm', searchTerm);
 
-    return this.http.get<PaginatedResponse<Vehicle>>(this.apiUrl, { params: httpParams }).pipe(
-      map(response => success(response)),
+    return this.http.get<any>(this.apiUrl, { params: httpParams }).pipe(
+      map(response => {
+        // Transform backend response to match frontend interface
+        const transformed: PaginatedResponse<Vehicle> = {
+          items: response.vehicles || [],
+          totalCount: response.totalCount || 0,
+          pageNumber: response.pageNumber || 1,
+          pageSize: response.pageSize || 10,
+          totalPages: response.totalPages || 0
+        };
+        return success(transformed);
+      }),
       catchError(error => of(failure<PaginatedResponse<Vehicle>>(error)))
     );
   }

@@ -1,0 +1,292 @@
+<div class="parts-container">
+  <app-error-message [error]="error" (onClose)="error = null"></app-error-message>
+
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="title">Peças e Stock</h1>
+      <p class="subtitle">Gestão de inventário e peças</p>
+    </div>
+    <div class="flex gap-2">
+      <button (click)="toggleLowStock()" [class.active]="showLowStockOnly" class="btn-filter">
+        <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+        </svg>
+        Stock Baixo
+      </button>
+      <button (click)="openCreateModal()" class="btn-primary">
+        <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+        </svg>
+        Nova Peça
+      </button>
+    </div>
+  </div>
+
+  <!-- Parts Table -->
+  <div class="table-card">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Nome</th>
+          <th>Marca</th>
+          <th>Categoria</th>
+          <th>Preço</th>
+          <th>Stock</th>
+          <th>Min. Stock</th>
+          <th>Estado</th>
+          <th class="text-right">Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        @if (parts.length === 0) {
+          <tr>
+            <td colspan="9" class="text-center py-8 text-gray-500">
+              Nenhuma peça encontrada
+            </td>
+          </tr>
+        }
+        
+        @for (part of parts; track part.id) {
+          <tr [class.row-inactive]="!part.isActive" [class.row-warning]="part.isLowStock && part.isActive">
+            <td class="font-mono">{{ part.code }}</td>
+            <td class="font-medium">{{ part.name }}</td>
+            <td>{{ part.brand }}</td>
+            <td>
+              <span class="badge badge-teal">{{ part.category }}</span>
+            </td>
+            <td>{{ formatCurrency(part.salePrice) }}</td>
+            <td [class.text-red-600]="part.isLowStock" [class.font-bold]="part.isLowStock">
+              {{ part.stockQuantity }}
+              @if (part.isLowStock) {
+                <svg class="inline w-4 h-4 ml-1" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                </svg>
+              }
+            </td>
+            <td>{{ part.minStockLevel }}</td>
+            <td>
+              <span [class]="part.isActive ? 'badge badge-green' : 'badge badge-gray'">
+                {{ part.isActive ? 'Ativo' : 'Inativo' }}
+              </span>
+            </td>
+            <td class="text-right">
+              <div class="action-buttons">
+                <button (click)="openStockModal(part)" class="btn-icon btn-stock" title="Atualizar Stock">
+                  <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
+                  </svg>
+                </button>
+                <button (click)="openEditModal(part)" class="btn-icon btn-edit" title="Editar">
+                  <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                  </svg>
+                </button>
+                <button (click)="toggleActive(part)" [class]="part.isActive ? 'btn-icon btn-delete' : 'btn-icon btn-success'" [title]="part.isActive ? 'Desativar' : 'Ativar'">
+                  <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    @if (part.isActive) {
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    } @else {
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    }
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    <!-- Pagination -->
+    @if (totalPages > 1) {
+      <div class="pagination">
+        <button (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 1" class="btn-pagination">
+          Anterior
+        </button>
+        <span class="pagination-info">
+          Página {{ currentPage }} de {{ totalPages }} ({{ totalCount }} peças)
+        </span>
+        <button (click)="onPageChange(currentPage + 1)" [disabled]="currentPage === totalPages" class="btn-pagination">
+          Próxima
+        </button>
+      </div>
+    }
+  </div>
+
+  <!-- Modal Create/Edit Part -->
+  @if (showModal) {
+    <div class="modal-overlay" (click)="closeModal()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2 class="modal-title">{{ isEditMode ? 'Editar Peça' : 'Nova Peça' }}</h2>
+          <button (click)="closeModal()" class="btn-close">
+            <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+
+        <form [formGroup]="partForm" (ngSubmit)="onSubmit()" class="modal-body">
+          <div class="form-section">
+            <h3 class="form-section-title">Informações da Peça</h3>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Código da Peça *</label>
+                <input type="text" formControlName="code" placeholder="PT-001" class="form-input" [class.input-error]="isFieldInvalid('code')" />
+                @if (isFieldInvalid('code')) {
+                  <span class="error-text">{{ getFieldError('code') }}</span>
+                }
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">Nome *</label>
+                <input type="text" formControlName="name" placeholder="Filtro de óleo" class="form-input" [class.input-error]="isFieldInvalid('name')" />
+                @if (isFieldInvalid('name')) {
+                  <span class="error-text">{{ getFieldError('name') }}</span>
+                }
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Descrição *</label>
+              <textarea formControlName="description" rows="2" class="form-input" [class.input-error]="isFieldInvalid('description')"></textarea>
+              @if (isFieldInvalid('description')) {
+                <span class="error-text">{{ getFieldError('description') }}</span>
+              }
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Marca *</label>
+                <input type="text" formControlName="brand" placeholder="Bosch" class="form-input" [class.input-error]="isFieldInvalid('brand')" />
+                @if (isFieldInvalid('brand')) {
+                  <span class="error-text">{{ getFieldError('brand') }}</span>
+                }
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">Categoria *</label>
+                <input type="text" formControlName="category" placeholder="Filtros" class="form-input" [class.input-error]="isFieldInvalid('category')" />
+                @if (isFieldInvalid('category')) {
+                  <span class="error-text">{{ getFieldError('category') }}</span>
+                }
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Custo Unitário (€) *</label>
+                <input type="number" formControlName="unitCost" step="0.01" class="form-input" [class.input-error]="isFieldInvalid('unitCost')" />
+                @if (isFieldInvalid('unitCost')) {
+                  <span class="error-text">{{ getFieldError('unitCost') }}</span>
+                }
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">Preço de Venda (€) *</label>
+                <input type="number" formControlName="salePrice" step="0.01" class="form-input" [class.input-error]="isFieldInvalid('salePrice')" />
+                @if (isFieldInvalid('salePrice')) {
+                  <span class="error-text">{{ getFieldError('salePrice') }}</span>
+                }
+              </div>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Localização *</label>
+                <input type="text" formControlName="location" placeholder="Prateleira A-12" class="form-input" [class.input-error]="isFieldInvalid('location')" />
+                @if (isFieldInvalid('location')) {
+                  <span class="error-text">{{ getFieldError('location') }}</span>
+                }
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Fornecedor</label>
+                <input type="text" formControlName="supplierName" placeholder="Nome do fornecedor" class="form-input" />
+              </div>
+            </div>
+
+            @if (!isEditMode) {
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Quantidade em Stock *</label>
+                  <input type="number" formControlName="stockQuantity" class="form-input" [class.input-error]="isFieldInvalid('stockQuantity')" />
+                  @if (isFieldInvalid('stockQuantity')) {
+                    <span class="error-text">{{ getFieldError('stockQuantity') }}</span>
+                  }
+                </div>
+                
+                <div class="form-group">
+                  <label class="form-label">Stock Mínimo *</label>
+                  <input type="number" formControlName="minStockLevel" class="form-input" [class.input-error]="isFieldInvalid('minStockLevel')" />
+                  @if (isFieldInvalid('minStockLevel')) {
+                    <span class="error-text">{{ getFieldError('minStockLevel') }}</span>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" (click)="closeModal()" class="btn-secondary">Cancelar</button>
+            <button type="submit" [disabled]="partForm.invalid" class="btn-primary">
+              {{ isEditMode ? 'Guardar' : 'Criar' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  <!-- Modal Update Stock -->
+  @if (showStockModal && selectedPart) {
+    <div class="modal-overlay" (click)="closeStockModal()">
+      <div class="modal-content modal-small" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2 class="modal-title">Atualizar Stock</h2>
+          <button (click)="closeStockModal()" class="btn-close">
+            <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <div class="stock-info">
+            <h3 class="font-medium text-gray-900">{{ selectedPart.name }}</h3>
+            <p class="text-sm text-gray-600">Código: {{ selectedPart.partNumber }}</p>
+            <p class="text-lg font-bold text-gray-900 mt-2">
+              Stock Atual: <span [class.text-red-600]="isLowStock(selectedPart)">{{ selectedPart.quantityInStock }}</span>
+            </p>
+          </div>
+
+          <form [formGroup]="stockForm" (ngSubmit)="onUpdateStock()" class="mt-4">
+            <div class="form-group">
+              <label class="form-label">Operação *</label>
+              <select formControlName="operation" class="form-input">
+                <option value="add">Adicionar ao Stock</option>
+                <option value="remove">Remover do Stock</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Quantidade *</label>
+              <input type="number" formControlName="quantity" placeholder="0" min="1" class="form-input" [class.input-error]="isFieldInvalid('quantity', stockForm)" />
+              @if (isFieldInvalid('quantity', stockForm)) {
+                <span class="error-text">{{ getFieldError('quantity', stockForm) }}</span>
+              }
+            </div>
+
+            <div class="modal-footer">
+              <button type="button" (click)="closeStockModal()" class="btn-secondary">Cancelar</button>
+              <button type="submit" [disabled]="stockForm.invalid" class="btn-primary">Atualizar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  }
+</div>

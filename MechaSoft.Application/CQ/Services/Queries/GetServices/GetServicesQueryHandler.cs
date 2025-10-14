@@ -53,7 +53,7 @@ public class GetServicesQueryHandler : IRequestHandler<GetServicesQuery, Result<
             s.FixedPrice?.Amount,
             s.IsActive,
             s.RequiresInspection
-        ));
+        )).ToList(); // Materialize the query to avoid deferred execution issues
 
         var response = new GetServicesResponse(
             serviceDtos,
@@ -62,6 +62,8 @@ public class GetServicesQueryHandler : IRequestHandler<GetServicesQuery, Result<
             request.PageSize,
             totalPages
         );
+
+        _logger.LogInformation("Retrieved {Count} services (Page {PageNumber}/{TotalPages})", serviceDtos.Count, request.PageNumber, totalPages);
 
         return response;
     }

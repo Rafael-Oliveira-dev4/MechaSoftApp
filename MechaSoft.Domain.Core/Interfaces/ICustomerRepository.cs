@@ -11,8 +11,9 @@ public interface ICustomerRepository : IRepository<Customer>
 {
     Task<Customer> SaveAsync(Customer customer);
     Task<Customer?> GetByPhoneAsync(string phone);
+    Task<Customer?> GetByEmailAsync(string email);
     Task<Customer?> GetByNifAsync(string nif);
     Task<IEnumerable<Customer>> SearchByNameAsync(string name);
     Task<Customer> UpdateAsync(Customer customer);
-
+    Task<bool> EmailExistsAsync(string email, Guid? excludeCustomerId = null);
 }
