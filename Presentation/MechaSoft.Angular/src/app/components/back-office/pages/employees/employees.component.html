@@ -130,10 +130,18 @@
               
               <div class="form-group">
                 <label class="form-label">Telefone *</label>
-                <input type="tel" formControlName="phone" placeholder="+351 912 345 678" class="form-input" [class.input-error]="isFieldInvalid('phone')" />
-                @if (isFieldInvalid('phone')) {
-                  <span class="error-text">{{ getFieldError('phone') }}</span>
-                }
+                <input 
+                  type="tel" 
+                  formControlName="phone" 
+                  placeholder="912345678" 
+                  maxlength="9"
+                  class="form-input" 
+                  appRealTimeValidation
+                />
+                <app-form-field-error 
+                  [control]="employeeForm.get('phone')" 
+                  fieldName="Telefone"
+                />
               </div>
             </div>
           </div>

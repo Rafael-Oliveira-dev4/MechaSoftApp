@@ -358,3 +358,40 @@ select.form-input {
     @apply opacity-100;
   }
 }
+
+// ========================================
+// Form Validation States
+// ========================================
+.field-valid {
+  @apply border-emerald-500 ring-2 ring-emerald-500/20 bg-emerald-500/5;
+  
+  &:focus {
+    @apply ring-emerald-500/30;
+  }
+}
+
+.field-invalid {
+  @apply border-red-500 ring-2 ring-red-500/20 bg-red-500/5;
+  
+  &:focus {
+    @apply ring-red-500/30;
+  }
+}
+
+// Error messages
+.error-message {
+  @apply text-sm text-red-400 mt-1 flex items-center gap-1;
+  
+  svg {
+    @apply w-4 h-4;
+  }
+}
+
+// Success messages
+.success-message {
+  @apply text-sm text-emerald-400 mt-1 flex items-center gap-1;
+  
+  svg {
+    @apply w-4 h-4;
+  }
+}

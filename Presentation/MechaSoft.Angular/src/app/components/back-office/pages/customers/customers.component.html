@@ -154,20 +154,36 @@
               
               <div class="form-group">
                 <label class="form-label">Telefone *</label>
-                <input type="tel" formControlName="phone" placeholder="912345678" class="form-input" [class.input-error]="isFieldInvalid('phone')" />
-                @if (isFieldInvalid('phone')) {
-                  <span class="error-text">{{ getFieldError('phone') }}</span>
-                }
+                <input 
+                  type="tel" 
+                  formControlName="phone" 
+                  placeholder="912345678" 
+                  maxlength="9"
+                  class="form-input" 
+                  appRealTimeValidation
+                />
+                <app-form-field-error 
+                  [control]="customerForm.get('phone')" 
+                  fieldName="Telefone"
+                />
               </div>
             </div>
 
             <div class="form-row">
               <div class="form-group">
                 <label class="form-label">NIF</label>
-                <input type="text" formControlName="nif" placeholder="123456789" class="form-input" [class.input-error]="isFieldInvalid('nif')" />
-                @if (isFieldInvalid('nif')) {
-                  <span class="error-text">{{ getFieldError('nif') }}</span>
-                }
+                <input 
+                  type="text" 
+                  formControlName="nif" 
+                  placeholder="123456789" 
+                  maxlength="9"
+                  class="form-input" 
+                  appRealTimeValidation
+                />
+                <app-form-field-error 
+                  [control]="customerForm.get('nif')" 
+                  fieldName="NIF"
+                />
               </div>
             </div>
           </div>
