@@ -1,0 +1,51 @@
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule, Router } from '@angular/router';
+import { AuthService } from '../../../core/services/auth.service';
+import { User } from '../../../core/models/api.models';
+import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
+
+@Component({
+  selector: 'app-back-office-layout',
+  standalone: true,
+  imports: [CommonModule, RouterModule, NavbarComponent],
+  templateUrl: './back-office-layout.component.html',
+  styleUrls: ['./back-office-layout.component.scss']
+})
+export class BackOfficeLayoutComponent implements OnInit {
+  currentUser: User | null = null;
+  isMobileMenuOpen = false;
+  
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
+
+  ngOnInit(): void {
+    this.authService.currentUser$.subscribe(user => {
+      this.currentUser = user;
+    });
+  }
+
+  // Mobile menu
+  toggleMobileMenu() {
+    this.isMobileMenuOpen = !this.isMobileMenuOpen;
+  }
+
+  closeMobileMenu() {
+    this.isMobileMenuOpen = false;
+  }
+
+  // Logout
+  logout(): void {
+    if (confirm('Deseja terminar sessão?')) {
+      this.authService.logout();
+      this.router.navigate(['/login']);
+    }
+  }
+
+  // Verificar se tem permissão
+  hasRole(roles: string[]): boolean {
+    return this.currentUser?.role ? roles.includes(this.currentUser.role) : false;
+  }
+}

@@ -63,7 +63,7 @@ public class GetPartsQueryHandler : IRequestHandler<GetPartsQuery, Result<GetPar
             p.SupplierName,
             p.Location,
             p.IsActive
-        ));
+        )).ToList(); // Materialize the query
 
         var response = new GetPartsResponse(
             partDtos,
@@ -72,6 +72,8 @@ public class GetPartsQueryHandler : IRequestHandler<GetPartsQuery, Result<GetPar
             request.PageSize,
             totalPages
         );
+
+        _logger.LogInformation("Retrieved {Count} parts (Page {PageNumber}/{TotalPages})", partDtos.Count, request.PageNumber, totalPages);
 
         return response;
     }

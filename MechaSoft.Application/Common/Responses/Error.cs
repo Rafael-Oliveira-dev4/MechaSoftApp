@@ -41,6 +41,11 @@ public sealed record Error(string Code, string Description)
     // Customer specific errors
     public static readonly Error CustomerNotFound = new("CustomerNotFound", "Customer Not Found");
     public static readonly Error ExistingCustomer = new("ExistingCustomer", "Customer already exists");
+    public static readonly Error CustomerAlreadyExists = new("CustomerAlreadyExists", "Customer profile already exists for this user");
+    public static readonly Error ExistingNif = new("ExistingNif", "A customer with this NIF already exists");
+    public static readonly Error ValidationFailed = new("ValidationFailed", "Data validation failed");
+    public static readonly Error InvalidOperation = new("InvalidOperation", "The operation is not valid for this user");
+    public static readonly Error ServerError = new("ServerError", "An unexpected error occurred");
 
     // Employee specific errors
     public static readonly Error EmployeeNotFound = new("EmployeeNotFound", "Employee Not Found");

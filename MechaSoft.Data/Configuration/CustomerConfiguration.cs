@@ -24,7 +24,7 @@ internal class CustomerConfiguration : IEntityTypeConfiguration<Customer>
             name.Property(n => n.LastName)
                 .HasColumnName("LastName")
                 .HasMaxLength(100)
-                .IsRequired();
+                .IsRequired(false); // Optional for companies
         });
 
         // Basic Properties

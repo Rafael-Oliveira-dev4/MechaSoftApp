@@ -1,0 +1,191 @@
+<div class="dashboard-container">
+  <!-- Background effects -->
+  <div class="absolute inset-0 pointer-events-none overflow-hidden">
+    <div class="absolute top-1/4 left-1/4 h-96 w-96 rounded-full bg-emerald-500/10 blur-3xl animate-float"></div>
+    <div
+      class="absolute bottom-1/4 right-1/4 h-80 w-80 rounded-full bg-teal-500/10 blur-3xl animate-float"
+      style="animation-delay: 2s"
+    ></div>
+  </div>
+
+  <!-- Profile Completion Alert -->
+  @if (showProfileAlert) {
+  <app-profile-completion-alert [isDismissible]="true"></app-profile-completion-alert>
+  }
+
+  <!-- Header -->
+  <div class="dashboard-header">
+    <div>
+      <h1 class="title">
+        <span class="bg-gradient-to-r from-emerald-400 to-teal-600 bg-clip-text text-transparent">Bem-vindo, {{ currentUser?.username }}</span>
+      </h1>
+      <p class="subtitle">Acompanhe os seus veículos e serviços</p>
+    </div>
+    <button (click)="refresh()" class="btn-refresh group">
+      <svg
+        class="icon group-hover:rotate-180 transition-transform duration-500"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+        />
+      </svg>
+      <span>Atualizar</span>
+    </button>
+  </div>
+
+  @if (stats) {
+  <!-- Stats Cards Grid - Customer -->
+  <div class="stats-grid">
+    <!-- Card 1: Meus Veículos -->
+    <div class="stat-card card-emerald">
+      <div class="card-glow"></div>
+      <div class="stat-icon-container">
+        <div class="stat-icon-bg bg-gradient-to-br from-emerald-500 to-teal-600">
+          <svg class="stat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
+            />
+          </svg>
+        </div>
+      </div>
+      <div class="stat-content">
+        <h3 class="stat-title">Meus Veículos</h3>
+        <p class="stat-value">{{ stats.totalVehicles }}</p>
+        <p class="text-sm text-zinc-400 mt-2">Veículos registados</p>
+      </div>
+    </div>
+
+    <!-- Card 2: Minhas Ordens -->
+    <div class="stat-card card-blue">
+      <div class="card-glow"></div>
+      <div class="stat-icon-container">
+        <div class="stat-icon-bg bg-gradient-to-br from-blue-500 to-cyan-600">
+          <svg class="stat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+            />
+          </svg>
+        </div>
+      </div>
+      <div class="stat-content">
+        <h3 class="stat-title">Minhas Ordens</h3>
+        <p class="stat-value">{{ stats.totalOrders }}</p>
+        <div class="stat-details mt-3">
+          <div class="stat-detail-item">
+            <span class="badge badge-yellow">{{ stats.pendingOrders }}</span>
+            <span class="badge-label">Pendentes</span>
+          </div>
+          <div class="stat-detail-item">
+            <span class="badge badge-blue">{{ stats.inProgressOrders }}</span>
+            <span class="badge-label">Em Curso</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 3: Ordens Concluídas -->
+    <div class="stat-card card-green">
+      <div class="card-glow"></div>
+      <div class="stat-icon-container">
+        <div class="stat-icon-bg bg-gradient-to-br from-green-500 to-emerald-600">
+          <svg class="stat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+        </div>
+      </div>
+      <div class="stat-content">
+        <h3 class="stat-title">Concluídas</h3>
+        <p class="stat-value">{{ stats.completedOrders }}</p>
+        <p class="text-sm text-green-400 mt-2">Serviços finalizados</p>
+      </div>
+    </div>
+
+    <!-- Card 4: Total Gasto -->
+    <div class="stat-card card-amber">
+      <div class="card-glow"></div>
+      <div class="stat-icon-container">
+        <div class="stat-icon-bg bg-gradient-to-br from-amber-500 to-orange-600">
+          <svg class="stat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+        </div>
+      </div>
+      <div class="stat-content">
+        <h3 class="stat-title">Total Gasto</h3>
+        <p class="stat-value text-amber-400">{{ formatCurrency(stats.totalSpent) }}</p>
+        <p class="text-xs text-zinc-400 mt-2">Em serviços</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Info Card - Próximos Passos -->
+  <div class="section-card fade-in-up mt-8">
+    <div class="section-header">
+      <h2 class="section-title">
+        <svg class="section-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+        Acesso Rápido
+      </h2>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-6">
+      <a href="/admin/vehicles" class="quick-link-card group">
+        <svg class="w-8 h-8 text-emerald-400 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+        </svg>
+        <div>
+          <h3 class="font-semibold text-zinc-200">Meus Veículos</h3>
+          <p class="text-sm text-zinc-400">Ver todos os veículos</p>
+        </div>
+      </a>
+      <a href="/admin/service-orders" class="quick-link-card group">
+        <svg class="w-8 h-8 text-blue-400 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+        </svg>
+        <div>
+          <h3 class="font-semibold text-zinc-200">Minhas Ordens</h3>
+          <p class="text-sm text-zinc-400">Ver histórico de serviços</p>
+        </div>
+      </a>
+      <a href="/admin/inspections" class="quick-link-card group">
+        <svg class="w-8 h-8 text-purple-400 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+        </svg>
+        <div>
+          <h3 class="font-semibold text-zinc-200">Minhas Inspeções</h3>
+          <p class="text-sm text-zinc-400">Agendar e acompanhar</p>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  }
+</div>
+

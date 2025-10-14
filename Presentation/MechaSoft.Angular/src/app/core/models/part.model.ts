@@ -1,43 +1,54 @@
 export interface Part {
   id: string;
-  partNumber: string;
+  code: string; // API retorna 'code' não 'partNumber'
   name: string;
   description: string;
   brand: string;
   category: string;
-  unitPrice: number;
-  quantityInStock: number;
-  minimumStock: number;
+  unitCost: number; // Custo unitário
+  salePrice: number; // Preço de venda
+  stockQuantity: number; // API retorna 'stockQuantity' não 'quantityInStock'
+  minStockLevel: number; // API retorna 'minStockLevel' não 'minimumStock'
+  isLowStock: boolean; // Flag calculada pela API
   location: string;
-  supplier?: string;
+  supplierName?: string; // API retorna 'supplierName' não 'supplier'
   isActive: boolean;
-  createdAt: Date;
+  createdAt?: Date;
   updatedAt?: Date;
+  
+  // Legacy properties for backwards compatibility
+  partNumber?: string;
+  unitPrice?: number;
+  quantityInStock?: number;
+  minimumStock?: number;
+  supplier?: string;
 }
 
 export interface CreatePartRequest {
-  partNumber: string;
+  code: string; // Backend espera 'code' não 'partNumber'
   name: string;
   description: string;
   brand: string;
   category: string;
-  unitPrice: number;
-  quantityInStock: number;
-  minimumStock: number;
+  unitCost: number; // Custo unitário
+  salePrice: number; // Preço de venda
+  stockQuantity: number; // Backend espera 'stockQuantity'
+  minStockLevel: number; // Backend espera 'minStockLevel'
   location: string;
-  supplier?: string;
+  supplierName?: string; // Backend espera 'supplierName'
 }
 
 export interface UpdatePartRequest {
   id: string;
-  partNumber: string;
+  code: string; // Backend espera 'code' não 'partNumber'
   name: string;
   description: string;
   brand: string;
   category: string;
-  unitPrice: number;
+  unitCost: number; // Custo unitário
+  salePrice: number; // Preço de venda
   location: string;
-  supplier?: string;
+  supplierName?: string; // Backend espera 'supplierName'
 }
 
 export interface UpdateStockRequest {

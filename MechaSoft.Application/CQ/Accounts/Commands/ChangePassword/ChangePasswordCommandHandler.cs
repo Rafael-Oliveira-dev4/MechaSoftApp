@@ -1,9 +1,7 @@
-using MediatR;
 using MechaSoft.Application.Common.Responses;
-using MechaSoft.Domain.Core.Interfaces;
 using MechaSoft.Domain.Core.Uow;
-using MechaSoft.Domain.Model;
 using MechaSoft.Security.Interfaces;
+using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace MechaSoft.Application.CQ.Accounts.Commands.ChangePassword;
@@ -24,58 +22,36 @@ public class ChangePasswordCommandHandler : IRequestHandler<ChangePasswordComman
         _logger = logger;
     }
 
-    public async Task<Result<ChangePasswordResponse, Success, Error>> Handle(ChangePasswordCommand request, CancellationToken cancellationToken)
+    public async Task<Result<ChangePasswordResponse, Success, Error>> Handle(
+        ChangePasswordCommand request,
+        CancellationToken cancellationToken)
     {
         // Get user
         var user = await _unitOfWork.UserRepository.GetByIdAsync(request.UserId);
         if (user == null)
-            return Error.UserNotFound;
-
-        // Verify current password (supports both BCrypt and legacy SHA256)
-        bool isCurrentPasswordValid = VerifyPassword(request.CurrentPassword, user.PasswordHash, user.Salt);
-        if (!isCurrentPasswordValid)
         {
-            _logger.LogWarning("Invalid current password for user: {UserId}", request.UserId);
-            return Error.InvalidPassword;
+            _logger.LogWarning("Attempt to change password for non-existent user: {UserId}", request.UserId);
+            return new Error("USER_NOT_FOUND", "Utilizador não encontrado");
         }
 
-        // Hash new password using BCrypt
+        // Verify current password
+        if (!_passwordHasher.VerifyPassword(request.CurrentPassword, user.PasswordHash))
+        {
+            _logger.LogWarning("Invalid current password for user: {UserId}", request.UserId);
+            return new Error("INVALID_PASSWORD", "Senha atual incorreta");
+        }
+
+        // Hash new password
         var newPasswordHash = _passwordHasher.HashPassword(request.NewPassword);
 
-        // Update password (empty salt for BCrypt)
-        user.ChangePassword(newPasswordHash, string.Empty);
+        // Update password (BCrypt doesn't use separate salt)
+        user.ChangePassword(newPasswordHash, null);
+
         await _unitOfWork.UserRepository.UpdateAsync(user);
         await _unitOfWork.CommitAsync(cancellationToken);
 
-        _logger.LogInformation("Password changed successfully for user: {UserId}", request.UserId);
+        _logger.LogInformation("Password changed successfully for user: {UserId}, {Username}", user.Id, user.Username);
 
-        var response = new ChangePasswordResponse(true, "Password changed successfully");
-        return response;
-    }
-
-    /// <summary>
-    /// Verifies password supporting both BCrypt (new) and SHA256 (legacy) hashes
-    /// </summary>
-    private bool VerifyPassword(string password, string storedHash, string? salt)
-    {
-        // New BCrypt hash (no salt stored separately)
-        if (string.IsNullOrEmpty(salt))
-        {
-            return _passwordHasher.VerifyPassword(password, storedHash);
-        }
-
-        // Legacy SHA256 hash with salt
-        try
-        {
-            using var sha256 = System.Security.Cryptography.SHA256.Create();
-            var saltedPassword = password + salt;
-            var hashedBytes = sha256.ComputeHash(System.Text.Encoding.UTF8.GetBytes(saltedPassword));
-            var computedHash = Convert.ToBase64String(hashedBytes);
-            return computedHash == storedHash;
-        }
-        catch
-        {
-            return false;
-        }
+        return new ChangePasswordResponse("Senha alterada com sucesso!");
     }
 }

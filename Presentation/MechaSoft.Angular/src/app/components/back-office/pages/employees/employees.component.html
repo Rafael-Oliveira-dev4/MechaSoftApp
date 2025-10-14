@@ -1,0 +1,311 @@
+<div class="employees-container">
+  <app-error-message [error]="error" (onClose)="error = null"></app-error-message>
+
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="title">Gestão de Funcionários</h1>
+      <p class="subtitle">Gerir equipa e colaboradores da oficina</p>
+    </div>
+    <button (click)="openCreateModal()" class="btn-primary">
+      <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+      </svg>
+      Novo Funcionário
+    </button>
+  </div>
+
+  <!-- Table -->
+  <div class="table-card">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Email</th>
+          <th>Telefone</th>
+          <th>Função</th>
+          <th>Taxa/Hora</th>
+          <th>Especialidades</th>
+          <th>Inspeções</th>
+          <th class="text-right">Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        @if (employees.length === 0) {
+          <tr>
+            <td colspan="8" class="text-center py-8 text-gray-500">
+              Nenhum funcionário encontrado
+            </td>
+          </tr>
+        }
+        
+        @for (employee of employees; track employee.id) {
+          <tr>
+            <td class="font-medium">{{ employee.fullName }}</td>
+            <td>{{ employee.email }}</td>
+            <td>{{ employee.phone }}</td>
+            <td>
+              <span class="badge badge-teal">{{ getRoleLabel(employee.role) }}</span>
+            </td>
+            <td>{{ employee.hourlyRate ? formatCurrency(employee.hourlyRate) : '-' }}</td>
+            <td class="text-sm">{{ getSpecialtiesLabel(employee.specialties) }}</td>
+            <td>
+              @if (employee.canPerformInspections) {
+                <span class="badge badge-green">✓ Sim</span>
+              } @else {
+                <span class="badge badge-gray">✗ Não</span>
+              }
+            </td>
+            <td class="text-right">
+              <button (click)="openEditModal(employee)" class="btn-icon btn-edit" title="Editar">
+                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                </svg>
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    <!-- Pagination -->
+    @if (totalPages > 1) {
+      <div class="pagination">
+        <button (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 1" class="btn-pagination">
+          Anterior
+        </button>
+        <span class="pagination-info">
+          Página {{ currentPage }} de {{ totalPages }} ({{ totalCount }} funcionários)
+        </span>
+        <button (click)="onPageChange(currentPage + 1)" [disabled]="currentPage === totalPages" class="btn-pagination">
+          Próxima
+        </button>
+      </div>
+    }
+  </div>
+
+  <!-- Modal Create/Edit -->
+  @if (showModal) {
+    <div class="modal-overlay" (click)="closeModal()">
+      <div class="modal-content modal-large" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2 class="modal-title">{{ isEditMode ? 'Editar Funcionário' : 'Novo Funcionário' }}</h2>
+          <button (click)="closeModal()" class="btn-close">
+            <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+
+        <form [formGroup]="employeeForm" (ngSubmit)="onSubmit()" class="modal-body">
+          <div class="form-section">
+            <h3 class="form-section-title">Informações Pessoais</h3>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Primeiro Nome *</label>
+                <input type="text" formControlName="firstName" placeholder="Ex: João" class="form-input" [class.input-error]="isFieldInvalid('firstName')" />
+                @if (isFieldInvalid('firstName')) {
+                  <span class="error-text">{{ getFieldError('firstName') }}</span>
+                }
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">Último Nome *</label>
+                <input type="text" formControlName="lastName" placeholder="Ex: Silva" class="form-input" [class.input-error]="isFieldInvalid('lastName')" />
+                @if (isFieldInvalid('lastName')) {
+                  <span class="error-text">{{ getFieldError('lastName') }}</span>
+                }
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Email *</label>
+                <input type="email" formControlName="email" placeholder="joao.silva@mechasoft.pt" class="form-input" [class.input-error]="isFieldInvalid('email')" />
+                @if (isFieldInvalid('email')) {
+                  <span class="error-text">{{ getFieldError('email') }}</span>
+                }
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">Telefone *</label>
+                <input type="tel" formControlName="phone" placeholder="+351 912 345 678" class="form-input" [class.input-error]="isFieldInvalid('phone')" />
+                @if (isFieldInvalid('phone')) {
+                  <span class="error-text">{{ getFieldError('phone') }}</span>
+                }
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3 class="form-section-title">Informações Profissionais</h3>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Função *</label>
+                <select formControlName="role" class="form-input" [class.input-error]="isFieldInvalid('role')">
+                  @for (role of roles; track role.value) {
+                    <option [value]="role.value">{{ role.label }}</option>
+                  }
+                </select>
+                @if (isFieldInvalid('role')) {
+                  <span class="error-text">{{ getFieldError('role') }}</span>
+                }
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">Taxa por Hora (€)</label>
+                <input type="number" formControlName="hourlyRate" step="0.01" placeholder="45.00" class="form-input" [class.input-error]="isFieldInvalid('hourlyRate')" />
+                @if (isFieldInvalid('hourlyRate')) {
+                  <span class="error-text">{{ getFieldError('hourlyRate') }}</span>
+                }
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Especialidades</label>
+              <div class="specialty-grid">
+                @for (specialty of specialtiesOptions; track specialty.value) {
+                  <label class="specialty-item">
+                    <input type="checkbox" (change)="toggleSpecialty(specialty.value)" [checked]="isSpecialtySelected(specialty.value)" />
+                    <span>{{ specialty.label }}</span>
+                  </label>
+                }
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label flex items-center gap-2">
+                <input type="checkbox" formControlName="canPerformInspections" class="form-checkbox" />
+                <span>Pode realizar inspeções</span>
+              </label>
+            </div>
+
+            @if (employeeForm.get('canPerformInspections')?.value) {
+              <div class="form-group">
+                <label class="form-label">Número da Licença de Inspeção</label>
+                <input type="text" formControlName="inspectionLicenseNumber" placeholder="INS-PT-2024-XXX" class="form-input" />
+              </div>
+            }
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" (click)="closeModal()" class="btn-secondary">
+              Cancelar
+            </button>
+            <button type="submit" [disabled]="employeeForm.invalid" class="btn-primary">
+              {{ isEditMode ? 'Atualizar' : 'Criar' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  <!-- Modal de Credenciais Geradas -->
+  @if (showCredentialsModal && generatedCredentials) {
+    <div class="modal-overlay" (click)="$event.stopPropagation()">
+      <div class="modal-content credentials-modal" (click)="$event.stopPropagation()">
+        <div class="modal-header bg-green-600 text-white">
+          <h2 class="modal-title flex items-center gap-2">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            Funcionário Criado com Sucesso!
+          </h2>
+        </div>
+
+        <div class="modal-body">
+          <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
+            <div class="flex items-start">
+              <svg class="w-6 h-6 text-blue-500 mr-3 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <div>
+                <p class="font-semibold text-blue-800">Conta de Utilizador Criada Automaticamente</p>
+                <p class="text-sm text-blue-700 mt-1">
+                  Uma conta de acesso foi criada para <strong>{{ generatedCredentials.employeeName }}</strong>.
+                  Por favor, guarde estas credenciais num local seguro e partilhe-as com o funcionário.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="space-y-4">
+            <!-- Username -->
+            <div class="credentials-field">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Nome de Utilizador</label>
+              <div class="flex items-center gap-2">
+                <input 
+                  type="text" 
+                  [value]="generatedCredentials.username" 
+                  readonly 
+                  class="form-input bg-gray-100 font-mono flex-1"
+                />
+                <button 
+                  type="button"
+                  (click)="copyToClipboard(generatedCredentials.username)"
+                  class="btn-secondary px-3 py-2"
+                  title="Copiar"
+                >
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Password -->
+            <div class="credentials-field">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Senha Temporária</label>
+              <div class="flex items-center gap-2">
+                <input 
+                  type="text" 
+                  [value]="generatedCredentials.password" 
+                  readonly 
+                  class="form-input bg-yellow-50 border-yellow-300 font-mono text-lg font-bold flex-1"
+                />
+                <button 
+                  type="button"
+                  (click)="copyToClipboard(generatedCredentials.password)"
+                  class="btn-secondary px-3 py-2"
+                  title="Copiar"
+                >
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                  </svg>
+                </button>
+              </div>
+              <p class="text-xs text-gray-600 mt-1">⚠️ Esta senha só será mostrada uma vez. O funcionário deve alterá-la no primeiro login.</p>
+            </div>
+          </div>
+
+          <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mt-6">
+            <div class="flex">
+              <svg class="w-6 h-6 text-yellow-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+              </svg>
+              <div>
+                <p class="text-sm font-semibold text-yellow-800">Atenção</p>
+                <p class="text-sm text-yellow-700 mt-1">
+                  Esta janela não aparecerá novamente. Certifique-se de copiar e guardar estas credenciais antes de fechar.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" (click)="closeCredentialsModal()" class="btn-primary">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
+            Credenciais Guardadas
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>
+

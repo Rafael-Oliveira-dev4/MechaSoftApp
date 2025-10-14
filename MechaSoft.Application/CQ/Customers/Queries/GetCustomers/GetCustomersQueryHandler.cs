@@ -57,7 +57,7 @@ public class GetCustomersQueryHandler : IRequestHandler<GetCustomersQuery, Resul
             Country = c.Address.District,
             CreatedAt = c.CreatedAt,
             UpdatedAt = c.UpdatedAt
-        });
+        }).ToList(); // Materialize the query
 
         var response = new GetCustomersResponse
         {
@@ -67,6 +67,8 @@ public class GetCustomersQueryHandler : IRequestHandler<GetCustomersQuery, Resul
             PageSize = request.PageSize,
             TotalPages = totalPages
         };
+
+        _logger.LogInformation("Retrieved {Count} customers (Page {PageNumber}/{TotalPages})", customerResponses.Count, request.PageNumber, totalPages);
 
         return response;
     }

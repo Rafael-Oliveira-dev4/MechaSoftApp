@@ -8,7 +8,8 @@ import {
   Employee, 
   CreateEmployeeRequest,
   UpdateEmployeeRequest,
-  EmployeesResponse 
+  EmployeesResponse,
+  CreateEmployeeResponse 
 } from '../models/employee.model';
 
 @Injectable({
@@ -30,8 +31,18 @@ export class EmployeeService {
       .set('pageNumber', pageNumber.toString())
       .set('pageSize', pageSize.toString());
 
-    return this.http.get<EmployeesResponse>(this.apiUrl, { params }).pipe(
-      map(response => success(response)),
+    return this.http.get<any>(this.apiUrl, { params }).pipe(
+      map(response => {
+        // Transform backend response to match frontend interface
+        const transformed: EmployeesResponse = {
+          items: response.employees || [],
+          totalCount: response.totalCount || 0,
+          pageNumber: response.pageNumber || 1,
+          pageSize: response.pageSize || 10,
+          totalPages: response.totalPages || 0
+        };
+        return success(transformed);
+      }),
       catchError(error => of(failure<EmployeesResponse>(error)))
     );
   }
@@ -44,11 +55,11 @@ export class EmployeeService {
     );
   }
 
-  // Criar novo funcionário
-  create(request: CreateEmployeeRequest): Observable<Result<Employee>> {
-    return this.http.post<Employee>(this.apiUrl, request).pipe(
+  // Criar novo funcionário (retorna CreateEmployeeResponse com credenciais)
+  create(request: CreateEmployeeRequest): Observable<Result<CreateEmployeeResponse>> {
+    return this.http.post<CreateEmployeeResponse>(this.apiUrl, request).pipe(
       map(employee => success(employee)),
-      catchError(error => of(failure<Employee>(error)))
+      catchError(error => of(failure<CreateEmployeeResponse>(error)))
     );
   }
 

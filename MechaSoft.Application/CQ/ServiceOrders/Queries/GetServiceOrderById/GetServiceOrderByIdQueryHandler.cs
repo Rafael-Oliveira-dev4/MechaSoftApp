@@ -32,6 +32,50 @@ public class GetServiceOrderByIdQueryHandler : IRequestHandler<GetServiceOrderBy
             ? serviceOrder.Mechanic ?? await _unitOfWork.EmployeeRepository.GetByIdAsync(serviceOrder.MechanicId.Value)
             : null;
 
+        // Map ServiceItems to DTOs
+        var serviceDtos = new List<ServiceItemDto>();
+        foreach (var serviceItem in serviceOrder.Services)
+        {
+            var service = serviceItem.Service ?? await _unitOfWork.ServiceRepository.GetByIdAsync(serviceItem.ServiceId);
+            var serviceMechanic = serviceItem.MechanicId.HasValue
+                ? serviceItem.Mechanic ?? await _unitOfWork.EmployeeRepository.GetByIdAsync(serviceItem.MechanicId.Value)
+                : null;
+
+            serviceDtos.Add(new ServiceItemDto(
+                serviceItem.Id,
+                serviceItem.ServiceId,
+                service?.Name ?? "Unknown",
+                serviceItem.Quantity,
+                serviceItem.EstimatedHours,
+                serviceItem.UnitPrice.Amount,
+                serviceItem.DiscountPercentage,
+                serviceItem.TotalPrice.Amount,
+                serviceItem.Status.ToString(),
+                serviceItem.MechanicId,
+                serviceMechanic?.Name.FullName
+            ));
+        }
+
+        // Map PartItems to DTOs (PartItem usa chave composta, não tem Id único)
+        var partDtos = new List<PartItemDto>();
+        if (serviceOrder.Parts != null && serviceOrder.Parts.Count > 0)
+        {
+            foreach (var partItem in serviceOrder.Parts)
+            {
+                var part = partItem.Part ?? await _unitOfWork.PartRepository.GetByIdAsync(partItem.PartId);
+
+                partDtos.Add(new PartItemDto(
+                    partItem.PartId,
+                    part?.Name ?? "Unknown",
+                    part?.Code ?? "N/A",
+                    partItem.Quantity,
+                    partItem.UnitPrice.Amount,
+                    partItem.DiscountPercentage,
+                    partItem.TotalPrice.Amount
+                ));
+            }
+        }
+
         var response = new ServiceOrderResponse(
             serviceOrder.Id,
             serviceOrder.OrderNumber,
@@ -52,7 +96,9 @@ public class GetServiceOrderByIdQueryHandler : IRequestHandler<GetServiceOrderBy
             serviceOrder.RequiresInspection,
             serviceOrder.InternalNotes,
             serviceOrder.CreatedAt ?? DateTime.UtcNow,
-            serviceOrder.UpdatedAt
+            serviceOrder.UpdatedAt,
+            serviceDtos,
+            partDtos
         );
 
         return response;

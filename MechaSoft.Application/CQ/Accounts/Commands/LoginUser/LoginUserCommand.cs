@@ -16,5 +16,8 @@ public record LoginUserResponse(
     UserRole Role,
     string AccessToken,
     string RefreshToken,
-    DateTime ExpiresAt
+    DateTime ExpiresAt,
+    Guid? CustomerId,
+    Guid? EmployeeId,
+    string? ProfileImageUrl
 );

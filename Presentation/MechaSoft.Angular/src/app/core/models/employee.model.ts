@@ -49,3 +49,9 @@ export interface EmployeesResponse {
   totalPages: number;
 }
 
+// Response DTO para criação de Employee (inclui credenciais auto-geradas)
+export interface CreateEmployeeResponse extends Employee {
+  generatedUsername?: string;  // Username auto-gerado
+  generatedPassword?: string;  // Senha temporária (retornada apenas uma vez)
+}
+

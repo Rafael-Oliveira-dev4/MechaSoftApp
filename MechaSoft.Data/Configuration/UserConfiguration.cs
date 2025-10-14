@@ -33,7 +33,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .HasMaxLength(255);
 
         builder.Property(u => u.Salt)
-            .IsRequired()
+            .IsRequired(false)
             .HasMaxLength(50);
 
         builder.Property(u => u.Role)

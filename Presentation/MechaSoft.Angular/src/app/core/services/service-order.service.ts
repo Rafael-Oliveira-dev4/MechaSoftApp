@@ -6,6 +6,21 @@ import { ApiConfigService } from './api-config.service';
 import { Result, success, failure, CommonErrors } from '../models/result.model';
 import { ServiceOrder, CreateServiceOrderRequest } from '../models/api.models';
 
+// Request DTOs para adicionar services/parts a ordens
+export interface AddServiceToOrderRequest {
+  serviceId: string;
+  quantity: number;
+  estimatedHours: number;
+  discountPercentage?: number;
+  mechanicId?: string;
+}
+
+export interface AddPartToOrderRequest {
+  partId: string;
+  quantity: number;
+  discountPercentage?: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -34,7 +49,17 @@ export class ServiceOrderService {
     if (customerId) params = params.set('customerId', customerId);
 
     return this.http.get<any>(this.apiUrl, { params }).pipe(
-      map(response => success(response)),
+      map(response => {
+        // Transform backend response to match frontend interface
+        const transformed = {
+          items: response.serviceOrders || [],
+          totalCount: response.totalCount || 0,
+          pageNumber: response.pageNumber || 1,
+          pageSize: response.pageSize || 10,
+          totalPages: response.totalPages || 0
+        };
+        return success(transformed);
+      }),
       catchError(error => of(failure<any>(error)))
     );
   }
@@ -56,34 +81,34 @@ export class ServiceOrderService {
   }
 
   // Atualizar estado da ordem
-  updateStatus(id: string, newStatus: string): Observable<Result<void>> {
-    return this.http.patch<void>(`${this.apiUrl}/${id}/status`, { status: newStatus }).pipe(
-      map(() => success(undefined)),
-      catchError(error => of(failure<void>(error)))
+  updateStatus(id: string, status: string, notes?: string): Observable<Result<any>> {
+    return this.http.put<any>(`${this.apiUrl}/${id}/status`, { status, notes: notes || null }).pipe(
+      map(response => success(response)),
+      catchError(error => of(failure<any>(error)))
     );
   }
 
   // Atribuir mecânico à ordem
-  assignMechanic(orderId: string, mechanicId: string): Observable<Result<void>> {
-    return this.http.patch<void>(`${this.apiUrl}/${orderId}/assign-mechanic`, { mechanicId }).pipe(
-      map(() => success(undefined)),
-      catchError(error => of(failure<void>(error)))
+  assignMechanic(orderId: string, mechanicId: string): Observable<Result<any>> {
+    return this.http.put<any>(`${this.apiUrl}/${orderId}/mechanic`, { mechanicId }).pipe(
+      map(response => success(response)),
+      catchError(error => of(failure<any>(error)))
     );
   }
 
   // Adicionar serviço à ordem
-  addService(orderId: string, serviceId: string, quantity: number): Observable<Result<void>> {
-    return this.http.post<void>(`${this.apiUrl}/${orderId}/services`, { serviceId, quantity }).pipe(
-      map(() => success(undefined)),
-      catchError(error => of(failure<void>(error)))
+  addService(orderId: string, request: AddServiceToOrderRequest): Observable<Result<any>> {
+    return this.http.post<any>(`${this.apiUrl}/${orderId}/services`, request).pipe(
+      map(response => success(response)),
+      catchError(error => of(failure<any>(error)))
     );
   }
 
   // Adicionar peça à ordem
-  addPart(orderId: string, partId: string, quantity: number): Observable<Result<void>> {
-    return this.http.post<void>(`${this.apiUrl}/${orderId}/parts`, { partId, quantity }).pipe(
-      map(() => success(undefined)),
-      catchError(error => of(failure<void>(error)))
+  addPart(orderId: string, request: AddPartToOrderRequest): Observable<Result<any>> {
+    return this.http.post<any>(`${this.apiUrl}/${orderId}/parts`, request).pipe(
+      map(response => success(response)),
+      catchError(error => of(failure<any>(error)))
     );
   }
 

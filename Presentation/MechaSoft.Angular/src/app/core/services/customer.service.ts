@@ -36,8 +36,18 @@ export class CustomerService {
       if (params.sortDescending !== undefined) httpParams = httpParams.set('sortDescending', params.sortDescending.toString());
     }
 
-    return this.http.get<PaginatedResponse<Customer>>(this.apiUrl, { params: httpParams }).pipe(
-      map(response => success(response)),
+    return this.http.get<any>(this.apiUrl, { params: httpParams }).pipe(
+      map(response => {
+        // Transform backend response to PaginatedResponse
+        const transformed: PaginatedResponse<Customer> = {
+          items: response.customers || [],
+          totalCount: response.totalCount || 0,
+          pageNumber: response.pageNumber || 1,
+          pageSize: response.pageSize || 10,
+          totalPages: response.totalPages || 0
+        };
+        return success(transformed);
+      }),
       catchError(error => of(failure<PaginatedResponse<Customer>>(error)))
     );
   }
@@ -85,4 +95,40 @@ export class CustomerService {
       })
     );
   }
+
+  // Completar perfil de cliente
+  completeProfile(request: CompleteCustomerProfileRequest): Observable<Result<CompleteCustomerProfileResponse>> {
+    return this.http.post<CompleteCustomerProfileResponse>(`${this.apiUrl}/complete-profile`, request).pipe(
+      map(response => success(response)),
+      catchError(error => of(failure<CompleteCustomerProfileResponse>(error)))
+    );
+  }
+}
+
+// Request/Response types for complete profile
+export interface CompleteCustomerProfileRequest {
+  userId: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  type: string; // 'Individual' or 'Company'
+  street: string;
+  number: string;
+  parish: string;
+  municipality: string;
+  district: string;
+  postalCode: string;
+  complement?: string;
+  nif?: string;
+  citizenCard?: string;
+}
+
+export interface CompleteCustomerProfileResponse {
+  customerId: string;
+  fullName: string;
+  email: string;
+  phone: string;
+  type: string;
+  nif?: string;
+  createdAt: string;
 }

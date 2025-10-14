@@ -1,0 +1,324 @@
+<div class="dashboard-container">
+  <!-- Background effects -->
+  <div class="absolute inset-0 pointer-events-none overflow-hidden">
+    <div class="absolute top-1/4 left-1/4 h-96 w-96 rounded-full bg-emerald-500/10 blur-3xl animate-float"></div>
+    <div
+      class="absolute bottom-1/4 right-1/4 h-80 w-80 rounded-full bg-teal-500/10 blur-3xl animate-float"
+      style="animation-delay: 2s"
+    ></div>
+  </div>
+
+  <app-error-message [error]="error" (onClose)="error = null"></app-error-message>
+
+  <!-- Header -->
+  <div class="dashboard-header">
+    <div>
+      <h1 class="title">
+        <span class="bg-gradient-to-r from-emerald-400 to-teal-600 bg-clip-text text-transparent">Dashboard Administrativo</span>
+      </h1>
+      <p class="subtitle">Visão geral da oficina</p>
+    </div>
+    <button (click)="refresh()" class="btn-refresh group">
+      <svg
+        class="icon group-hover:rotate-180 transition-transform duration-500"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+        />
+      </svg>
+      <span>Atualizar</span>
+    </button>
+  </div>
+
+  <!-- Loading Skeleton -->
+  @if (!stats && !error) {
+  <div class="stats-grid">
+    @for (i of [1,2,3,4]; track i) {
+    <div class="stat-card skeleton-card">
+      <div class="skeleton-icon"></div>
+      <div class="skeleton-content">
+        <div class="skeleton-line skeleton-title"></div>
+        <div class="skeleton-line skeleton-value"></div>
+        <div class="skeleton-line skeleton-detail"></div>
+      </div>
+    </div>
+    }
+  </div>
+  }
+
+  @if (stats) {
+  <!-- Stats Cards Grid - Admin -->
+  <div class="stats-grid">
+    <!-- Card 1: Total Clientes -->
+    <div class="stat-card card-emerald">
+      <div class="card-glow"></div>
+      <div class="stat-icon-container">
+        <div class="stat-icon-bg bg-gradient-to-br from-emerald-500 to-teal-600">
+          <svg class="stat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+            />
+          </svg>
+        </div>
+      </div>
+      <div class="stat-content">
+        <h3 class="stat-title">Total Clientes</h3>
+        <p class="stat-value">{{ animatedTotalCustomers }}</p>
+        <p class="text-sm text-emerald-400 mt-2">{{ stats.activeCustomers }} ativos</p>
+      </div>
+    </div>
+
+    <!-- Card 2: Ordens de Serviço -->
+    <div class="stat-card card-blue">
+      <div class="card-glow"></div>
+      <div class="stat-icon-container">
+        <div class="stat-icon-bg bg-gradient-to-br from-blue-500 to-cyan-600">
+          <svg class="stat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+            />
+          </svg>
+        </div>
+      </div>
+      <div class="stat-content">
+        <h3 class="stat-title">Ordens de Serviço</h3>
+        <p class="stat-value">{{ animatedTotalOrders }}</p>
+        <div class="stat-details mt-3">
+          <div class="stat-detail-item">
+            <span class="badge badge-yellow">{{ stats.serviceOrders.pending }}</span>
+            <span class="badge-label">Pendentes</span>
+          </div>
+          <div class="stat-detail-item">
+            <span class="badge badge-blue">{{ stats.serviceOrders.inProgress }}</span>
+            <span class="badge-label">Em Curso</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 3: Peças em Stock -->
+    <div class="stat-card card-purple">
+      <div class="card-glow"></div>
+      <div class="stat-icon-container">
+        <div class="stat-icon-bg bg-gradient-to-br from-violet-500 to-purple-600">
+          <svg class="stat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+            />
+          </svg>
+        </div>
+      </div>
+      <div class="stat-content">
+        <h3 class="stat-title">Peças em Stock</h3>
+        <p class="stat-value">{{ stats.parts.totalParts }}</p>
+        <div class="stat-details mt-3">
+          <div class="stat-detail-item">
+            <span class="badge badge-red">{{ animatedLowStockCount }}</span>
+            <span class="badge-label">Stock Baixo</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 4: Valor do Inventário -->
+    <div class="stat-card card-amber">
+      <div class="card-glow"></div>
+      <div class="stat-icon-container">
+        <div class="stat-icon-bg bg-gradient-to-br from-amber-500 to-orange-600">
+          <svg class="stat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+        </div>
+      </div>
+      <div class="stat-content">
+        <h3 class="stat-title">Valor Inventário</h3>
+        <p class="stat-value text-amber-400">{{ formatCurrency(animatedInventoryValue) }}</p>
+        <p class="text-xs text-zinc-400 mt-2">Total em peças</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Peças com Stock Baixo (Crítico) -->
+  @if (stats.parts.criticalLowStock && stats.parts.criticalLowStock.length > 0) {
+  <div class="section-card fade-in-up mt-8">
+    <div class="section-header">
+      <h2 class="section-title">
+        <svg class="section-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+          />
+        </svg>
+        Peças com Stock Crítico
+      </h2>
+      <span class="section-badge badge-red">{{ stats.parts.criticalLowStock.length }} peças</span>
+    </div>
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>Nome da Peça</th>
+            <th class="text-center">Stock Atual</th>
+            <th class="text-center">Stock Mínimo</th>
+            <th class="text-center">Déficit</th>
+            <th class="text-center">Urgência</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (part of stats.parts.criticalLowStock; track part.partId) {
+          <tr class="table-row hover:bg-zinc-800/50 transition-colors">
+            <td class="font-mono text-emerald-400 font-semibold">{{ part.code }}</td>
+            <td class="font-medium text-zinc-200">{{ part.name }}</td>
+            <td class="text-center">
+              <span class="badge badge-red">{{ part.currentStock }}</span>
+            </td>
+            <td class="text-center text-zinc-400">{{ part.minStock }}</td>
+            <td class="text-center">
+              <span class="badge badge-red font-semibold">-{{ part.deficit }}</span>
+            </td>
+            <td class="text-center">
+              @if (part.deficit >= 8) {
+                <span class="badge badge-red">🔴 Crítico</span>
+              } @else if (part.deficit >= 4) {
+                <span class="badge badge-yellow">⚠️ Alto</span>
+              } @else {
+                <span class="badge badge-blue">ℹ️ Médio</span>
+              }
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+  }
+
+  <!-- Resumo Estatísticas -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+    <!-- Receita do Mês -->
+    <div class="section-card fade-in-up">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        </div>
+        <div>
+          <p class="text-sm text-zinc-400">Receita do Mês</p>
+          <p class="text-2xl font-bold text-green-400">{{ formatCurrency(stats.monthRevenue) }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Receita Hoje -->
+    <div class="section-card fade-in-up">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+          </svg>
+        </div>
+        <div>
+          <p class="text-sm text-zinc-400">Receita Hoje</p>
+          <p class="text-2xl font-bold text-blue-400">{{ formatCurrency(stats.todayRevenue) }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Total Veículos -->
+    <div class="section-card fade-in-up">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+          </svg>
+        </div>
+        <div>
+          <p class="text-sm text-zinc-400">Total Veículos</p>
+          <p class="text-2xl font-bold text-purple-400">{{ stats.totalVehicles }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Equipa -->
+  <div class="section-card fade-in-up mt-8">
+    <div class="section-header">
+      <h2 class="section-title">
+        <svg class="section-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+          />
+        </svg>
+        Equipa
+      </h2>
+      <span class="section-badge">{{ stats.totalEmployees }} funcionários</span>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-6">
+      <div class="flex items-center gap-4">
+        <div class="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center">
+          <span class="text-2xl font-bold text-white">{{ stats.totalEmployees }}</span>
+        </div>
+        <div>
+          <p class="text-lg font-semibold text-zinc-200">Total de Funcionários</p>
+          <p class="text-sm text-zinc-400">Toda a equipa</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-4">
+        <div class="w-16 h-16 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
+          <span class="text-2xl font-bold text-white">{{ stats.activeMechanics }}</span>
+        </div>
+        <div>
+          <p class="text-lg font-semibold text-zinc-200">Mecânicos Ativos</p>
+          <p class="text-sm text-zinc-400">Prontos para trabalhar</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  } <!-- End if stats -->
+
+  <!-- Empty State -->
+  @if (!stats && error) {
+  <div class="empty-state">
+    <svg class="empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+    </svg>
+    <h3 class="empty-title">Não foi possível carregar os dados</h3>
+    <p class="empty-description">Ocorreu um erro ao tentar obter as estatísticas do sistema.</p>
+    <button (click)="refresh()" class="btn-refresh">
+      <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+      </svg>
+      <span>Tentar Novamente</span>
+    </button>
+  </div>
+  }
+</div>
+

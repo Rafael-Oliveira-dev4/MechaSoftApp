@@ -1,0 +1,32 @@
+<div 
+  [class]="hasCustomerProfile ? 'stat-item stat-green' : 'stat-item stat-yellow clickable'"
+  (click)="handleClick()"
+  [attr.role]="hasCustomerProfile ? null : 'button'"
+  [attr.tabindex]="hasCustomerProfile ? null : '0'">
+  <div class="stat-icon-container">
+    @if (hasCustomerProfile) {
+    <svg class="stat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+      />
+    </svg>
+    } @else {
+    <svg class="stat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+      />
+    </svg>
+    }
+  </div>
+  <div class="stat-content">
+    <p class="stat-label">Perfil de Cliente</p>
+    <p class="stat-value">{{ hasCustomerProfile ? 'Completo' : 'Pendente' }}</p>
+  </div>
+</div>
+

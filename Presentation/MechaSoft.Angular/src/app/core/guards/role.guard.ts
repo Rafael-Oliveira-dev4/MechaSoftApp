@@ -23,6 +23,11 @@ export const roleGuard: CanActivateFn = (route, state) => {
   }
 
   // Verificar se user tem role permitida
+  if (!currentUser.role) {
+    router.navigate(['/dashboard']);
+    return false;
+  }
+  
   const hasRole = allowedRoles.includes(currentUser.role);
   
   if (!hasRole) {

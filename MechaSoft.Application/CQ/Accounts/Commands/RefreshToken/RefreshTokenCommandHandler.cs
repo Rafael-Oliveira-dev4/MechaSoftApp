@@ -6,6 +6,7 @@ using MechaSoft.Domain.Model;
 using MechaSoft.Security.Interfaces;
 using Microsoft.Extensions.Logging;
 using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace MechaSoft.Application.CQ.Accounts.Commands.RefreshToken;
 
@@ -24,22 +25,27 @@ public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, R
 
     public async Task<Result<RefreshTokenResponse, Success, Error>> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
     {
-        // Get principal from expired token
-        var principal = _unitOfWork.TokenService.GetPrincipalFromExpiredToken(request.AccessToken);
-        if (principal == null)
+        // Extract userId directly from JWT without validation (we validate refresh token against DB next)
+        Guid userId;
+        try
         {
-            _logger.LogWarning("Invalid access token provided for refresh");
+            var jwt = new JwtSecurityToken(request.AccessToken);
+            var userIdValue = jwt.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier
+                || c.Type == JwtRegisteredClaimNames.NameId
+                || c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
+
+            if (string.IsNullOrWhiteSpace(userIdValue) || !Guid.TryParse(userIdValue, out userId))
+            {
+                _logger.LogWarning("Invalid user ID in access token");
+                return Error.InvalidToken;
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to parse access token for refresh");
             return Error.InvalidToken;
         }
-
-        // Get user ID from claims
-        var userIdClaim = principal.FindFirst(ClaimTypes.NameIdentifier);
-        if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
-        {
-            _logger.LogWarning("Invalid user ID in access token");
-            return Error.InvalidToken;
-        }
-
+        
         // Get user
         var user = await _unitOfWork.UserRepository.GetByIdAsync(userId);
         if (user == null)

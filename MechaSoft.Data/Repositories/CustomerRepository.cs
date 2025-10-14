@@ -43,7 +43,8 @@ public class CustomerRepository : Repository<Customer>, ICustomerRepository
             throw new ArgumentException("Name cannot be null or empty", nameof(name));
         
         return await _dbSet
-            .Where(c => c.Name.FirstName.Contains(name) || c.Name.LastName.Contains(name))
+            .Where(c => c.Name.FirstName.Contains(name) || 
+                       (!string.IsNullOrEmpty(c.Name.LastName) && c.Name.LastName.Contains(name)))
             .ToListAsync();
     }
     public override async Task<Customer> UpdateAsync(Customer customer)
@@ -99,7 +100,7 @@ public class CustomerRepository : Repository<Customer>, ICustomerRepository
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
             query = query.Where(c => c.Name.FirstName.Contains(searchTerm) || 
-                                     c.Name.LastName.Contains(searchTerm) ||
+                                     (!string.IsNullOrEmpty(c.Name.LastName) && c.Name.LastName.Contains(searchTerm)) ||
                                      c.Email.Contains(searchTerm) ||
                                      c.Phone.Contains(searchTerm));
         }

@@ -1,0 +1,484 @@
+<div class="orders-container">
+  <app-error-message [error]="error" (onClose)="error = null"></app-error-message>
+
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="title">As Minhas Ordens de Serviço</h1>
+      <p class="subtitle">Acompanhe o estado dos seus serviços</p>
+    </div>
+    <div class="header-info">
+      <span class="order-count">{{ totalCount }} {{ totalCount === 1 ? 'ordem' : 'ordens' }}</span>
+    </div>
+  </div>
+
+  <!-- Status Filters -->
+  <div class="status-filters">
+    <button (click)="filterByStatus('')" [class.active]="statusFilter === ''" class="filter-btn">
+      Todas
+    </button>
+    @for (status of statuses; track status.value) {
+      <button 
+        (click)="filterByStatus(status.value)" 
+        [class.active]="statusFilter === status.value"
+        class="filter-btn"
+      >
+        <span [class]="'badge badge-' + status.color">{{ status.label }}</span>
+      </button>
+    }
+  </div>
+
+  <!-- Orders Table -->
+  <div class="table-card">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Nº Ordem</th>
+          <th>Veículo</th>
+          <th>Serviço</th>
+          <th>Estado</th>
+          <th>Data Prevista</th>
+          <th>Valor</th>
+          <th class="text-right">Detalhes</th>
+        </tr>
+      </thead>
+      <tbody>
+        @if (orders.length === 0) {
+          <tr>
+            <td colspan="7" class="text-center py-8">
+              <div class="empty-state">
+                <svg class="empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                </svg>
+                <p class="empty-title">Nenhuma ordem encontrada</p>
+                <p class="empty-subtitle">Ainda não tem ordens de serviço registadas</p>
+              </div>
+            </td>
+          </tr>
+        }
+        
+        @for (order of orders; track order.id) {
+          <tr class="order-row">
+            <td class="font-mono font-bold text-teal-400">{{ order.orderNumber }}</td>
+            <td class="vehicle-info">
+              <span class="vehicle-plate">{{ order.vehiclePlate }}</span>
+              <span class="vehicle-model">{{ order.vehicleInfo }}</span>
+            </td>
+            <td class="service-desc">{{ order.description }}</td>
+            <td>
+              <span [class]="'badge badge-' + getStatusColor(order.status)">
+                {{ getStatusLabel(order.status) }}
+              </span>
+            </td>
+            <td class="date-cell">
+              @if (order.status === 'Completed' && order.actualDelivery) {
+                <span class="completed-date">{{ order.actualDelivery | date: 'dd/MM/yyyy HH:mm' }}</span>
+              } @else {
+                {{ order.estimatedDelivery | date: 'dd/MM/yyyy HH:mm' }}
+              }
+            </td>
+            <td class="cost-cell">
+              @if (order.finalCost && order.finalCost > 0) {
+                <div class="cost-breakdown">
+                  <span class="final-cost">{{ formatCurrency(order.finalCost) }}</span>
+                  @if (order.finalCost !== order.estimatedCost) {
+                    <span class="estimated-cost">Est: {{ formatCurrency(order.estimatedCost) }}</span>
+                  }
+                </div>
+              } @else {
+                <span class="estimated-label">{{ formatCurrency(order.estimatedCost) }}</span>
+              }
+            </td>
+            <td class="text-right">
+              <button (click)="viewDetails(order)" class="btn-icon btn-view" title="Ver Detalhes">
+                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                </svg>
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+  </div>
+
+  <!-- Modal Details -->
+  @if (showDetailsModal && selectedOrder) {
+    <div class="modal-overlay" (click)="closeDetailsModal()">
+      <div class="modal-content modal-large" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <div>
+            <h2 class="modal-title">Ordem {{ selectedOrder.orderNumber }}</h2>
+            <p class="text-sm text-zinc-400">{{ selectedOrder.vehicleInfo }} - {{ selectedOrder.vehiclePlate }}</p>
+          </div>
+          <button (click)="closeDetailsModal()" class="btn-close">
+            <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <!-- Informações Principais -->
+          <div class="detail-section">
+            <h3 class="detail-section-title">Informações do Serviço</h3>
+            <div class="detail-info-grid">
+              <!-- Estado: Dropdown para Admin/Owner, Badge para Customer -->
+              <div class="detail-item">
+                <span class="detail-label">Estado:</span>
+                @if (canManageOrders()) {
+                  <select 
+                    [value]="selectedOrder.status" 
+                    (change)="changeOrderStatus(selectedOrder, $any($event.target).value)"
+                    class="form-input inline-select">
+                    @for (status of statuses; track status.value) {
+                      <option [value]="status.value">{{ status.label }}</option>
+                    }
+                  </select>
+                } @else {
+                  <span [class]="'badge badge-' + getStatusColor(selectedOrder.status)">
+                    {{ getStatusLabel(selectedOrder.status) }}
+                  </span>
+                }
+              </div>
+              
+              <div class="detail-item">
+                <span class="detail-label">Data de Criação:</span>
+                <span class="detail-value">{{ selectedOrder.createdAt | date: 'dd/MM/yyyy HH:mm' }}</span>
+              </div>
+
+              <!-- Mecânico: Dropdown para Admin/Owner, Display para Customer -->
+              <div class="detail-item">
+                <span class="detail-label">Mecânico Responsável:</span>
+                @if (canManageOrders()) {
+                  <select 
+                    [value]="selectedOrder.mechanicId || ''" 
+                    (change)="assignMechanicToOrder(selectedOrder, $any($event.target).value)"
+                    class="form-input inline-select">
+                    <option value="">Sem mecânico atribuído</option>
+                    @for (mechanic of mechanics; track mechanic.id) {
+                      <option [value]="mechanic.id">{{ mechanic.fullName }}</option>
+                    }
+                  </select>
+                } @else {
+                  <span class="detail-value">{{ selectedOrder.mechanicName || 'Não atribuído' }}</span>
+                }
+              </div>
+
+              <div class="detail-item">
+                <span class="detail-label">Data Prevista:</span>
+                <span class="detail-value">{{ selectedOrder.estimatedDelivery | date: 'dd/MM/yyyy HH:mm' }}</span>
+              </div>
+
+              @if (selectedOrder.actualDelivery) {
+                <div class="detail-item">
+                  <span class="detail-label">Data de Conclusão:</span>
+                  <span class="detail-value text-emerald-400">{{ selectedOrder.actualDelivery | date: 'dd/MM/yyyy HH:mm' }}</span>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Descrição -->
+          <div class="detail-section">
+            <h3 class="detail-section-title">Descrição do Serviço</h3>
+            <p class="service-description">{{ selectedOrder.description }}</p>
+          </div>
+
+          <!-- Serviços Adicionados -->
+          @if (selectedOrder.services && selectedOrder.services.length > 0) {
+            <div class="detail-section">
+              <h3 class="detail-section-title">Serviços</h3>
+              <div class="overflow-x-auto">
+                <table class="w-full">
+                  <thead class="bg-slate-800/50">
+                    <tr>
+                      <th class="px-4 py-3 text-left text-xs font-semibold text-zinc-300 uppercase">Serviço</th>
+                      <th class="px-4 py-3 text-center text-xs font-semibold text-zinc-300 uppercase">Qtd</th>
+                      <th class="px-4 py-3 text-center text-xs font-semibold text-zinc-300 uppercase">Horas Est.</th>
+                      <th class="px-4 py-3 text-right text-xs font-semibold text-zinc-300 uppercase">Preço Unit.</th>
+                      <th class="px-4 py-3 text-center text-xs font-semibold text-zinc-300 uppercase">Desc.%</th>
+                      <th class="px-4 py-3 text-right text-xs font-semibold text-zinc-300 uppercase">Total</th>
+                      <th class="px-4 py-3 text-center text-xs font-semibold text-zinc-300 uppercase">Estado</th>
+                      @if (canManageOrders()) {
+                        <th class="px-4 py-3 text-center text-xs font-semibold text-zinc-300 uppercase">Mecânico</th>
+                      }
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (service of selectedOrder.services; track service.id) {
+                      <tr class="border-b border-slate-800/50 hover:bg-slate-800/30 transition-colors">
+                        <td class="px-4 py-3 text-sm text-white">{{ service.serviceName }}</td>
+                        <td class="px-4 py-3 text-center text-sm text-zinc-300">{{ service.quantity }}</td>
+                        <td class="px-4 py-3 text-center text-sm text-zinc-300">{{ service.estimatedHours }}h</td>
+                        <td class="px-4 py-3 text-right text-sm text-zinc-300">{{ formatCurrency(service.unitPrice) }}</td>
+                        <td class="px-4 py-3 text-center text-sm text-emerald-400">{{ service.discountPercentage || 0 }}%</td>
+                        <td class="px-4 py-3 text-right text-sm font-semibold text-white">{{ formatCurrency(service.totalPrice) }}</td>
+                        <td class="px-4 py-3 text-center">
+                          <span [class]="'badge badge-' + getServiceStatusColor(service.status)">{{ service.status }}</span>
+                        </td>
+                        @if (canManageOrders()) {
+                          <td class="px-4 py-3 text-center text-xs text-zinc-400">{{ service.mechanicName || '-' }}</td>
+                        }
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          }
+
+          <!-- Peças Adicionadas -->
+          @if (selectedOrder.parts && selectedOrder.parts.length > 0) {
+            <div class="detail-section">
+              <h3 class="detail-section-title">Peças</h3>
+              <div class="overflow-x-auto">
+                <table class="w-full">
+                  <thead class="bg-slate-800/50">
+                    <tr>
+                      <th class="px-4 py-3 text-left text-xs font-semibold text-zinc-300 uppercase">Código</th>
+                      <th class="px-4 py-3 text-left text-xs font-semibold text-zinc-300 uppercase">Peça</th>
+                      <th class="px-4 py-3 text-center text-xs font-semibold text-zinc-300 uppercase">Qtd</th>
+                      <th class="px-4 py-3 text-right text-xs font-semibold text-zinc-300 uppercase">Preço Unit.</th>
+                      <th class="px-4 py-3 text-center text-xs font-semibold text-zinc-300 uppercase">Desc.%</th>
+                      <th class="px-4 py-3 text-right text-xs font-semibold text-zinc-300 uppercase">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (part of selectedOrder.parts; track part.partId) {
+                      <tr class="border-b border-slate-800/50 hover:bg-slate-800/30 transition-colors">
+                        <td class="px-4 py-3 text-sm font-mono text-emerald-400">{{ part.partCode }}</td>
+                        <td class="px-4 py-3 text-sm text-white">{{ part.partName }}</td>
+                        <td class="px-4 py-3 text-center text-sm text-zinc-300">{{ part.quantity }}</td>
+                        <td class="px-4 py-3 text-right text-sm text-zinc-300">{{ formatCurrency(part.unitPrice) }}</td>
+                        <td class="px-4 py-3 text-center text-sm text-emerald-400">{{ part.discountPercentage || 0 }}%</td>
+                        <td class="px-4 py-3 text-right text-sm font-semibold text-white">{{ formatCurrency(part.totalPrice) }}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          }
+
+          <!-- Valores -->
+          <div class="detail-section">
+            <h3 class="detail-section-title">Valores</h3>
+            <div class="cost-details">
+              <div class="cost-item">
+                <span class="cost-label">Valor Estimado:</span>
+                <span class="cost-value">{{ formatCurrency(selectedOrder.estimatedCost) }}</span>
+              </div>
+              
+              @if (selectedOrder.finalCost && selectedOrder.finalCost > 0) {
+                <div class="cost-item final">
+                  <span class="cost-label">Valor Final:</span>
+                  <span class="cost-value final-value">{{ formatCurrency(selectedOrder.finalCost) }}</span>
+                </div>
+                
+                @if (selectedOrder.finalCost !== selectedOrder.estimatedCost) {
+                  <div class="cost-item difference">
+                    <span class="cost-label">Diferença:</span>
+                    <span [class]="selectedOrder.finalCost > selectedOrder.estimatedCost ? 'cost-value text-red-400' : 'cost-value text-emerald-400'">
+                      {{ formatCurrency(selectedOrder.finalCost - selectedOrder.estimatedCost) }}
+                      ({{ selectedOrder.finalCost > selectedOrder.estimatedCost ? '+' : '' }}{{ ((selectedOrder.finalCost - selectedOrder.estimatedCost) / selectedOrder.estimatedCost * 100).toFixed(1) }}%)
+                    </span>
+                  </div>
+                }
+              }
+            </div>
+          </div>
+
+          <!-- Info Box -->
+          @if (selectedOrder.status === 'Pending') {
+            <div class="info-banner info">
+              <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <span>A sua ordem está pendente. Será processada em breve.</span>
+            </div>
+          }
+
+          @if (selectedOrder.status === 'InProgress') {
+            <div class="info-banner progress">
+              <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <span>O seu veículo está atualmente a ser trabalhado{{ selectedOrder.mechanicName ? ' por ' + selectedOrder.mechanicName : '' }}.</span>
+            </div>
+          }
+
+          @if (selectedOrder.status === 'Completed') {
+            <div class="info-banner success">
+              <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <span>Serviço concluído! O seu veículo está pronto para levantamento.</span>
+            </div>
+          }
+        </div>
+
+        <div class="modal-footer">
+          @if (canManageOrders()) {
+            <div class="flex gap-2">
+              <button (click)="openAddServiceModal(selectedOrder)" class="btn-secondary">
+                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                </svg>
+                Adicionar Serviço
+              </button>
+              <button (click)="openAddPartModal(selectedOrder)" class="btn-secondary">
+                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                </svg>
+                Adicionar Peça
+              </button>
+            </div>
+          }
+          <button (click)="closeDetailsModal()" class="btn-primary">Fechar</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Modal: Adicionar Serviço -->
+  @if (showAddServiceModal && selectedOrder) {
+    <div class="modal-overlay" (click)="closeAddServiceModal()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2 class="modal-title">Adicionar Serviço - {{ selectedOrder.orderNumber }}</h2>
+          <button (click)="closeAddServiceModal()" class="btn-close">
+            <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+
+        <form [formGroup]="addServiceForm" (ngSubmit)="submitAddService()">
+          <div class="modal-body">
+            @if (error) {
+              <app-error-message [error]="error"></app-error-message>
+            }
+
+            <div class="form-grid">
+              <!-- Serviço -->
+              <div class="form-group col-span-2">
+                <label for="serviceId">Serviço *</label>
+                <select id="serviceId" formControlName="serviceId" class="form-input">
+                  <option value="">Selecione um serviço</option>
+                  @for (service of availableServices; track service.id) {
+                    <option [value]="service.id">
+                      {{ service.name }} - {{ formatCurrency(service.basePrice) }}
+                    </option>
+                  }
+                </select>
+              </div>
+
+              <!-- Quantidade -->
+              <div class="form-group">
+                <label for="quantity">Quantidade *</label>
+                <input type="number" id="quantity" formControlName="quantity" class="form-input" min="1" />
+              </div>
+
+              <!-- Horas Estimadas -->
+              <div class="form-group">
+                <label for="estimatedHours">Horas Estimadas *</label>
+                <input type="number" id="estimatedHours" formControlName="estimatedHours" class="form-input" min="0.1" step="0.5" />
+              </div>
+
+              <!-- Desconto -->
+              <div class="form-group">
+                <label for="discountPercentage">Desconto (%)</label>
+                <input type="number" id="discountPercentage" formControlName="discountPercentage" class="form-input" min="0" max="100" />
+              </div>
+
+              <!-- Mecânico (opcional) -->
+              <div class="form-group">
+                <label for="mechanicId">Mecânico Responsável</label>
+                <select id="mechanicId" formControlName="mechanicId" class="form-input">
+                  <option value="">Atribuir depois</option>
+                  @for (mechanic of mechanics; track mechanic.id) {
+                    <option [value]="mechanic.id">{{ mechanic.fullName }}</option>
+                  }
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" (click)="closeAddServiceModal()" class="btn-secondary">Cancelar</button>
+            <button type="submit" class="btn-primary" [disabled]="addServiceForm.invalid">
+              <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+              </svg>
+              Adicionar Serviço
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  <!-- Modal: Adicionar Peça -->
+  @if (showAddPartModal && selectedOrder) {
+    <div class="modal-overlay" (click)="closeAddPartModal()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2 class="modal-title">Adicionar Peça - {{ selectedOrder.orderNumber }}</h2>
+          <button (click)="closeAddPartModal()" class="btn-close">
+            <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+
+        <form [formGroup]="addPartForm" (ngSubmit)="submitAddPart()">
+          <div class="modal-body">
+            @if (error) {
+              <app-error-message [error]="error"></app-error-message>
+            }
+
+            <div class="form-grid">
+              <!-- Peça -->
+              <div class="form-group col-span-2">
+                <label for="partId">Peça *</label>
+                <select id="partId" formControlName="partId" class="form-input">
+                  <option value="">Selecione uma peça</option>
+                  @for (part of availableParts; track part.id) {
+                    <option [value]="part.id">
+                      {{ part.name }} ({{ part.code }}) - Stock: {{ part.stockQuantity }} - {{ formatCurrency(part.salePrice) }}
+                    </option>
+                  }
+                </select>
+              </div>
+
+              <!-- Quantidade -->
+              <div class="form-group">
+                <label for="partQuantity">Quantidade *</label>
+                <input type="number" id="partQuantity" formControlName="quantity" class="form-input" min="1" />
+              </div>
+
+              <!-- Desconto -->
+              <div class="form-group">
+                <label for="partDiscountPercentage">Desconto (%)</label>
+                <input type="number" id="partDiscountPercentage" formControlName="discountPercentage" class="form-input" min="0" max="100" />
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" (click)="closeAddPartModal()" class="btn-secondary">Cancelar</button>
+            <button type="submit" class="btn-primary" [disabled]="addPartForm.invalid">
+              <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+              </svg>
+              Adicionar Peça
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+</div>

@@ -1,0 +1,65 @@
+.stat-item {
+  @apply flex items-center gap-4 p-4 rounded-xl border transition-all hover:-translate-y-1 hover:shadow-lg;
+
+  &.clickable {
+    @apply cursor-pointer;
+    
+    &:hover {
+      @apply -translate-y-1 shadow-lg;
+    }
+
+    &:active {
+      @apply translate-y-0;
+    }
+  }
+
+  &.stat-green {
+    @apply bg-emerald-500/10 border-emerald-500/30;
+    
+    &:hover {
+      @apply shadow-emerald-500/25;
+    }
+  }
+
+  &.stat-yellow {
+    @apply bg-yellow-500/10 border-yellow-500/30;
+    
+    &:hover {
+      @apply shadow-yellow-500/25;
+    }
+    
+    &.clickable:hover {
+      @apply shadow-yellow-500/25 border-yellow-500/50;
+    }
+  }
+}
+
+.stat-icon-container {
+  @apply w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0;
+
+  .stat-green & {
+    @apply bg-gradient-to-br from-emerald-500 to-teal-600;
+  }
+
+  .stat-yellow & {
+    @apply bg-gradient-to-br from-yellow-500 to-amber-600;
+  }
+}
+
+.stat-icon {
+  @apply w-6 h-6 text-white;
+}
+
+.stat-content {
+  @apply flex-1;
+}
+
+.stat-label {
+  @apply text-sm text-zinc-400 mb-1;
+}
+
+.stat-value {
+  @apply text-lg text-white font-semibold;
+}
+
+

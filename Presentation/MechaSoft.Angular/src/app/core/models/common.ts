@@ -5,10 +5,12 @@ export interface NameModel {
 
 export interface AddressModel {
   street: string;
-  city: string;
-  state: string;
-  postalCode: string;
-  country: string;
+  number: string;
+  parish: string;        // Freguesia
+  municipality: string;  // Concelho
+  district: string;      // Distrito
+  postalCode: string;    // XXXX-XXX
+  complement?: string;   // Complemento (andar, porta, etc.)
 }
 
 export interface MoneyModel {
