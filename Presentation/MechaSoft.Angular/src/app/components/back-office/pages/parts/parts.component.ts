@@ -108,6 +108,7 @@ export class PartsComponent implements OnInit {
       category: part.category,
       unitCost: part.unitCost,
       salePrice: part.salePrice,
+      minStockLevel: part.minStockLevel,
       location: part.location,
       supplierName: part.supplierName
     });

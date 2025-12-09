@@ -39,16 +39,17 @@ export interface CreatePartRequest {
 }
 
 export interface UpdatePartRequest {
-  id: string;
-  code: string; // Backend espera 'code' não 'partNumber'
   name: string;
   description: string;
   brand: string;
   category: string;
   unitCost: number; // Custo unitário
   salePrice: number; // Preço de venda
+  minStockLevel: number;
   location: string;
   supplierName?: string; // Backend espera 'supplierName'
+  supplierContact?: string;
+  isActive?: boolean;
 }
 
 export interface UpdateStockRequest {
