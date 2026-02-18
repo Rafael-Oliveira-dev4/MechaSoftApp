@@ -89,7 +89,7 @@
         <dt>Descrição</dt>
         <dd>{{ form.get('description')?.value }}</dd>
         <dt>Prioridade</dt>
-        <dd>{{ priorities.find(p => p.value === form.get('priority')?.value)?.label }}</dd>
+        <dd>{{ priorityLabel }}</dd>
         <dt>Data preferida</dt>
         <dd>{{ formatDate(form.get('preferredDate')?.value) }}</dd>
         @if (form.get('observations')?.value) {

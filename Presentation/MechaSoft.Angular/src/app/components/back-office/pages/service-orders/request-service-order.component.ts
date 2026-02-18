@@ -86,6 +86,11 @@ export class RequestServiceOrderComponent implements OnInit {
     return id ? this.vehicles.find(v => v.id === id) : undefined;
   }
 
+  get priorityLabel(): string {
+    const value = this.form.get('priority')?.value;
+    return this.priorities.find(p => p.value === value)?.label ?? value ?? '—';
+  }
+
   nextStep(): void {
     if (this.step < this.maxStep) {
       this.step++;
