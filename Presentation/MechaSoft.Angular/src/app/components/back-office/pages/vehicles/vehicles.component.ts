@@ -58,7 +58,7 @@ export class VehiclesComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadVehicles();
-    this.loadCustomers(); // Owner/Admin precisa ver clientes para criar veículos
+    this.loadCustomers();
   }
 
   // Criar formulário com validações
