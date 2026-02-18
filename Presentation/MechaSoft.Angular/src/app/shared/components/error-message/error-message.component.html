@@ -1,0 +1,53 @@
+@if (error) {
+<div class="error-toast">
+  <!-- Glow effect -->
+  <div class="error-glow"></div>
+  
+  <div class="error-card">
+    <!-- Icon Section -->
+    <div class="error-icon-wrapper">
+      <div class="icon-glow"></div>
+      <div class="error-icon">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+          />
+        </svg>
+      </div>
+    </div>
+
+    <!-- Content Section -->
+    <div class="error-content">
+      <div class="error-header">
+        <h3 class="error-title">Ops! Algo correu mal</h3>
+        <button (click)="close()" class="close-button" aria-label="Fechar">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <p class="error-message">{{ error.message }}</p>
+
+      @if (error.code) {
+      <div class="error-meta">
+        <span class="error-code">Código: {{ error.code }}</span>
+        @if (error.statusCode) {
+        <span class="error-status">Status: {{ error.statusCode }}</span>
+        }
+      </div>
+      }
+    </div>
+
+    <!-- Progress bar for auto-dismiss -->
+    @if (autoDismiss) {
+    <div class="progress-bar">
+      <div class="progress-fill" [style.animation-duration.ms]="dismissTime"></div>
+    </div>
+    }
+  </div>
+</div>
+}

@@ -1,0 +1,196 @@
+using MechaSoft.Application.CQ.Parts.Commands.CreatePart;
+using MechaSoft.Application.CQ.Parts.Commands.UpdatePart;
+using MechaSoft.Application.CQ.Parts.Commands.UpdateStock;
+using MechaSoft.Application.CQ.Parts.Commands.TogglePartActive;
+using MechaSoft.Application.CQ.Parts.Queries.GetPartById;
+using MechaSoft.Application.CQ.Parts.Queries.GetParts;
+using MechaSoft.Application.Common.Responses;
+using MechaSoft.Domain.Model;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
+using MechaSoft.Application.CQ.Parts.Common;
+
+namespace MechaSoft.WebAPI.Endpoints;
+
+public static class PartEndpoints
+{
+    public static void RegisterPartEndpoints(this IEndpointRouteBuilder routes)
+    {
+        var parts = routes.MapGroup("api/parts").WithTags("Parts").RequireAuthorization();
+
+        // GET /api/parts - List parts with pagination
+        parts.MapGet("/", Queries.GetParts)
+             .WithName("GetParts")
+             .Produces<GetPartsResponse>(200)
+             .Produces<Error>(400);
+
+        // GET /api/parts/{id} - Get part by ID
+        parts.MapGet("/{id:guid}", Queries.GetPartById)
+             .WithName("GetPartById")
+             .Produces<PartResponse>(200)
+             .Produces<Error>(404);
+
+        // POST /api/parts - Create new part
+        parts.MapPost("/", Commands.CreatePart)
+             .WithName("CreatePart")
+             .Produces<CreatePartResponse>(201)
+             .Produces<Error>(400);
+
+        // PUT /api/parts/{id} - Update part details
+        parts.MapPut("/{id:guid}", Commands.UpdatePart)
+             .WithName("UpdatePart")
+             .Produces<UpdatePartResponse>(200)
+             .Produces<Error>(400)
+             .Produces<Error>(404);
+
+        // PUT /api/parts/{id}/stock - Update part stock
+        parts.MapPut("/{id:guid}/stock", Commands.UpdateStock)
+             .WithName("UpdatePartStock")
+             .Produces<UpdateStockResponse>(200)
+             .Produces<Error>(400);
+
+        // PATCH /api/parts/{id}/toggle-active - Toggle part active status
+        parts.MapPatch("/{id:guid}/toggle-active", Commands.ToggleActive)
+             .WithName("TogglePartActive")
+             .Produces<TogglePartActiveResponse>(200)
+             .Produces<Error>(400)
+             .Produces<Error>(404);
+    }
+
+    private static class Commands
+    {
+        public static async Task<Results<CreatedAtRoute<CreatePartResponse>, BadRequest<Error>>> CreatePart(
+            [FromServices] ISender sender,
+            [FromBody] CreatePartRequest request)
+        {
+            if (request == null)
+            {
+                return TypedResults.BadRequest(Error.InvalidInput);
+            }
+
+            var command = new CreatePartCommand(
+                request.Code,
+                request.Name,
+                request.Description,
+                request.Category,
+                request.Brand,
+                request.UnitCost,
+                request.SalePrice,
+                request.StockQuantity,
+                request.MinStockLevel,
+                request.SupplierName,
+                request.SupplierContact,
+                request.Location
+            );
+
+            var result = await sender.Send(command);
+
+            return result.IsSuccess
+                ? TypedResults.CreatedAtRoute(result.Value!, "GetPartById", new { id = result.Value!.Id })
+                : TypedResults.BadRequest(result.Error!);
+        }
+
+        public static async Task<Results<Ok<UpdatePartResponse>, BadRequest<Error>, NotFound<Error>>> UpdatePart(
+            [FromServices] ISender sender,
+            Guid id,
+            [FromBody] UpdatePartRequest request)
+        {
+            if (request == null)
+            {
+                return TypedResults.BadRequest(Error.InvalidInput);
+            }
+
+            var command = new UpdatePartCommand(
+                id,
+                request.Name,
+                request.Description,
+                request.Category,
+                request.Brand,
+                request.UnitCost,
+                request.SalePrice,
+                request.MinStockLevel,
+                request.SupplierName,
+                request.SupplierContact,
+                request.Location,
+                request.IsActive
+            );
+
+            var result = await sender.Send(command);
+
+            return result.IsSuccess
+                ? TypedResults.Ok(result.Value!)
+                : TypedResults.BadRequest(result.Error!);
+        }
+
+        public static async Task<Results<Ok<UpdateStockResponse>, BadRequest<Error>>> UpdateStock(
+            [FromServices] ISender sender,
+            Guid id,
+            [FromBody] UpdateStockRequest request)
+        {
+            if (request == null)
+            {
+                return TypedResults.BadRequest(Error.InvalidInput);
+            }
+
+            var command = new UpdateStockCommand(id, request.Quantity, request.MovementType, request.Reason);
+            var result = await sender.Send(command);
+
+            return result.IsSuccess
+                ? TypedResults.Ok(result.Value!)
+                : TypedResults.BadRequest(result.Error!);
+        }
+
+        public static async Task<Results<Ok<TogglePartActiveResponse>, BadRequest<Error>, NotFound<Error>>> ToggleActive(
+            [FromServices] ISender sender,
+            Guid id,
+            [FromBody] ToggleActiveRequest request)
+        {
+            if (request == null)
+            {
+                return TypedResults.BadRequest(Error.InvalidInput);
+            }
+
+            var command = new TogglePartActiveCommand(id, request.IsActive, request.Reason);
+            var result = await sender.Send(command);
+
+            return result.IsSuccess
+                ? TypedResults.Ok(result.Value!)
+                : TypedResults.BadRequest(result.Error!);
+        }
+    }
+
+    private static class Queries
+    {
+        public static async Task<Results<Ok<GetPartsResponse>, BadRequest<Error>>> GetParts(
+            [FromServices] ISender sender,
+            int pageNumber = 1,
+            int pageSize = 10,
+            string? category = null,
+            bool? isActive = null,
+            bool? lowStockOnly = null,
+            string? searchTerm = null)
+        {
+            var query = new GetPartsQuery(pageNumber, pageSize, category, isActive, lowStockOnly, searchTerm);
+            var result = await sender.Send(query);
+
+            return result.IsSuccess
+                ? TypedResults.Ok(result.Value!)
+                : TypedResults.BadRequest(result.Error!);
+        }
+
+        public static async Task<Results<Ok<PartResponse>, NotFound<Error>>> GetPartById(
+            [FromServices] ISender sender,
+            Guid id)
+        {
+            var query = new GetPartByIdQuery(id);
+            var result = await sender.Send(query);
+
+            return result.IsSuccess
+                ? TypedResults.Ok(result.Value!)
+                : TypedResults.NotFound(result.Error!);
+        }
+    }
+}
+

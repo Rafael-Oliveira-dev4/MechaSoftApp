@@ -1,0 +1,88 @@
+﻿################################################################################
+# .gitignore para projetos .NET, Visual Studio, Rider e VS Code
+################################################################################
+
+# Diretórios e arquivos de IDE
+.vs/
+.idea/
+.vscode/
+*.code-workspace
+*.sln.iml
+
+# Arquivos de usuário e configuração local
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.rsuser
+
+# Build, binários e cache
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+x64/
+x86/
+[Aa][Rr][Mm]/
+bld/
+artifacts/
+*.pdb
+*.cache
+*.tmp
+*.temp
+
+# Resultados de testes
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+
+# NuGet
+*.nupkg
+*.snupkg
+.nuget/
+packages/
+project.lock.json
+project.fragment.lock.json
+project.assets.json
+project.nuget.cache
+
+# Arquivos temporários e de backup
+*.bak
+*.backup
+*.log
+*.dbmdl
+*.mdf
+*.ldf
+*.rdl.data
+*.bkp
+*.sql
+Thumbs.db
+ehthumbs.db
+
+# Ferramentas de análise e plugins
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.dotCover
+*.ncrunch*
+.*crunch*.local.xml
+StyleCopReport.xml
+
+# Azure, publicação e deploy
+.publish/
+
+# Outros arquivos e diretórios locais
+.localhistory/
+ScaffoldingReadMe.txt
+$tf/
+*.vspscc
+*.vssscc
+
+# Arquivos específicos do projeto (exemplo: gerados pelo build)
+**/obj/
+**/bin/
+**/logs/
+**/artifacts/
+
+# Itens específicos do seu projeto (adicionados manualmente)
+# (Se necessário, mantenha entradas específicas para arquivos gerados que não devem ir para o repositório)

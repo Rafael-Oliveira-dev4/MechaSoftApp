@@ -1,0 +1,243 @@
+.parts-container {
+  @apply relative min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-4 md:p-6 overflow-y-auto;
+}
+
+// Background Grid Pattern
+.parts-container::before {
+  content: '';
+  @apply absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:50px_50px] pointer-events-none;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+// Low stock warning
+.low-stock-alert {
+  @apply relative bg-red-500/10 border border-red-500/30 rounded-2xl p-4 mb-6 z-10;
+  @apply flex items-center gap-3;
+  
+  svg {
+    @apply h-5 w-5 text-red-400;
+  }
+  
+  span {
+    @apply text-red-300 font-medium;
+  }
+}
+
+// Stock indicators
+.stock-indicator {
+  @apply inline-flex items-center gap-2;
+  
+  .stock-dot {
+    @apply h-2 w-2 rounded-full;
+    
+    &.stock-high {
+      @apply bg-green-500 animate-pulse;
+    }
+    
+    &.stock-low {
+      @apply bg-yellow-500 animate-pulse;
+    }
+    
+    &.stock-empty {
+      @apply bg-red-500 animate-pulse;
+    }
+  }
+}
+
+// ===== MELHORIAS DE RESPONSIVIDADE E DESIGN =====
+
+// Wrapper para scroll horizontal responsivo
+.table-card {
+  @apply relative overflow-x-auto rounded-xl bg-slate-800/50 backdrop-blur-sm border border-slate-700/50;
+  
+  // Sombra personalizada para indicar scroll
+  &::after {
+    content: '';
+    @apply absolute top-0 right-0 bottom-0 w-8 pointer-events-none;
+    background: linear-gradient(to left, rgba(15, 23, 42, 0.5), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  &.has-scroll::after {
+    opacity: 1;
+  }
+}
+
+// Melhorias na tabela
+.data-table {
+  @apply w-full;
+  
+  thead {
+    @apply bg-slate-800/80 sticky top-0 z-10;
+    
+    th {
+      @apply px-4 py-3 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider;
+      white-space: nowrap;
+      
+      @media (max-width: 768px) {
+        @apply px-3 py-2 text-[10px];
+      }
+    }
+  }
+  
+  tbody {
+    tr {
+      @apply border-t border-slate-700/50 transition-all duration-200;
+      
+      &:hover {
+        @apply bg-slate-700/30;
+      }
+      
+      &.row-inactive {
+        @apply opacity-60;
+      }
+      
+      &.row-warning {
+        @apply bg-yellow-500/5;
+      }
+      
+      td {
+        @apply px-4 py-3 text-sm text-slate-200;
+        white-space: nowrap;
+        
+        @media (max-width: 768px) {
+          @apply px-3 py-2 text-xs;
+        }
+      }
+    }
+  }
+}
+
+// Melhorias nos botões de ação
+.action-buttons {
+  @apply flex items-center justify-end gap-2;
+  
+  .btn-icon {
+    @apply p-2 rounded-lg transition-all duration-200;
+    @apply hover:scale-110 active:scale-95;
+    
+    &.btn-stock {
+      @apply text-blue-400 hover:bg-blue-500/20 hover:text-blue-300;
+    }
+    
+    &.btn-edit {
+      @apply text-teal-400 hover:bg-teal-500/20 hover:text-teal-300;
+    }
+    
+    &.btn-delete,
+    &.btn-deactivate {
+      @apply text-red-400 hover:bg-red-500/20 hover:text-red-300;
+    }
+    
+    &.btn-activate {
+      @apply text-green-400 hover:bg-green-500/20 hover:text-green-300;
+    }
+    
+    .icon {
+      @apply w-5 h-5;
+    }
+  }
+}
+
+// Melhorias nos badges
+.badge {
+  @apply px-3 py-1 rounded-full text-xs font-semibold transition-all duration-200;
+  
+  &.badge-green {
+    @apply bg-green-500/20 text-green-300 border border-green-500/30;
+  }
+  
+  &.badge-gray {
+    @apply bg-slate-500/20 text-slate-300 border border-slate-500/30;
+  }
+  
+  &.badge-teal {
+    @apply bg-teal-500/20 text-teal-300 border border-teal-500/30;
+  }
+  
+  &.badge-yellow {
+    @apply bg-yellow-500/20 text-yellow-300 border border-yellow-500/30;
+  }
+  
+  &.badge-red {
+    @apply bg-red-500/20 text-red-300 border border-red-500/30;
+  }
+}
+
+// Melhorias no header da página
+.page-header {
+  @apply relative z-10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6;
+  
+  .title {
+    @apply text-2xl md:text-3xl font-bold text-white;
+  }
+  
+  .subtitle {
+    @apply text-sm md:text-base text-slate-400 mt-1;
+  }
+  
+  .flex {
+    @apply flex-shrink-0;
+  }
+  
+  .btn-filter,
+  .btn-primary {
+    @apply flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200;
+    @apply text-sm;
+    
+    .icon {
+      @apply w-5 h-5;
+    }
+  }
+  
+  .btn-filter {
+    @apply bg-slate-700/50 text-slate-300 border border-slate-600/50;
+    @apply hover:bg-slate-700 hover:border-slate-500;
+    
+    &.active {
+      @apply bg-yellow-500/20 text-yellow-300 border-yellow-500/50;
+      @apply hover:bg-yellow-500/30;
+    }
+  }
+  
+  .btn-primary {
+    @apply bg-gradient-to-r from-teal-500 to-blue-500 text-white;
+    @apply hover:from-teal-400 hover:to-blue-400;
+    @apply shadow-lg shadow-teal-500/20 hover:shadow-teal-500/30;
+  }
+}
+
+// Melhorias para mobile - ocultar colunas menos importantes
+@media (max-width: 768px) {
+  .data-table {
+    th:nth-child(3),
+    td:nth-child(3) {
+      // Marca - ocultar em mobile
+      display: none;
+    }
+    
+    th:nth-child(7),
+    td:nth-child(7) {
+      // Min Stock - ocultar em mobile
+      display: none;
+    }
+  }
+}
+
+// Indicador de scroll horizontal
+.scroll-indicator {
+  @apply absolute bottom-0 left-0 right-0 h-1 bg-slate-700/50;
+  
+  .scroll-bar {
+    @apply h-full bg-teal-500 transition-all duration-300;
+  }
+}

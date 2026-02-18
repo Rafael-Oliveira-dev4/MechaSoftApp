@@ -1,0 +1,98 @@
+// Main content area - Dark elegant theme
+.main-content {
+  min-height: 100vh;
+  padding-top: 64px; // Compensar altura da navbar fixa
+  background: linear-gradient(135deg, #0f172a 0%, #020617 100%);
+  position: relative;
+  overflow-x: hidden;
+
+  // Animated background effects
+  &::before {
+    content: '';
+    position: fixed;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(16, 185, 129, 0.05) 0%, transparent 70%);
+    border-radius: 50%;
+    top: -300px;
+    left: -300px;
+    animation: float 20s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  &::after {
+    content: '';
+    position: fixed;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(20, 184, 166, 0.04) 0%, transparent 70%);
+    border-radius: 50%;
+    bottom: -250px;
+    right: -250px;
+    animation: float 15s ease-in-out infinite reverse;
+    pointer-events: none;
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(30px, -30px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+}
+
+// Navigation styles
+.is-active {
+  color: #10b981;
+}
+
+// Glass effect utility class
+.glass-enhanced {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+// Mobile menu animations
+.mobile-menu-enter {
+  animation: slideDown 0.3s ease-out;
+}
+
+.mobile-menu-leave {
+  animation: slideUp 0.3s ease-in;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 640px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
