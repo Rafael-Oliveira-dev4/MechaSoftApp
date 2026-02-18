@@ -87,6 +87,9 @@ public class PartItem
     public PartItem(Guid serviceOrderId, Guid partId, int quantity,
                     Money unitPrice, decimal? discountPercentage = null)
     {
+        TotalPrice = new Money(0);
+        ServiceOrder = null!;
+        Part = null!;
         ServiceOrderId = serviceOrderId;
         PartId = partId;
         Quantity = quantity;

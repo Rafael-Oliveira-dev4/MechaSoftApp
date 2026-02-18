@@ -185,10 +185,6 @@
     @apply text-sm md:text-base text-slate-400 mt-1;
   }
   
-  .flex {
-    @apply flex-shrink-0;
-  }
-  
   .btn-filter,
   .btn-primary {
     @apply flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200;

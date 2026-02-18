@@ -1,9 +1,11 @@
+using MechaSoft.Data.Context;
 using MechaSoft.IoC;
 using MechaSoft.WebAPI.Middleware;
 using MechaSoft.WebAPI.Endpoints;
 using MechaSoft.WebAPI.Extensions;
 using MechaSoft.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -46,7 +48,11 @@ builder.Services.AddAuthentication(options =>
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 });
 builder.Services.AddAuthorization();
-builder.Services.AddHealthChecks();
+
+// Health checks: aplicação + base de dados (EF Core DbContext)
+builder.Services.AddHealthChecks()
+    .AddDbContextCheck<ApplicationDbContext>(name: "database");
+
 builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
@@ -61,13 +67,17 @@ if (app.Environment.IsDevelopment())
 // Adicionar middleware de tratamento global de erros
 app.UseMiddleware<GlobalExceptionMiddleware>();
 
-// CORS
+// CORS (deve vir antes de UseHttpsRedirection para que respostas tenham os headers)
 app.UseCors("AllowAngularApp");
 
 // Static Files (for serving uploaded images)
 app.UseStaticFiles();
 
-app.UseHttpsRedirection();
+// Em desenvolvimento, não redirecionar HTTP→HTTPS para evitar CORS no redirect (Angular em http://localhost:4200)
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 // Authentication & Authorization
 app.UseAuthentication();
@@ -76,7 +86,28 @@ app.UseAuthorization();
 // Mapear endpoints organizados por módulo
 app.RegisterEndpoints();
 
-// Health Check Endpoint
-app.MapHealthChecks("/health");
+// Health Check Endpoint (devolve JSON com status e descrição dos checks)
+app.MapHealthChecks("/health", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
+{
+    ResponseWriter = async (context, report) =>
+    {
+        context.Response.ContentType = "application/json";
+        context.Response.StatusCode = report.Status == Microsoft.Extensions.Diagnostics.HealthChecks.HealthStatus.Healthy
+            ? 200
+            : 503;
+        var result = System.Text.Json.JsonSerializer.Serialize(new
+        {
+            status = report.Status.ToString(),
+            totalDuration = report.TotalDuration.TotalMilliseconds,
+            entries = report.Entries.ToDictionary(e => e.Key, e => new
+            {
+                status = e.Value.Status.ToString(),
+                description = e.Value.Description,
+                duration = e.Value.Duration.TotalMilliseconds
+            })
+        }, new System.Text.Json.JsonSerializerOptions { PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase });
+        await context.Response.WriteAsync(result);
+    }
+});
 
 app.Run();

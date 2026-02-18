@@ -12,6 +12,7 @@ namespace MechaSoft.Data.Context
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.Development.json", optional: true)
                 .AddJsonFile("appsettings.json", optional: true)
+                .AddEnvironmentVariables()
                 .Build();
 
             var connectionString = configuration.GetConnectionString("MechaSoftCS");

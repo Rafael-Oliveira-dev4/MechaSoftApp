@@ -39,6 +39,16 @@ export class ErrorInterceptor implements HttpInterceptor {
       };
     }
 
+    // status 0 = conexão recusada / servidor inacessível (API não está a correr ou CORS)
+    if (error.status === 0) {
+      return {
+        code: 'CONNECTION_REFUSED',
+        message: 'Não foi possível ligar ao servidor. Verifique se a API está a correr (ex.: http://localhost:5039).',
+        details: error.message || 'Connection refused',
+        statusCode: 0,
+      };
+    }
+
     switch (error.status) {
       case 400:
         return this.handle400Error(error);
@@ -51,7 +61,9 @@ export class ErrorInterceptor implements HttpInterceptor {
       case 500:
       case 502:
       case 503:
-        return CommonErrors.ServerError(error.error?.message);
+        // API devolve { code, description } em erros 5xx
+        const serverMsg = error.error?.description ?? error.error?.message;
+        return CommonErrors.ServerError(serverMsg);
       default:
         return {
           code: 'UNKNOWN_ERROR',

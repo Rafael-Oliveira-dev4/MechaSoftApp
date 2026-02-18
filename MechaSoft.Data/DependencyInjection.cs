@@ -1,4 +1,4 @@
-﻿using MechaSoft.Data.Context;
+using MechaSoft.Data.Context;
 using MechaSoft.Data.Interceptors;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
@@ -31,8 +31,12 @@ public static class DependencyInjection
             options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
             options.UseSqlServer(connectionString, sqlOptions =>
             {
-                // Configure SQL Server options
                 sqlOptions.CommandTimeout(30);
+                // Resiliência a falhas transitórias (conexão, timeouts, etc.)
+                sqlOptions.EnableRetryOnFailure(
+                    maxRetryCount: 3,
+                    maxRetryDelay: TimeSpan.FromSeconds(30),
+                    errorNumbersToAdd: null);
             });
         });
 
@@ -63,8 +67,7 @@ public static class DependencyInjection
         // services.AddScoped<IFileStorageService, FileStorageService>();
         //services.AddScoped<INotificationService, NotificationService>();
 
-        // Health Checks (registered in WebAPI Program)
-        services.AddHealthChecks();
+        // Health checks com verificação à BD estão registados em MechaSoft.WebAPI/Program.cs
 
         return services;
     }

@@ -37,7 +37,10 @@ public class ServiceItem : AuditableEntity, IEntity<Guid>
     public ServiceItem(Guid serviceOrderId, Guid serviceId, int quantity,
                       decimal estimatedHours, Money unitPrice, decimal? discountPercentage = null)
     {
-        Id = Guid.NewGuid(); // ← Inicializar o Id
+        Id = Guid.NewGuid();
+        TotalPrice = new Money(0);
+        ServiceOrder = null!;
+        Service = null!;
         ServiceOrderId = serviceOrderId;
         ServiceId = serviceId;
         Quantity = quantity;
@@ -45,8 +48,6 @@ public class ServiceItem : AuditableEntity, IEntity<Guid>
         UnitPrice = unitPrice ?? throw new ArgumentNullException(nameof(unitPrice));
         DiscountPercentage = discountPercentage;
         Status = ServiceItemStatus.Pending;
-        ServiceOrder = null!;
-        Service = null!;
         CalculateTotalPrice();
     }
 
