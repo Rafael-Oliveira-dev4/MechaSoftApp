@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { RouterModule } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth.service';
 import { DashboardService, CustomerDashboardStats } from '../../../../core/services/dashboard.service';
 import { User } from '../../../../core/models/api.models';
@@ -8,7 +9,7 @@ import { ProfileCompletionAlertComponent } from '../../components/profile-comple
 @Component({
   selector: 'app-customer-dashboard',
   standalone: true,
-  imports: [CommonModule, ProfileCompletionAlertComponent],
+  imports: [CommonModule, RouterModule, ProfileCompletionAlertComponent],
   templateUrl: './customer-dashboard.component.html',
   styleUrls: ['./customer-dashboard.component.scss'],
 })

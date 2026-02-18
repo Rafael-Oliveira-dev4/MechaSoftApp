@@ -1,0 +1,127 @@
+.wizard-container {
+  @apply max-w-2xl mx-auto p-6;
+}
+
+.wizard-header {
+  @apply mb-8;
+}
+
+.back-link {
+  @apply inline-flex items-center gap-2 text-zinc-400 hover:text-emerald-400 transition-colors mb-6;
+}
+
+.wizard-title {
+  @apply text-3xl font-bold text-white mb-2;
+}
+
+.wizard-subtitle {
+  @apply text-zinc-400 mb-6;
+}
+
+.steps-indicator {
+  @apply flex items-center gap-1;
+}
+
+.step-dot {
+  @apply w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold bg-slate-800 text-zinc-500 border border-slate-700;
+  &.active {
+    @apply bg-emerald-600 border-emerald-500 text-white;
+  }
+}
+
+.step-line {
+  @apply flex-1 h-0.5 bg-slate-700 max-w-[60px];
+  &.active {
+    @apply bg-emerald-600;
+  }
+}
+
+.alert-error {
+  @apply p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 mb-6;
+}
+
+.loading-block,
+.empty-block {
+  @apply py-12 text-center text-zinc-400;
+}
+
+.empty-block .btn-primary {
+  @apply mt-4 inline-block px-6 py-2 bg-emerald-600 text-white rounded-xl font-semibold hover:bg-emerald-500 transition-colors;
+}
+
+.wizard-form {
+  @apply space-y-6;
+}
+
+.step-content {
+  @apply bg-slate-800/50 border border-slate-700/50 rounded-2xl p-6;
+}
+
+.step-heading {
+  @apply text-xl font-semibold text-white mb-4;
+}
+
+.vehicle-list {
+  @apply space-y-2;
+}
+
+.vehicle-option {
+  @apply flex flex-col p-4 rounded-xl border cursor-pointer transition-all border-slate-700 hover:border-emerald-500/50;
+  &.selected {
+    @apply border-emerald-500 bg-emerald-500/10;
+  }
+  input {
+    @apply sr-only;
+  }
+}
+
+.vehicle-plate {
+  @apply font-bold text-white;
+}
+
+.vehicle-info {
+  @apply text-sm text-zinc-400 mt-1;
+}
+
+.form-group {
+  @apply mb-4;
+  label {
+    @apply block text-sm font-medium text-zinc-400 mb-2;
+  }
+  textarea, input, select {
+    @apply w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder-zinc-500 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none;
+  }
+  textarea {
+    @apply resize-y min-h-[100px];
+  }
+}
+
+.form-row {
+  @apply grid grid-cols-1 md:grid-cols-2 gap-4;
+}
+
+.field-error {
+  @apply text-sm text-red-400 mt-1 block;
+}
+
+.summary-list {
+  @apply space-y-2 text-sm;
+  dt {
+    @apply text-zinc-500 font-medium;
+  }
+  dd {
+    @apply text-white mt-0.5 mb-3;
+  }
+}
+
+.wizard-actions {
+  @apply flex items-center gap-4 pt-6;
+}
+
+.btn-primary {
+  @apply px-6 py-3 bg-emerald-600 text-white font-semibold rounded-xl hover:bg-emerald-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.btn-secondary {
+  @apply px-6 py-3 bg-slate-700 text-white font-semibold rounded-xl hover:bg-slate-600 transition-colors;
+}

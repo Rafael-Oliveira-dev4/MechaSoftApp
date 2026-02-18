@@ -1,5 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { InspectionService, Inspection } from '../../../../core/services/inspection.service';
 import { AuthService } from '../../../../core/services/auth.service';
 import { ErrorDetail } from '../../../../core/models/result.model';
@@ -7,7 +8,7 @@ import { ErrorDetail } from '../../../../core/models/result.model';
 @Component({
   selector: 'app-inspections',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './inspections.component.html',
   styleUrls: ['./inspections.component.scss']
 })
@@ -132,6 +133,10 @@ export class InspectionsComponent implements OnInit {
       hour: '2-digit',
       minute: '2-digit'
     });
+  }
+
+  isCustomer(): boolean {
+    return this.authService.getCurrentUser()?.role === 'Customer';
   }
 }
 

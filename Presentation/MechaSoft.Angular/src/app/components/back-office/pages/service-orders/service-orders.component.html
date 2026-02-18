@@ -7,7 +7,15 @@
       <h1 class="title">As Minhas Ordens de Serviço</h1>
       <p class="subtitle">Acompanhe o estado dos seus serviços</p>
     </div>
-    <div class="header-info">
+    <div class="header-info flex items-center gap-4">
+      @if (isCustomer()) {
+        <a routerLink="/admin/service-orders/request" class="btn-request-service">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+          </svg>
+          Pedir serviço
+        </a>
+      }
       <span class="order-count">{{ totalCount }} {{ totalCount === 1 ? 'ordem' : 'ordens' }}</span>
     </div>
   </div>
@@ -67,7 +75,7 @@
             <td class="service-desc">{{ order.description }}</td>
             <td>
               <span [class]="'badge badge-' + getStatusColor(order.status)">
-                {{ getStatusLabel(order.status) }}
+                {{ isCustomer() && order.status === 'Pending' ? 'À espera de confirmação' : getStatusLabel(order.status) }}
               </span>
             </td>
             <td class="date-cell">

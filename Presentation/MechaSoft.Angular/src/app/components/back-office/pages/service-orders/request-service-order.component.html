@@ -1,0 +1,118 @@
+<div class="wizard-container">
+  <div class="wizard-header">
+    <a routerLink="/admin/dashboard" class="back-link">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+      </svg>
+      Voltar
+    </a>
+    <h1 class="wizard-title">Pedir serviço</h1>
+    <p class="wizard-subtitle">Revisão, reparação ou outro. A oficina confirmará brevemente.</p>
+    <div class="steps-indicator">
+      @for (s of [1,2,3]; track s) {
+        <span [class]="'step-dot' + (step >= s ? ' active' : '')">{{ s }}</span>
+        @if (s < 3) { <span class="step-line" [class.active]="step > s"></span> }
+      }
+    </div>
+  </div>
+
+  @if (error) {
+  <div class="alert-error">
+    {{ error }}
+  </div>
+  }
+
+  @if (loading) {
+  <div class="loading-block">A carregar veículos...</div>
+  } @else if (vehicles.length === 0 && !loading) {
+  <div class="empty-block">
+    <p>Não tem veículos registados.</p>
+    <a routerLink="/admin/vehicles" class="btn-primary">Registar veículo</a>
+  </div>
+  } @else {
+  <form [formGroup]="form" (ngSubmit)="step < maxStep ? nextStep() : submit()" class="wizard-form">
+    <!-- Passo 1: Veículo -->
+    @if (step === 1) {
+    <div class="step-content">
+      <h2 class="step-heading">Escolha o veículo</h2>
+      <div class="vehicle-list">
+        @for (v of vehicles; track v.id) {
+        <label class="vehicle-option" [class.selected]="form.get('vehicleId')?.value === v.id">
+          <input type="radio" formControlName="vehicleId" [value]="v.id" />
+          <span class="vehicle-plate">{{ v.licensePlate }}</span>
+          <span class="vehicle-info">{{ v.brand }} {{ v.model }} · {{ v.year }}</span>
+        </label>
+        }
+      </div>
+    </div>
+    }
+
+    <!-- Passo 2: Descrição e data -->
+    @if (step === 2) {
+    <div class="step-content">
+      <h2 class="step-heading">Descreva o que precisa</h2>
+      <div class="form-group">
+        <label for="description">Descrição do serviço *</label>
+        <textarea id="description" formControlName="description" rows="4" placeholder="Ex.: Revisão dos 30 000 km, mudança de óleo e filtros"></textarea>
+        @if (form.get('description')?.invalid && form.get('description')?.touched) {
+          <span class="field-error">Mínimo 10 caracteres.</span>
+        }
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="priority">Prioridade</label>
+          <select id="priority" formControlName="priority">
+            @for (p of priorities; track p.value) {
+              <option [value]="p.value">{{ p.label }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="preferredDate">Data preferida (opcional)</label>
+          <input id="preferredDate" type="date" formControlName="preferredDate" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="observations">Observações (opcional)</label>
+        <input id="observations" type="text" formControlName="observations" placeholder="Ex.: Preferência de manhã" />
+      </div>
+    </div>
+    }
+
+    <!-- Passo 3: Resumo -->
+    @if (step === 3) {
+    <div class="step-content summary">
+      <h2 class="step-heading">Confirme o seu pedido</h2>
+      <dl class="summary-list">
+        <dt>Veículo</dt>
+        <dd>{{ selectedVehicle?.licensePlate }} – {{ selectedVehicle?.brand }} {{ selectedVehicle?.model }}</dd>
+        <dt>Descrição</dt>
+        <dd>{{ form.get('description')?.value }}</dd>
+        <dt>Prioridade</dt>
+        <dd>{{ priorities.find(p => p.value === form.get('priority')?.value)?.label }}</dd>
+        <dt>Data preferida</dt>
+        <dd>{{ formatDate(form.get('preferredDate')?.value) }}</dd>
+        @if (form.get('observations')?.value) {
+          <dt>Observações</dt>
+          <dd>{{ form.get('observations')?.value }}</dd>
+        }
+      </dl>
+    </div>
+    }
+
+    <div class="wizard-actions">
+      @if (step > 1) {
+        <button type="button" class="btn-secondary" (click)="prevStep()">Anterior</button>
+      }
+      <div class="flex-1"></div>
+      @if (step < maxStep) {
+        <button type="submit" class="btn-primary" [disabled]="(step === 1 && form.get('vehicleId')?.invalid)">Seguinte</button>
+      } @else {
+        <button type="submit" class="btn-primary" [disabled]="form.invalid || submitting">
+          {{ submitting ? 'A enviar...' : 'Enviar pedido' }}
+        </button>
+      }
+    </div>
+  </form>
+  }
+</div>

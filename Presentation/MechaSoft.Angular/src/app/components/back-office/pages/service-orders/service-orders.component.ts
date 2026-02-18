@@ -1,5 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { ServiceOrderService, AddServiceToOrderRequest, AddPartToOrderRequest } from '../../../../core/services/service-order.service';
 import { CustomerService } from '../../../../core/services/customer.service';
@@ -52,7 +53,7 @@ interface PartItemDto {
 @Component({
   selector: 'app-service-orders',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, ErrorMessageComponent],
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, FormsModule, ErrorMessageComponent],
   templateUrl: './service-orders.component.html',
   styleUrls: ['./service-orders.component.scss']
 })
@@ -341,6 +342,10 @@ export class ServiceOrdersComponent implements OnInit {
   canManageOrders(): boolean {
     const user = this.authService.getCurrentUser();
     return user?.role === 'Owner' || user?.role === 'Admin';
+  }
+
+  isCustomer(): boolean {
+    return this.authService.getCurrentUser()?.role === 'Customer';
   }
 
   // Traduzir Status do enum para português

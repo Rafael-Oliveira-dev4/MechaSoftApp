@@ -497,6 +497,44 @@
   @apply text-base font-bold text-white;
 }
 
+// CTA Cards (Pedir serviço / Agendar inspeção)
+.cta-card {
+  @apply relative flex items-center gap-4 p-6 rounded-2xl border transition-all duration-300 cursor-pointer overflow-hidden;
+  @apply bg-slate-800/50 border-slate-700/50 hover:-translate-y-1 hover:shadow-xl;
+
+  .cta-card-glow {
+    @apply absolute -inset-1 opacity-0 blur-xl transition-opacity duration-300;
+    z-index: 0;
+  }
+
+  &.cta-service:hover .cta-card-glow {
+    @apply opacity-100 from-blue-500/20 to-cyan-600/20 bg-gradient-to-r;
+  }
+
+  &.cta-inspection:hover .cta-card-glow {
+    @apply opacity-100 from-purple-500/20 to-violet-600/20 bg-gradient-to-r;
+  }
+
+  > svg,
+  > .flex-1,
+  > .cta-arrow {
+    position: relative;
+    z-index: 1;
+  }
+
+  .cta-arrow {
+    @apply text-2xl text-zinc-500 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all;
+  }
+
+  &.cta-service:hover {
+    @apply border-blue-500/30 shadow-blue-500/10;
+  }
+
+  &.cta-inspection:hover {
+    @apply border-purple-500/30 shadow-purple-500/10;
+  }
+}
+
 // Quick Link Cards (Customer Dashboard)
 .quick-link-card {
   @apply flex items-center gap-4 p-6 rounded-xl bg-zinc-900/50 border border-zinc-800 hover:border-emerald-500/50 transition-all duration-300 cursor-pointer;

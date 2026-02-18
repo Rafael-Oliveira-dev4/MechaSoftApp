@@ -20,6 +20,8 @@ import { InspectionsComponent } from './pages/inspections/inspections.component'
 import { PartsComponent } from './pages/parts/parts.component';
 import { ProfileComponent } from './pages/profile/profile.component';
 import { ServiceOrdersComponent } from './pages/service-orders/service-orders.component';
+import { RequestServiceOrderComponent } from './pages/service-orders/request-service-order.component';
+import { BookInspectionComponent } from './pages/inspections/book-inspection.component';
 import { ServicesComponent } from './pages/services/services.component';
 import { SettingsComponent } from './pages/settings/settings.component';
 import { VehiclesComponent } from './pages/vehicles/vehicles.component';
@@ -48,9 +50,11 @@ const routes: Routes = [
 
       // Ordens de Serviço (todos os funcionários)
       { path: 'service-orders', component: ServiceOrdersComponent },
+      { path: 'service-orders/request', component: RequestServiceOrderComponent },
 
       // Inspeções (todos os funcionários)
       { path: 'inspections', component: InspectionsComponent },
+      { path: 'inspections/book', component: BookInspectionComponent },
 
       // Funcionários (Owner+)
       {

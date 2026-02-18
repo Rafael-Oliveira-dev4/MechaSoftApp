@@ -4,7 +4,15 @@
         <h1 class="title">As Minhas Inspeções</h1>
         <p class="subtitle">Acompanhe as inspeções técnicas dos seus veículos</p>
       </div>
-      <div class="header-info">
+      <div class="header-info flex items-center gap-4">
+        @if (isCustomer()) {
+          <a routerLink="/admin/inspections/book" class="btn-book-inspection">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+            </svg>
+            Agendar inspeção
+          </a>
+        }
         <span class="inspection-count">{{ inspections.length }} {{ inspections.length === 1 ? 'inspeção' : 'inspeções' }}</span>
       </div>
     </div>
@@ -183,14 +191,16 @@
       </div>
     </div>
 
-    <!-- Info Box -->
-    <div class="info-box">
+    @if (isCustomer()) {
+    <!-- Info Box - Cliente pode agendar na app -->
+    <div class="info-box info-box-action">
       <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
       </svg>
       <div class="info-content">
         <p class="info-title">Precisa de agendar uma inspeção?</p>
-        <p class="info-text">Entre em contacto com a oficina para agendar inspeções técnicas para os seus veículos.</p>
+        <p class="info-text">Use o botão <strong>Agendar inspeção</strong> no topo da página. A oficina confirmará brevemente.</p>
       </div>
     </div>
+    }
 </div>
