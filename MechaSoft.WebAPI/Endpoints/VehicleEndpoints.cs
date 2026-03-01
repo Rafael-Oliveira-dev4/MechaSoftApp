@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using MechaSoft.Application.Common.Responses;
 using MechaSoft.Application.CQ.Vehicles.Commands.CreateVehicle;
 using MechaSoft.Application.CQ.Vehicles.Commands.UpdateVehicle;
@@ -39,25 +40,39 @@ public static class VehicleEndpoints
         vehicles.MapPost("/", Commands.CreateVehicle)
             .WithName("CreateVehicle")
             .Produces<CreateVehicleResponse>(201)
-            .Produces<Error>(400);
+            .Produces<Error>(400)
+            .Produces<Error>(403);
 
         // PUT /api/vehicles/{id} - Atualizar veículo
         vehicles.MapPut("/{id:guid}", Commands.UpdateVehicle)
             .WithName("UpdateVehicle")
             .Produces<UpdateVehicleResponse>(200)
-            .Produces<Error>(400);
+            .Produces<Error>(400)
+            .Produces<Error>(403);
     }
 
     private static class Commands
     {
-        public static async Task<Results<CreatedAtRoute<CreateVehicleResponse>, BadRequest<Error>>> CreateVehicle(
+        public static async Task<IResult> CreateVehicle(
+            HttpContext httpContext,
             [FromServices] ISender sender,
             [FromBody] CreateVehicleRequest request,
             CancellationToken cancellationToken = default)
         {
+            var role = httpContext.User.FindFirst(ClaimTypes.Role)?.Value;
+            var customerIdClaim = httpContext.User.FindFirst("CustomerId")?.Value;
+
+            Guid effectiveCustomerId = request.CustomerId;
+            if (string.Equals(role, "Customer", StringComparison.OrdinalIgnoreCase))
+            {
+                if (string.IsNullOrEmpty(customerIdClaim) || !Guid.TryParse(customerIdClaim, out var claimCustomerId))
+                    return TypedResults.Json(Error.InsufficientPermissions, statusCode: 403);
+                effectiveCustomerId = claimCustomerId;
+            }
+
             var command = new CreateVehicleCommand
             {
-                CustomerId = request.CustomerId,
+                CustomerId = effectiveCustomerId,
                 Brand = request.Brand,
                 Model = request.Model,
                 LicensePlate = request.LicensePlate,
@@ -68,13 +83,14 @@ public static class VehicleEndpoints
                 FuelType = Enum.Parse<MechaSoft.Domain.Model.FuelType>(request.FuelType, true)
             };
             var result = await sender.Send(command, cancellationToken);
-            
+
             return result.IsSuccess
                 ? TypedResults.CreatedAtRoute(result.Value!, "GetVehicleById", new { id = result.Value!.Id })
                 : TypedResults.BadRequest(result.Error!);
         }
 
-        public static async Task<Results<Ok<UpdateVehicleResponse>, BadRequest<Error>>> UpdateVehicle(
+        public static async Task<IResult> UpdateVehicle(
+            HttpContext httpContext,
             [FromServices] ISender sender,
             Guid id,
             [FromBody] UpdateVehicleRequest request,
@@ -83,6 +99,18 @@ public static class VehicleEndpoints
             if (request == null)
             {
                 return TypedResults.BadRequest(Error.InvalidInput);
+            }
+
+            var role = httpContext.User.FindFirst(ClaimTypes.Role)?.Value;
+            if (string.Equals(role, "Customer", StringComparison.OrdinalIgnoreCase))
+            {
+                var vehicleResult = await sender.Send(new GetVehicleByIdQuery(id), cancellationToken);
+                if (!vehicleResult.IsSuccess || vehicleResult.Value == null)
+                    return TypedResults.NotFound(vehicleResult.Error ?? Error.VehicleNotFound);
+                var claimCustomerId = httpContext.User.FindFirst("CustomerId")?.Value;
+                if (string.IsNullOrEmpty(claimCustomerId) || !Guid.TryParse(claimCustomerId, out var customerId) ||
+                    vehicleResult.Value.CustomerId != customerId)
+                    return TypedResults.Json(Error.InsufficientPermissions, statusCode: 403);
             }
 
             var command = new UpdateVehicleCommand(

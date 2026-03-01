@@ -171,7 +171,7 @@
 
           <div class="dropdown-divider"></div>
 
-          <button (click)="logout()" class="dropdown-item dropdown-item-danger">
+          <button (click)="openLogoutConfirm()" class="dropdown-item dropdown-item-danger">
             <svg class="dropdown-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 stroke-linecap="round"
@@ -312,7 +312,7 @@
       <span>Configurações</span>
     </a>
 
-    <button (click)="logout()" class="mobile-link mobile-link-danger">
+    <button (click)="openLogoutConfirm()" class="mobile-link mobile-link-danger">
       <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
           stroke-linecap="round"
@@ -332,3 +332,15 @@
 @if (isMobileMenuOpen || isUserMenuOpen) {
 <div class="navbar-overlay" (click)="closeMenus()"></div>
 }
+
+<!-- Modal de confirmação para terminar sessão -->
+<app-confirm-dialog
+  [visible]="showLogoutConfirm"
+  title="Terminar sessão"
+  message="Tem a certeza que deseja terminar a sessão? Será redirecionado para a página de login."
+  confirmLabel="Sim, terminar sessão"
+  cancelLabel="Cancelar"
+  type="danger"
+  (confirm)="onLogoutConfirm()"
+  (cancel)="onLogoutCancel()"
+/>

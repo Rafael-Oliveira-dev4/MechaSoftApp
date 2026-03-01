@@ -6,6 +6,7 @@ import { filter } from 'rxjs/operators';
 import { User } from '../../../core/models/api.models';
 import { AuthService } from '../../../core/services/auth.service';
 import { ProfileImageService } from '../../../core/services/profile-image.service';
+import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 
 interface NavLink {
   label: string;
@@ -18,7 +19,7 @@ interface NavLink {
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, ConfirmDialogComponent],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.scss'],
   encapsulation: ViewEncapsulation.None // Forçar estilos globais
@@ -28,6 +29,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   isAuthenticated = false;
   isMobileMenuOpen = false;
   isUserMenuOpen = false;
+  showLogoutConfirm = false;
   currentRoute = '';
 
   private destroy$ = new Subject<void>();
@@ -175,13 +177,19 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.isUserMenuOpen = false;
   }
 
-  // Logout
-  logout(): void {
-    if (confirm('Deseja terminar sessão?')) {
-      this.authService.logout();
-      this.router.navigate(['/login']);
-      this.closeMenus();
-    }
+  openLogoutConfirm(): void {
+    this.showLogoutConfirm = true;
+  }
+
+  onLogoutConfirm(): void {
+    this.showLogoutConfirm = false;
+    this.authService.logout();
+    this.router.navigate(['/login']);
+    this.closeMenus();
+  }
+
+  onLogoutCancel(): void {
+    this.showLogoutConfirm = false;
   }
 
   // Obter iniciais do nome do utilizador
@@ -217,6 +225,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
       Owner: 'avatar-owner',
       Admin: 'avatar-admin',
       Employee: 'avatar-employee',
+      Mechanic: 'avatar-mechanic',
       Customer: 'avatar-customer',
     };
 
@@ -231,6 +240,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
       Owner: 'Proprietário',
       Admin: 'Administrador',
       Employee: 'Funcionário',
+      Mechanic: 'Mecânico',
       Customer: 'Cliente',
     };
 

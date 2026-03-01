@@ -109,6 +109,15 @@ export class VehiclesComponent implements OnInit {
     this.isEditMode = false;
     this.selectedVehicleId = null;
     this.vehicleForm.reset();
+    if (this.canCreateOwnVehicle()) {
+      const customerId = this.authService.getCurrentUser()?.customerId;
+      if (customerId) {
+        this.vehicleForm.patchValue({ customerId });
+        this.vehicleForm.get('customerId')?.disable();
+      }
+    } else {
+      this.vehicleForm.get('customerId')?.enable();
+    }
     this.showModal = true;
   }
 
@@ -127,6 +136,11 @@ export class VehiclesComponent implements OnInit {
       engineType: vehicle.engineType,
       fuelType: vehicle.fuelType
     });
+    if (this.canCreateOwnVehicle()) {
+      this.vehicleForm.get('customerId')?.disable();
+    } else {
+      this.vehicleForm.get('customerId')?.enable();
+    }
     this.showModal = true;
   }
 
@@ -144,7 +158,7 @@ export class VehiclesComponent implements OnInit {
       return;
     }
 
-    const request: CreateVehicleRequest = this.vehicleForm.value;
+    const request: CreateVehicleRequest = this.vehicleForm.getRawValue();
 
     const operation$ = this.isEditMode && this.selectedVehicleId
       ? this.vehicleService.update(this.selectedVehicleId, request)
@@ -219,6 +233,22 @@ export class VehiclesComponent implements OnInit {
   canManageVehicles(): boolean {
     const user = this.authService.getCurrentUser();
     return user?.role === 'Owner' || user?.role === 'Admin';
+  }
+
+  // Cliente pode adicionar os seus próprios veículos (perfil completo)
+  canCreateOwnVehicle(): boolean {
+    const user = this.authService.getCurrentUser();
+    return user?.role === 'Customer' && !!user?.customerId;
+  }
+
+  // Pode editar este veículo (gestores: todos; cliente: só os seus)
+  canEditVehicle(vehicle: Vehicle): boolean {
+    if (this.canManageVehicles()) return true;
+    if (this.canCreateOwnVehicle()) {
+      const user = this.authService.getCurrentUser();
+      return vehicle.customerId === user?.customerId;
+    }
+    return false;
   }
 
   // Traduzir FuelType do enum para português

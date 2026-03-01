@@ -31,7 +31,7 @@
         [class.active]="statusFilter === status.value"
         class="filter-btn"
       >
-        <span [class]="'badge badge-' + status.color">{{ status.label }}</span>
+        <span [class]="'badge badge-' + status.color">{{ getFilterLabel(status) }}</span>
       </button>
     }
   </div>
@@ -75,7 +75,7 @@
             <td class="service-desc">{{ order.description }}</td>
             <td>
               <span [class]="'badge badge-' + getStatusColor(order.status)">
-                {{ isCustomer() && order.status === 'Pending' ? 'À espera de confirmação' : getStatusLabel(order.status) }}
+                {{ isCustomer() && order.status === 'Pending' ? 'Por aprovar' : getStatusLabel(order.status) }}
               </span>
             </td>
             <td class="date-cell">

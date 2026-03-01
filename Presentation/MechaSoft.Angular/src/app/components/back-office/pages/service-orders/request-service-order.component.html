@@ -22,7 +22,9 @@
   </div>
   }
 
-  @if (loading) {
+  @if (profileLoading) {
+  <div class="loading-block">A carregar dados da conta...</div>
+  } @else if (loading) {
   <div class="loading-block">A carregar veículos...</div>
   } @else if (vehicles.length === 0 && !loading) {
   <div class="empty-block">
@@ -68,9 +70,19 @@
           </select>
         </div>
         <div class="form-group">
-          <label for="preferredDate">Data preferida (opcional)</label>
-          <input id="preferredDate" type="date" formControlName="preferredDate" />
+          <label>Data preferida (opcional)</label>
+          <p class="field-hint">Sábados e domingos não disponíveis.</p>
+          <app-booking-calendar
+            [selectedDate]="form.get('preferredDate')?.value"
+            [disableWeekends]="true"
+            (dateSelected)="onDateSelected($event)"
+          />
         </div>
+        <app-time-slots
+          [selectedDate]="form.get('preferredDate')?.value"
+          [selectedTime]="form.get('preferredTime')?.value"
+          (slotSelected)="onTimeSelected($event)"
+        />
       </div>
       <div class="form-group">
         <label for="observations">Observações (opcional)</label>
@@ -91,7 +103,7 @@
         <dt>Prioridade</dt>
         <dd>{{ priorityLabel }}</dd>
         <dt>Data preferida</dt>
-        <dd>{{ formatDate(form.get('preferredDate')?.value) }}</dd>
+        <dd>{{ formatDateTimeLabel(form.get('preferredDate')?.value, form.get('preferredTime')?.value) }}</dd>
         @if (form.get('observations')?.value) {
           <dt>Observações</dt>
           <dd>{{ form.get('observations')?.value }}</dd>

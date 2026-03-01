@@ -1,0 +1,18 @@
+<div class="time-slots" *ngIf="selectedDate">
+  <h3 class="slots-heading">Escolha o horário</h3>
+  <p class="slots-hint">Selecione o slot que prefere para a sua marcação.</p>
+  <div class="slots-grid">
+    @for (slot of slots(); track slot) {
+      <button
+        type="button"
+        class="slot-btn"
+        [class.selected]="isSelected(slot)"
+        [class.disabled]="isDisabled(slot)"
+        [disabled]="isDisabled(slot)"
+        (click)="onSlotClick(slot)"
+      >
+        {{ formatSlot(slot) }}
+      </button>
+    }
+  </div>
+</div>

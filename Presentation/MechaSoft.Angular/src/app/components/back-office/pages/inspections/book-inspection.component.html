@@ -22,7 +22,9 @@
   </div>
   }
 
-  @if (loading) {
+  @if (profileLoading) {
+  <div class="loading-block">A carregar dados da conta...</div>
+  } @else if (loading) {
   <div class="loading-block">A carregar veículos...</div>
   } @else if (vehicles.length === 0 && !loading) {
   <div class="empty-block">
@@ -48,7 +50,7 @@
 
     @if (step === 2) {
     <div class="step-content">
-      <h2 class="step-heading">Tipo e data preferida</h2>
+      <h2 class="step-heading">Tipo, data e horário</h2>
       <div class="form-group">
         <label for="type">Tipo de inspeção *</label>
         <select id="type" formControlName="type">
@@ -58,13 +60,26 @@
         </select>
       </div>
       <div class="form-group">
-        <label for="preferredDate">Data preferida *</label>
-        <input id="preferredDate" type="date" formControlName="preferredDate" />
+        <label>Data preferida *</label>
+        <p class="field-hint">Sábados e domingos não disponíveis.</p>
+        <app-booking-calendar
+          [selectedDate]="form.get('preferredDate')?.value"
+          [disableWeekends]="true"
+          (dateSelected)="onDateSelected($event)"
+        />
         @if (form.get('preferredDate')?.invalid && form.get('preferredDate')?.touched) {
           <span class="field-error">Indique a data desejada.</span>
         }
       </div>
-      <div class="form-group">
+      <app-time-slots
+        [selectedDate]="form.get('preferredDate')?.value"
+        [selectedTime]="form.get('preferredTime')?.value"
+        (slotSelected)="onTimeSelected($event)"
+      />
+      @if (form.get('preferredTime')?.invalid && form.get('preferredTime')?.touched) {
+        <span class="field-error">Indique o horário desejado.</span>
+      }
+      <div class="form-group" style="margin-top: 1rem;">
         <label for="observations">Observações (opcional)</label>
         <input id="observations" type="text" formControlName="observations" placeholder="Ex.: Preferência de manhã" />
       </div>
@@ -79,8 +94,8 @@
         <dd>{{ selectedVehicle?.licensePlate }} – {{ selectedVehicle?.brand }} {{ selectedVehicle?.model }}</dd>
         <dt>Tipo</dt>
         <dd>{{ selectedTypeLabel }}</dd>
-        <dt>Data preferida</dt>
-        <dd>{{ formatDate(form.get('preferredDate')?.value) }}</dd>
+        <dt>Data e horário preferidos</dt>
+        <dd>{{ formatDateTimeLabel(form.get('preferredDate')?.value, form.get('preferredTime')?.value) }}</dd>
         @if (form.get('observations')?.value) {
           <dt>Observações</dt>
           <dd>{{ form.get('observations')?.value }}</dd>
@@ -95,7 +110,7 @@
       }
       <div class="flex-1"></div>
       @if (step < maxStep) {
-        <button type="submit" class="btn-primary" [disabled]="(step === 1 && form.get('vehicleId')?.invalid)">Seguinte</button>
+        <button type="submit" class="btn-primary" [disabled]="(step === 1 && form.get('vehicleId')?.invalid) || (step === 2 && (form.get('preferredDate')?.invalid || form.get('preferredTime')?.invalid))">Seguinte</button>
       } @else {
         <button type="submit" class="btn-primary" [disabled]="form.invalid || submitting">
           {{ submitting ? 'A enviar...' : 'Enviar pedido' }}

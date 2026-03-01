@@ -1,0 +1,27 @@
+@if (visible) {
+<div class="confirm-backdrop" (click)="onBackdropClick()" role="presentation">
+  <div class="confirm-dialog" [class.confirm-dialog--danger]="type === 'danger'" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="confirm-title" aria-describedby="confirm-message">
+    <div class="confirm-dialog__icon" [class.confirm-dialog__icon--danger]="type === 'danger'">
+      @if (type === 'danger') {
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+      </svg>
+      } @else {
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      }
+    </div>
+    <h2 id="confirm-title" class="confirm-dialog__title">{{ title }}</h2>
+    <p id="confirm-message" class="confirm-dialog__message">{{ message }}</p>
+    <div class="confirm-dialog__actions">
+      <button type="button" class="confirm-dialog__btn confirm-dialog__btn--cancel" (click)="onCancel()">
+        {{ cancelLabel }}
+      </button>
+      <button type="button" class="confirm-dialog__btn confirm-dialog__btn--confirm" [class.confirm-dialog__btn--danger]="type === 'danger'" (click)="onConfirm()">
+        {{ confirmLabel }}
+      </button>
+    </div>
+  </div>
+</div>
+}

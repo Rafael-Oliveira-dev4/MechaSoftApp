@@ -1,11 +1,9 @@
 <div class="profile-container">
   <!-- Background effects -->
-  <div class="absolute inset-0 pointer-events-none overflow-hidden">
-    <div class="absolute top-1/4 left-1/4 h-96 w-96 rounded-full bg-emerald-500/10 blur-3xl animate-float"></div>
-    <div
-      class="absolute bottom-1/4 right-1/4 h-80 w-80 rounded-full bg-emerald-500/10 blur-3xl animate-float"
-      style="animation-delay: 2s"
-    ></div>
+  <div class="bg-effects">
+    <div class="bg-blur bg-blur-1"></div>
+    <div class="bg-blur bg-blur-2"></div>
+    <div class="bg-grid"></div>
   </div>
 
   <!-- Error/Success Messages -->
@@ -24,15 +22,13 @@
   </div>
   }
 
-  <!-- Header -->
-  <div class="page-header">
-    <div>
-      <h1 class="title">
-        <span class="bg-gradient-to-r from-emerald-400 to-teal-600 bg-clip-text text-transparent">Meu Perfil</span>
-      </h1>
-      <p class="subtitle">Gira as suas informações pessoais</p>
+  <!-- Page Header -->
+  <header class="page-header">
+    <div class="header-content">
+      <h1 class="title">Meu Perfil</h1>
+      <p class="subtitle">Gerir as suas informações pessoais e preferências</p>
     </div>
-    <button routerLink="/admin/settings" class="btn-secondary">
+    <a routerLink="/admin/settings" class="btn-settings">
       <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
           stroke-linecap="round"
@@ -42,29 +38,49 @@
         />
       </svg>
       <span>Configurações</span>
-    </button>
-  </div>
+    </a>
+  </header>
 
   @if (currentUser) {
+  <!-- Hero Card: Avatar + Nome + Role -->
+  <section class="hero-card">
+    <div class="hero-bg"></div>
+    <div class="hero-content">
+      <div class="hero-avatar-wrap">
+        <app-profile-image-upload
+          [userId]="currentUser.id"
+          [currentImageUrl]="currentUser.profileImageUrl"
+          (uploadSuccess)="onImageUploadSuccess($event)"
+          (uploadError)="onImageUploadError($event)"
+        ></app-profile-image-upload>
+      </div>
+      <div class="hero-info">
+        <h2 class="hero-name">{{ currentUser.username || 'Utilizador' }}</h2>
+        <p class="hero-role">
+          <span class="role-pill">{{ getRoleLabel() }}</span>
+          @if (currentUser.isActive) {
+            <span class="status-pill status-active">Conta ativa</span>
+          } @else {
+            <span class="status-pill status-inactive">Conta inativa</span>
+          }
+        </p>
+      </div>
+    </div>
+  </section>
+
   <div class="profile-grid">
     <!-- Profile Card -->
-    <div class="profile-card">
+    <div class="profile-card card-float">
       <div class="card-header">
-        <h2 class="card-title">Informações do Perfil</h2>
+        <h2 class="card-title">
+          <span class="card-title-icon">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+          </span>
+          Informações do Perfil
+        </h2>
       </div>
 
       <div class="profile-content">
-        <!-- Avatar Section with ProfileImageUploadComponent -->
-        <div class="avatar-section">
-          <app-profile-image-upload
-            [userId]="currentUser.id"
-            [currentImageUrl]="currentUser.profileImageUrl"
-            (uploadSuccess)="onImageUploadSuccess($event)"
-            (uploadError)="onImageUploadError($event)"
-          ></app-profile-image-upload>
-        </div>
-
-        <!-- User Info Section -->
         <div class="info-section">
           @if (!isEditingProfile) {
           <!-- View Mode -->
@@ -187,9 +203,14 @@
     </div>
 
     <!-- Stats Card -->
-    <div class="stats-card">
+    <div class="stats-card card-float">
       <div class="card-header">
-        <h2 class="card-title">Estatísticas Rápidas</h2>
+        <h2 class="card-title">
+          <span class="card-title-icon">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+          </span>
+          Estatísticas Rápidas
+        </h2>
       </div>
 
       <div class="stats-grid">
@@ -277,12 +298,14 @@
 
   <!-- Employee Profile Card (only for employees/owner with employee profile) -->
   @if (hasEmployeeProfile()) {
-  <div class="employee-profile-card">
+  <div class="employee-profile-card card-float">
     <div class="card-header">
       <h2 class="card-title">
-        <svg class="section-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <span class="card-title-icon">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
         </svg>
+        </span>
         Dados Profissionais
       </h2>
     </div>
@@ -364,10 +387,11 @@
   <!-- Customer Profile Form Card (only for customers without profile) - Full Width Row -->
   @if (currentUser && isCustomer() && !hasCustomerProfile()) {
   <div class="customer-form-row">
-    <div id="customer-profile-section" class="customer-profile-form-card">
+    <div id="customer-profile-section" class="customer-profile-form-card card-float">
       <div class="card-header">
         <h2 class="card-title">
-          <svg class="section-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <span class="card-title-icon">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -375,6 +399,7 @@
               d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
             />
           </svg>
+          </span>
           Complete o seu Perfil de Cliente
         </h2>
         <p class="card-subtitle">Preencha os dados abaixo para aceder a todos os serviços da oficina</p>

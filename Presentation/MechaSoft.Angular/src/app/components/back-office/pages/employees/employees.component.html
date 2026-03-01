@@ -243,13 +243,13 @@
           <div class="space-y-4">
             <!-- Username -->
             <div class="credentials-field">
-              <label class="block text-sm font-medium text-gray-700 mb-2">Nome de Utilizador</label>
+              <label class="block text-sm font-medium text-zinc-200 mb-2">Nome de Utilizador</label>
               <div class="flex items-center gap-2">
                 <input 
                   type="text" 
                   [value]="generatedCredentials.username" 
                   readonly 
-                  class="form-input bg-gray-100 font-mono flex-1"
+                  class="form-input bg-gray-100 text-slate-900 font-mono flex-1"
                 />
                 <button 
                   type="button"
@@ -266,13 +266,13 @@
 
             <!-- Password -->
             <div class="credentials-field">
-              <label class="block text-sm font-medium text-gray-700 mb-2">Senha Temporária</label>
+              <label class="block text-sm font-medium text-zinc-200 mb-2">Senha Temporária</label>
               <div class="flex items-center gap-2">
                 <input 
                   type="text" 
                   [value]="generatedCredentials.password" 
                   readonly 
-                  class="form-input bg-yellow-50 border-yellow-300 font-mono text-lg font-bold flex-1"
+                  class="form-input bg-yellow-50 border-yellow-300 text-slate-900 font-mono text-lg font-bold flex-1"
                 />
                 <button 
                   type="button"
@@ -285,7 +285,7 @@
                   </svg>
                 </button>
               </div>
-              <p class="text-xs text-gray-600 mt-1">⚠️ Esta senha só será mostrada uma vez. O funcionário deve alterá-la no primeiro login.</p>
+              <p class="text-xs text-zinc-400 mt-1">⚠️ Esta senha só será mostrada uma vez. O funcionário deve alterá-la no primeiro login.</p>
             </div>
           </div>
 

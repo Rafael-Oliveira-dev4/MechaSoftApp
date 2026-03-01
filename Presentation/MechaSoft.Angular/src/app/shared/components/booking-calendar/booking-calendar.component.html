@@ -1,0 +1,47 @@
+<div class="booking-calendar">
+  <div class="calendar-header">
+    <button type="button" class="nav-btn" (click)="prevMonth()" aria-label="Mês anterior">
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+      </svg>
+    </button>
+    <div class="month-label">{{ displayLabel() }}</div>
+    <button type="button" class="nav-btn" (click)="nextMonth()" aria-label="Mês seguinte">
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="weekdays-row">
+    @for (w of weekDays; track $index) {
+      <span class="weekday-cell">{{ w }}</span>
+    }
+  </div>
+
+  <div class="calendar-grid">
+    @for (row of calendarGrid(); track row[0].isoDate) {
+      <div class="calendar-row">
+        @for (day of row; track day.isoDate) {
+          <button
+            type="button"
+            class="day-cell"
+            [class.outside]="!day.isCurrentMonth"
+            [class.disabled]="day.isDisabled"
+            [class.selected]="day.isSelected"
+            [class.today]="day.isToday && !day.isSelected"
+            [disabled]="day.isDisabled"
+            (click)="onDayClick(day, $event)"
+          >
+            <span class="day-num">{{ day.dayOfMonth }}</span>
+          </button>
+        }
+      </div>
+    }
+  </div>
+
+  <div class="calendar-footer">
+    <button type="button" class="footer-btn" (click)="clearSelection()">Limpar</button>
+    <button type="button" class="footer-btn primary" (click)="goToday()">Hoje</button>
+  </div>
+</div>

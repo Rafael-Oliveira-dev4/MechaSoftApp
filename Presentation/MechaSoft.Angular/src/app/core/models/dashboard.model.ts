@@ -80,6 +80,23 @@ export interface MonthlyExpense {
   amount: number;
 }
 
+export interface MechanicDashboardStats {
+  totalAssigned: number;
+  pending: number;
+  inProgress: number;
+  completedToday: number;
+  recentOrders: MechanicRecentOrder[];
+}
+
+export interface MechanicRecentOrder {
+  id: string;
+  orderNumber: string;
+  vehiclePlate: string;
+  description: string;
+  status: string;
+  createdAt: Date | string | null;
+}
+
 export interface LowStockReport {
   parts: LowStockPart[];
   totalDeficit: number;

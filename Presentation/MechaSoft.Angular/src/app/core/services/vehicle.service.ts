@@ -57,11 +57,26 @@ export class VehicleService {
     );
   }
 
-  // Listar veículos de um cliente
+  // Listar veículos de um cliente (API devolve GetVehiclesResponse: { vehicles, totalCount, ... })
   getByCustomer(customerId: string): Observable<Result<Vehicle[]>> {
-    return this.http.get<Vehicle[]>(`${this.apiUrl}/customer/${customerId}`).pipe(
-      map(vehicles => success(vehicles)),
-      catchError(error => of(failure<Vehicle[]>(error)))
+    const url = `${this.apiUrl}/customer/${customerId}`;
+    console.debug('[VehicleService] getByCustomer request:', url);
+    return this.http.get<Record<string, unknown>>(url).pipe(
+      map(response => {
+        console.debug('[VehicleService] getByCustomer response raw:', response);
+        if (response == null || typeof response !== 'object') {
+          console.warn('[VehicleService] getByCustomer: response null ou não-object');
+          return success([]);
+        }
+        const list = (response['vehicles'] ?? response['Vehicles']) as Vehicle[] | undefined;
+        const vehicles = Array.isArray(list) ? list : [];
+        console.debug('[VehicleService] getByCustomer parsed:', vehicles.length, 'veículos');
+        return success(vehicles);
+      }),
+      catchError(error => {
+        console.error('[VehicleService] getByCustomer HTTP error:', error?.status ?? error?.statusCode, error?.message ?? error, error);
+        return of(failure<Vehicle[]>(error));
+      })
     );
   }
 

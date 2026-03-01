@@ -197,9 +197,10 @@ export class AuthService {
     const options = token 
       ? { headers: { Authorization: `Bearer ${token}` } } 
       : {};
-    
+    console.debug('[AuthService] loadFullUserProfile request:', `${this.apiUrl}/accounts/profile/${userId}`);
     return this.httpClientNoInterceptors.get<any>(`${this.apiUrl}/accounts/profile/${userId}`, options).pipe(
       map(response => {
+        console.debug('[AuthService] loadFullUserProfile response:', { customerId: response.customerId, employeeId: response.employeeId });
         // Merge with current user to preserve JWT data
         const currentUser = this.currentUserSubject.value;
         const fullUser: User = {
@@ -215,10 +216,13 @@ export class AuthService {
           employeeId: response.employeeId,
           profileImageUrl: response.profileImageUrl
         };
-        
         this.currentUserSubject.next(fullUser);
+        console.debug('[AuthService] currentUserSubject.next(fullUser) com customerId:', fullUser.customerId);
       }),
-      catchError(() => of(undefined))
+      catchError((err) => {
+        console.error('[AuthService] loadFullUserProfile error:', err?.status ?? err?.statusCode, err?.message ?? err);
+        return of(undefined);
+      })
     );
   }
 

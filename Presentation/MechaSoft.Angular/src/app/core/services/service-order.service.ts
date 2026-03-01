@@ -120,11 +120,38 @@ export class ServiceOrderService {
     );
   }
 
-  // Listar ordens de um cliente
-  getByCustomer(customerId: string): Observable<Result<ServiceOrder[]>> {
-    return this.http.get<ServiceOrder[]>(`${this.apiUrl}/customer/${customerId}`).pipe(
-      map(orders => success(orders)),
-      catchError(error => of(failure<ServiceOrder[]>(error)))
+  // Listar ordens de um cliente (com paginação e mesmo formato que getAll)
+  getByCustomer(
+    customerId: string,
+    pageNumber: number = 1,
+    pageSize: number = 10,
+    status?: string
+  ): Observable<Result<{ items: ServiceOrder[]; totalCount: number; pageNumber: number; pageSize: number; totalPages: number }>> {
+    let params = new HttpParams()
+      .set('pageNumber', pageNumber.toString())
+      .set('pageSize', pageSize.toString());
+    if (status) params = params.set('status', status);
+    return this.http.get<any>(`${this.apiUrl}/customer/${customerId}`, { params }).pipe(
+      map(response => {
+        let items = response?.serviceOrders ?? response ?? [];
+        if (!Array.isArray(items)) items = [];
+        // Compatibilidade: API pode devolver vehicleLicensePlate; a lista usa vehiclePlate e vehicleInfo
+        items = items.map((o: any) => ({
+          ...o,
+          vehiclePlate: o.vehiclePlate ?? o.vehicleLicensePlate,
+          vehicleInfo: o.vehicleInfo ?? (o.vehicleBrand && o.vehicleModel ? `${o.vehicleBrand} ${o.vehicleModel}` : o.vehicleLicensePlate ?? '-')
+        }));
+        const totalCount = response?.totalCount ?? items.length;
+        const totalPages = response?.totalPages ?? Math.ceil(totalCount / pageSize);
+        return success({
+          items,
+          totalCount,
+          pageNumber: response?.pageNumber ?? pageNumber,
+          pageSize: response?.pageSize ?? pageSize,
+          totalPages
+        });
+      }),
+      catchError(error => of(failure<any>(error)))
     );
   }
 }

@@ -212,9 +212,10 @@ public static class ServiceOrderEndpoints
             [FromServices] ISender sender,
             Guid customerId,
             int pageNumber = 1,
-            int pageSize = 10)
+            int pageSize = 10,
+            ServiceOrderStatus? status = null)
         {
-            var query = new GetServiceOrdersQuery(pageNumber, pageSize, customerId, null);
+            var query = new GetServiceOrdersQuery(pageNumber, pageSize, customerId, status);
             var result = await sender.Send(query);
 
             return result.IsSuccess

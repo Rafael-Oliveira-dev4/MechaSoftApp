@@ -1,0 +1,54 @@
+.time-slots {
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--cal-border, #475569);
+}
+
+.slots-heading {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--cal-text, #f8fafc);
+  margin: 0 0 0.25rem 0;
+  letter-spacing: 0.01em;
+}
+
+.slots-hint {
+  font-size: 0.8125rem;
+  color: var(--cal-text-muted, #94a3b8);
+  margin: 0 0 1rem 0;
+}
+
+.slots-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(5rem, 1fr));
+  gap: 0.5rem;
+}
+
+.slot-btn {
+  padding: 0.625rem 0.75rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  border: 1px solid var(--cal-border, #475569);
+  border-radius: 0.5rem;
+  background: var(--cal-bg-elevated, #334155);
+  color: var(--cal-text, #f8fafc);
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+
+  &:hover:not(.disabled) {
+    border-color: var(--cal-accent, #10b981);
+    background: rgba(16, 185, 129, 0.12);
+  }
+
+  &.selected {
+    background: var(--cal-accent, #10b981);
+    border-color: var(--cal-accent, #10b981);
+    color: #fff;
+  }
+
+  &.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    text-decoration: line-through;
+  }
+}

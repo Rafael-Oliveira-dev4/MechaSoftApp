@@ -4,7 +4,7 @@ import { Observable, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { ApiConfigService } from './api-config.service';
 import { Result, success, failure } from '../models/result.model';
-import { DashboardStats, LowStockReport } from '../models/dashboard.model';
+import { DashboardStats, LowStockReport, MechanicDashboardStats } from '../models/dashboard.model';
 
 @Injectable({
   providedIn: 'root'
@@ -60,6 +60,14 @@ export class DashboardService {
     return this.http.get<CustomerDashboardStats>(`${this.apiUrl}/customer/${customerId}`).pipe(
       map(stats => success(stats)),
       catchError(error => of(failure<CustomerDashboardStats>(error)))
+    );
+  }
+
+  // Obter estatísticas do dashboard do mecânico (minhas ordens, sem receita)
+  getMechanicStats(mechanicId: string): Observable<Result<MechanicDashboardStats>> {
+    return this.http.get<MechanicDashboardStats>(`${this.apiUrl}/mechanic/${mechanicId}`).pipe(
+      map(stats => success(stats)),
+      catchError(error => of(failure<MechanicDashboardStats>(error)))
     );
   }
 }

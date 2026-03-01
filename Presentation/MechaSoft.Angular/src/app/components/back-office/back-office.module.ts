@@ -14,6 +14,7 @@ import { BookInspectionComponent } from './pages/inspections/book-inspection.com
 import { ServicesComponent } from './pages/services/services.component';
 import { SettingsComponent } from './pages/settings/settings.component';
 import { VehiclesComponent } from './pages/vehicles/vehicles.component';
+import { EmployeesComponent } from './pages/employees/employees.component';
 
 @NgModule({
   imports: [
@@ -24,6 +25,7 @@ import { VehiclesComponent } from './pages/vehicles/vehicles.component';
     DashboardComponent,
     CustomersComponent,
     VehiclesComponent,
+    EmployeesComponent,
     ServicesComponent,
     PartsComponent,
     InspectionsComponent,

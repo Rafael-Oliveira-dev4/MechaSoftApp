@@ -93,6 +93,10 @@
   }
 }
 
+.field-hint {
+  @apply text-sm text-zinc-500 mb-2;
+}
+
 .field-error {
   @apply text-sm text-red-400 mt-1 block;
 }

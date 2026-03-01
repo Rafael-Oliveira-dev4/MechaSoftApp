@@ -1,0 +1,225 @@
+// Tema escuro alinhado ao back-office (slate + emerald)
+.booking-calendar {
+  --cal-bg: #1e293b;
+  --cal-bg-elevated: #334155;
+  --cal-border: #475569;
+  --cal-text: #f8fafc;
+  --cal-text-muted: #94a3b8;
+  --cal-text-dim: #64748b;
+  --cal-accent: #10b981;
+  --cal-accent-hover: #34d399;
+  --cal-accent-bg: rgba(16, 185, 129, 0.15);
+  --cal-today-border: #10b981;
+  --cal-radius: 0.75rem;
+  --cal-radius-sm: 0.5rem;
+
+  max-width: 340px;
+  padding: 1.25rem;
+  border: 1px solid var(--cal-border);
+  border-radius: var(--cal-radius);
+  background: var(--cal-bg);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -2px rgba(0, 0, 0, 0.15);
+}
+
+.calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+  gap: 0.5rem;
+}
+
+.nav-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  border: 1px solid var(--cal-border);
+  border-radius: var(--cal-radius-sm);
+  background: var(--cal-bg-elevated);
+  color: var(--cal-text-muted);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+
+  &:hover:not(:disabled) {
+    background: var(--cal-border);
+    color: var(--cal-text);
+    border-color: var(--cal-accent);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--cal-accent);
+    outline-offset: 2px;
+  }
+}
+
+.nav-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.month-label {
+  font-weight: 600;
+  font-size: 1.125rem;
+  letter-spacing: 0.01em;
+  color: var(--cal-text);
+  text-transform: capitalize;
+}
+
+.weekdays-row {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  margin-bottom: 0.75rem;
+}
+
+.weekday-cell {
+  text-align: center;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: var(--cal-text-muted);
+  text-transform: uppercase;
+}
+
+.calendar-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.calendar-row {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.day-cell {
+  aspect-ratio: 1;
+  min-width: 2.5rem;
+  min-height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--cal-radius-sm);
+  background: transparent;
+  color: var(--cal-text);
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.1s;
+
+  .day-num {
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  &.outside {
+    color: var(--cal-text-dim);
+
+    .day-num {
+      opacity: 0.6;
+    }
+  }
+
+  &.disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    color: var(--cal-text-dim);
+
+    .day-num {
+      text-decoration: line-through;
+    }
+  }
+
+  &:hover:not(.disabled) {
+    background: var(--cal-bg-elevated);
+    border-color: var(--cal-border);
+  }
+
+  &:active:not(.disabled) {
+    transform: scale(0.96);
+  }
+
+  &.today:not(.selected) {
+    border-color: var(--cal-today-border);
+    background: var(--cal-accent-bg);
+    color: var(--cal-accent);
+
+    .day-num {
+      font-weight: 700;
+    }
+
+    &:hover {
+      background: var(--cal-accent-bg);
+      border-color: var(--cal-accent-hover);
+    }
+  }
+
+  &.selected {
+    background: var(--cal-accent);
+    border-color: var(--cal-accent);
+    color: #fff;
+    box-shadow: 0 0 0 1px var(--cal-accent);
+
+    .day-num {
+      font-weight: 700;
+    }
+
+    &:hover {
+      background: var(--cal-accent-hover);
+      border-color: var(--cal-accent-hover);
+    }
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--cal-accent);
+    outline-offset: 2px;
+  }
+}
+
+.calendar-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--cal-border);
+  gap: 0.75rem;
+}
+
+.footer-btn {
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--cal-radius-sm);
+  border: 1px solid var(--cal-border);
+  background: transparent;
+  color: var(--cal-text-muted);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+
+  &:hover {
+    background: var(--cal-bg-elevated);
+    color: var(--cal-text);
+    border-color: var(--cal-border);
+  }
+
+  &.primary {
+    border-color: var(--cal-accent);
+    background: var(--cal-accent-bg);
+    color: var(--cal-accent);
+
+    &:hover {
+      background: var(--cal-accent);
+      color: #fff;
+    }
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--cal-accent);
+    outline-offset: 2px;
+  }
+}

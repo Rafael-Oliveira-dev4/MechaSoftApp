@@ -155,20 +155,33 @@ export class ServiceOrdersComponent implements OnInit {
     });
   }
 
-  // Carregar ordens da API
+  // Carregar ordens da API (cliente usa endpoint por customerId para ver as suas ordens)
   loadOrders(): void {
     const currentUser = this.authService.getCurrentUser();
-    const customerId = currentUser?.role === 'Customer' ? currentUser.customerId : undefined;
+    const isCustomer = currentUser?.role === 'Customer';
+    const customerId = isCustomer ? currentUser.customerId : undefined;
 
-    this.serviceOrderService.getAll(this.currentPage, this.pageSize, this.statusFilter, customerId).subscribe(result => {
-      if (result.isSuccess && result.value) {
-        this.orders = result.value.items;
-        this.totalCount = result.value.totalCount;
-        this.cdr.detectChanges();
-      } else {
-        this.error = result.error || null;
-      }
-    });
+    if (isCustomer && customerId) {
+      this.serviceOrderService.getByCustomer(customerId, this.currentPage, this.pageSize, this.statusFilter || undefined).subscribe(result => {
+        if (result.isSuccess && result.value) {
+          this.orders = result.value.items;
+          this.totalCount = result.value.totalCount;
+          this.cdr.detectChanges();
+        } else {
+          this.error = result.error || null;
+        }
+      });
+    } else {
+      this.serviceOrderService.getAll(this.currentPage, this.pageSize, this.statusFilter).subscribe(result => {
+        if (result.isSuccess && result.value) {
+          this.orders = result.value.items;
+          this.totalCount = result.value.totalCount;
+          this.cdr.detectChanges();
+        } else {
+          this.error = result.error || null;
+        }
+      });
+    }
   }
 
   // Carregar clientes para dropdown (Admin/Owner)
@@ -346,6 +359,12 @@ export class ServiceOrdersComponent implements OnInit {
 
   isCustomer(): boolean {
     return this.authService.getCurrentUser()?.role === 'Customer';
+  }
+
+  // Label do filtro: para cliente, "Pendente" mostra como "Por aprovar"
+  getFilterLabel(status: { value: string; label: string }): string {
+    if (this.isCustomer() && status.value === 'Pending') return 'Por aprovar';
+    return status.label;
   }
 
   // Traduzir Status do enum para português
