@@ -1,6 +1,5 @@
-import { Component, OnInit, AfterViewInit, Inject, PLATFORM_ID } from '@angular/core';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Component, OnInit, AfterViewInit, OnDestroy, Inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-landing',
@@ -8,9 +7,12 @@ import { RouterModule } from '@angular/router';
   templateUrl: './landing.component.html',
   styleUrls: ['./landing.component.scss']
 })
-export class LandingComponent implements OnInit, AfterViewInit {
+export class LandingComponent implements OnInit, AfterViewInit, OnDestroy {
   isMobileMenuOpen = false;
   isNavbarScrolled = false;
+  private readonly sectionOffset = 92;
+  private scrollHandler?: () => void;
+  private observers: IntersectionObserver[] = [];
   
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
   
@@ -30,18 +32,21 @@ export class LandingComponent implements OnInit, AfterViewInit {
 
   private setupScrollListener() {
     if (typeof window === 'undefined') return;
-    
-    window.addEventListener('scroll', () => {
+
+    this.scrollHandler = () => {
       this.isNavbarScrolled = window.scrollY > 50;
-    }, { passive: true });
+    };
+
+    window.addEventListener('scroll', this.scrollHandler, { passive: true });
   }
 
   scrollToSection(sectionId: string) {
-    if (typeof document === 'undefined') return;
-    
+    if (typeof document === 'undefined' || typeof window === 'undefined') return;
+
     const element = document.querySelector(sectionId);
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const top = element.getBoundingClientRect().top + window.scrollY - this.sectionOffset;
+      window.scrollTo({ top, behavior: 'smooth' });
       this.closeMobileMenu();
     }
   }
@@ -54,7 +59,8 @@ export class LandingComponent implements OnInit, AfterViewInit {
   }
 
   private animateOnScroll() {
-    if (typeof document === 'undefined') return;
+    if (typeof document === 'undefined' || typeof window === 'undefined') return;
+    if (!('IntersectionObserver' in window)) return;
     
     const elements = document.querySelectorAll('[data-animate]');
     
@@ -68,10 +74,12 @@ export class LandingComponent implements OnInit, AfterViewInit {
     }, { threshold: 0.1 });
 
     elements.forEach(el => observer.observe(el));
+    this.observers.push(observer);
   }
 
   private animateCounters() {
-    if (typeof document === 'undefined') return;
+    if (typeof document === 'undefined' || typeof window === 'undefined') return;
+    if (!('IntersectionObserver' in window)) return;
     
     const counters = document.querySelectorAll('[data-count]');
     
@@ -87,6 +95,7 @@ export class LandingComponent implements OnInit, AfterViewInit {
     }, { threshold: 0.5 });
 
     counters.forEach(counter => observer.observe(counter));
+    this.observers.push(observer);
   }
 
   private animateCounter(element: HTMLElement, target: number) {
@@ -122,6 +131,15 @@ export class LandingComponent implements OnInit, AfterViewInit {
           element.textContent = value.toString();
       }
     }, 16);
+  }
+
+  ngOnDestroy() {
+    if (typeof window !== 'undefined' && this.scrollHandler) {
+      window.removeEventListener('scroll', this.scrollHandler);
+    }
+
+    this.observers.forEach(observer => observer.disconnect());
+    this.observers = [];
   }
 }
 
