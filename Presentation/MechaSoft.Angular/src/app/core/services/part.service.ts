@@ -27,13 +27,14 @@ export class PartService {
   }
 
   // Listar peças com paginação
-  getAll(pageNumber: number = 1, pageSize: number = 10, lowStock?: boolean): Observable<Result<PartsResponse>> {
+  getAll(pageNumber: number = 1, pageSize: number = 10, lowStockOnly?: boolean): Observable<Result<PartsResponse>> {
     let params = new HttpParams()
       .set('pageNumber', pageNumber.toString())
       .set('pageSize', pageSize.toString());
 
-    if (lowStock !== undefined) {
-      params = params.set('lowStock', lowStock.toString());
+    if (lowStockOnly !== undefined) {
+      // Backend expects lowStockOnly query parameter
+      params = params.set('lowStockOnly', lowStockOnly.toString());
     }
 
     return this.http.get<any>(this.apiUrl, { params }).pipe(

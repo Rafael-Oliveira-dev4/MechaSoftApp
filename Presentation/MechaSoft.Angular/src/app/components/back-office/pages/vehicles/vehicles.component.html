@@ -68,7 +68,7 @@
         
         @for (vehicle of vehicles; track vehicle.id) {
           <tr class="vehicle-row">
-            @if (canManageVehicles()) { <td class="font-medium">{{ vehicle.customerName }}</td> }
+            @if (canManageVehicles()) { <td class="font-medium">{{ getDisplayCustomerName(vehicle) }}</td> }
             <td class="font-mono font-bold text-teal-400">{{ vehicle.licensePlate }}</td>
             <td class="vehicle-brand">{{ vehicle.brand }} {{ vehicle.model }}</td>
             <td>{{ vehicle.year }}</td>

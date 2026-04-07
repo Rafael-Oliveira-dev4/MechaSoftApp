@@ -81,7 +81,7 @@ export class VehiclesComponent implements OnInit {
     const currentUser = this.authService.getCurrentUser();
     const customerId = currentUser?.role === 'Customer' ? currentUser.customerId : undefined;
 
-    this.vehicleService.getAll(this.currentPage, this.pageSize, customerId).subscribe(result => {
+    this.vehicleService.getAll(this.currentPage, this.pageSize, customerId, this.searchTerm).subscribe(result => {
       if (result.isSuccess && result.value) {
         this.vehicles = result.value.items;
         this.totalCount = result.value.totalCount;
@@ -226,7 +226,17 @@ export class VehiclesComponent implements OnInit {
   // Obter nome do cliente
   getCustomerName(customerId: string): string {
     const customer = this.customers.find(c => c.id === customerId);
-    return customer?.name || 'Desconhecido';
+    return customer?.name || 'Sem cliente';
+  }
+
+  // Resolve nome do cliente para exibição na tabela, evitando "Unknown" do backend
+  getDisplayCustomerName(vehicle: Vehicle): string {
+    const backendName = (vehicle.customerName || '').trim();
+    if (backendName && backendName.toLowerCase() !== 'unknown') {
+      return backendName;
+    }
+
+    return this.getCustomerName(vehicle.customerId);
   }
 
   // Check if user can create vehicles (Admin/Owner)
