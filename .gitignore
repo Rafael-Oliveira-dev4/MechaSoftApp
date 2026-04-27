@@ -86,3 +86,14 @@ $tf/
 
 # Itens específicos do seu projeto (adicionados manualmente)
 # (Se necessário, mantenha entradas específicas para arquivos gerados que não devem ir para o repositório)
+
+# Arquivos sensíveis e segredos locais
+.env
+.env.*
+!.env.example
+secrets.json
+secrets.*.json
+appsettings.Local.json
+appsettings.*.Local.json
+**/appsettings.Local.json
+**/appsettings.*.Local.json

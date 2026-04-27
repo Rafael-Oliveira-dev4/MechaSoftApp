@@ -1,3 +1,126 @@
+# MechaSoft - Workshop Management System
+
+Full-stack workshop management platform with a .NET backend and an Angular frontend.
+
+## Stack
+
+- Backend: .NET 10, ASP.NET Core Minimal API, EF Core, MediatR, FluentValidation
+- Frontend: Angular 20, TypeScript, Tailwind CSS
+- Database: SQL Server
+
+## Repository Structure
+
+```text
+MechaSoftApp/
+|- MechaSoft.WebAPI/          # ASP.NET Core API
+|- MechaSoft.Application/     # Use cases and handlers
+|- MechaSoft.Data/            # EF Core context and repositories
+|- MechaSoft.Domain/          # Domain entities
+|- MechaSoft.Domain.Core/     # Shared abstractions
+|- MechaSoft.Security/        # Authentication and authorization
+|- MechaSoft.IoC/             # Dependency injection
+|- Presentation/
+|  \- MechaSoft.Angular/      # Angular application
+|- scripts/
+|  |- linux/
+|  \- windows/
+\- API_TESTS.http
+```
+
+## Prerequisites
+
+- .NET SDK 10+
+- Node.js 18+ and npm 9+
+- SQL Server (local or Docker)
+
+## Configuration
+
+1. Copy example files in `MechaSoft.WebAPI`:
+   - `appsettings.example.json` -> `appsettings.json`
+   - `appsettings.Development.example.json` -> `appsettings.Development.json`
+2. Fill local values for:
+   - `ConnectionStrings:MechaSoftCS`
+   - `JwtSettings:Key`
+
+Do not commit real credentials or secret keys.
+
+## Run Locally
+
+### Windows
+
+```powershell
+# from repository root
+.\scripts\windows\setup-db.ps1
+.\scripts\windows\start.ps1
+```
+
+### Linux/macOS
+
+```bash
+# from repository root
+./scripts/linux/setup-db.sh
+./scripts/linux/start.sh
+```
+
+### Manual run
+
+Backend:
+
+```bash
+dotnet restore
+dotnet run --project MechaSoft.WebAPI
+```
+
+Frontend:
+
+```bash
+cd Presentation/MechaSoft.Angular
+npm install
+npm start
+```
+
+Default local endpoints:
+
+- Frontend: `http://localhost:4300`
+- Backend: `http://localhost:5039`
+- Swagger: `http://localhost:5039/swagger`
+
+## Tests and Quality
+
+Backend:
+
+```bash
+dotnet test
+```
+
+Frontend:
+
+```bash
+cd Presentation/MechaSoft.Angular
+npm run build
+npm run test -- --watch=false --browsers=ChromeHeadless
+```
+
+API manual tests:
+
+- Open `API_TESTS.http` with a REST client extension.
+
+## Documentation
+
+- Angular structure: `Presentation/MechaSoft.Angular/ESTRUTURA.md`
+- Navigation flow: `Presentation/MechaSoft.Angular/FLUXO_NAVEGACAO.md`
+
+## Governance
+
+- Contribution guide: `CONTRIBUTING.md`
+- Code of conduct: `CODE_OF_CONDUCT.md`
+- Security policy: `SECURITY.md`
+- License: `LICENSE`
+
+## Developer
+
+- Rafael Oliveira
+
 # 🔧 MechaSoft - Workshop Management System
 
 Full-stack workshop management solution with .NET 10 backend (WebAPI + EF Core) and Angular 19 frontend.
