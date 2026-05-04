@@ -1,7 +1,7 @@
 import { provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { RouterModule } from '@angular/router';
-import { App } from './app';
+import { App } from './app.component';
 
 describe('App', () => {
   beforeEach(async () => {
@@ -22,10 +22,10 @@ describe('App', () => {
     expect(app).toBeTruthy();
   });
 
-  it('should render title', () => {
+  it('should render router outlet', () => {
     const fixture = TestBed.createComponent(App);
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, MechaSoft.Angular');
+    expect(compiled.querySelector('router-outlet')).toBeTruthy();
   });
 });
