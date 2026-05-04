@@ -26,6 +26,8 @@ public record ServiceOrderDto(
     string CustomerName,
     Guid VehicleId,
     string VehicleLicensePlate,
+    string? VehicleBrand,
+    string? VehicleModel,
     string Description,
     ServiceOrderStatus Status,
     decimal EstimatedCost,

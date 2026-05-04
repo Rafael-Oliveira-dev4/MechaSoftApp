@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { ProfileImageService } from '../../../core/services/profile-image.service';
 
 @Component({
@@ -9,7 +9,7 @@ import { ProfileImageService } from '../../../core/services/profile-image.servic
   templateUrl: './profile-image-upload.component.html',
   styleUrls: ['./profile-image-upload.component.scss'],
 })
-export class ProfileImageUploadComponent {
+export class ProfileImageUploadComponent implements OnChanges {
   @Input() userId!: string;
   @Input() currentImageUrl?: string | null;
   @Output() uploadSuccess = new EventEmitter<string>();
@@ -20,8 +20,15 @@ export class ProfileImageUploadComponent {
   isUploading = false;
   isDragging = false;
   errorMessage: string | null = null;
+  imageLoadFailed = false;
 
   constructor(private profileImageService: ProfileImageService) {}
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['currentImageUrl']) {
+      this.imageLoadFailed = false;
+    }
+  }
 
   /**
    * Handle file selection from input
@@ -103,6 +110,7 @@ export class ProfileImageUploadComponent {
       next: response => {
         this.isUploading = false;
         this.currentImageUrl = response.profileImageUrl;
+        this.imageLoadFailed = false;
         this.imagePreview = null;
         this.selectedFile = null;
         this.uploadSuccess.emit(response.profileImageUrl);
@@ -129,6 +137,14 @@ export class ProfileImageUploadComponent {
    */
   get displayImageUrl(): string {
     return this.profileImageService.getProfileImageUrl(this.currentImageUrl);
+  }
+
+  get hasCurrentImage(): boolean {
+    return !!this.currentImageUrl && !this.imageLoadFailed;
+  }
+
+  onImageError(): void {
+    this.imageLoadFailed = true;
   }
 
   /**

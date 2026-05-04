@@ -42,3 +42,8 @@ public record CompleteCustomerProfileRequest(
     string? Nif,
     string? CitizenCard
 );
+
+public record ToggleActiveRequest(
+    bool IsActive,
+    string? Reason
+);

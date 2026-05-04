@@ -31,6 +31,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   isUserMenuOpen = false;
   showLogoutConfirm = false;
   currentRoute = '';
+  avatarLoadFailed = false;
 
   private destroy$ = new Subject<void>();
 
@@ -122,6 +123,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.authService.currentUser$.pipe(takeUntil(this.destroy$)).subscribe((user: User | null) => {
       this.currentUser = user;
       this.isAuthenticated = !!user;
+      this.avatarLoadFailed = false;
     });
 
     // Rastrear mudanças de rota
@@ -217,6 +219,10 @@ export class NavbarComponent implements OnInit, OnDestroy {
     return this.profileImageService.getProfileImageUrl(this.currentUser?.profileImageUrl);
   }
 
+  hasAvatarImage(): boolean {
+    return !!this.getAvatarUrl() && !this.avatarLoadFailed;
+  }
+
   // Obter cor do avatar baseado na role
   getAvatarColor(): string {
     if (!this.currentUser?.role) return 'avatar-default';
@@ -258,7 +264,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   // Handler para erro no carregamento da imagem do avatar
   onAvatarError(event: Event): void {
-    const img = event.target as HTMLImageElement;
-    img.style.display = 'none'; // Esconder imagem quebrada
+    this.avatarLoadFailed = true;
   }
 }

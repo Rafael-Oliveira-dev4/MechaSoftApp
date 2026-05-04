@@ -35,20 +35,29 @@ public class GetServiceOrdersQueryHandler : IRequestHandler<GetServiceOrdersQuer
             .Skip((request.PageNumber - 1) * request.PageSize)
             .Take(request.PageSize);
 
-        var orderDtos = pagedOrders.Select(so => new ServiceOrderDto(
-            so.Id,
-            so.OrderNumber,
-            so.CustomerId,
-            so.Customer?.Name.FullName ?? "Unknown",
-            so.VehicleId,
-            so.Vehicle?.LicensePlate ?? "Unknown",
-            so.Description,
-            so.Status,
-            so.EstimatedCost.Amount,
-            so.FinalCost?.Amount,
-            so.EstimatedDelivery,
-            so.CreatedAt ?? DateTime.UtcNow
-        ));
+        var orderDtos = new List<ServiceOrderDto>();
+        foreach (var so in pagedOrders)
+        {
+            var customer = so.Customer ?? await _unitOfWork.CustomerRepository.GetByIdAsync(so.CustomerId);
+            var vehicle = so.Vehicle ?? await _unitOfWork.VehicleRepository.GetByIdAsync(so.VehicleId);
+
+            orderDtos.Add(new ServiceOrderDto(
+                so.Id,
+                so.OrderNumber,
+                so.CustomerId,
+                customer?.Name.FullName ?? "Unknown",
+                so.VehicleId,
+                vehicle?.LicensePlate ?? "Unknown",
+                vehicle?.Brand,
+                vehicle?.Model,
+                so.Description,
+                so.Status,
+                so.EstimatedCost.Amount,
+                so.FinalCost?.Amount,
+                so.EstimatedDelivery,
+                so.CreatedAt ?? DateTime.UtcNow
+            ));
+        }
 
         var response = new GetServiceOrdersResponse(
             orderDtos,

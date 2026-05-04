@@ -10,11 +10,12 @@ import { ErrorMessageComponent } from '../../../../shared/components/error-messa
 import { nifValidator, phonePortugueseValidator } from '../../../../core/validators';
 import { FormFieldErrorComponent } from '../../../../shared/components/form-field-error/form-field-error.component';
 import { RealTimeValidationDirective } from '../../../../shared/directives/real-time-validation.directive';
+import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-customers',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, ErrorMessageComponent, FormFieldErrorComponent, RealTimeValidationDirective],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, ErrorMessageComponent, FormFieldErrorComponent, RealTimeValidationDirective, ConfirmDialogComponent],
   templateUrl: './customers.component.html',
   styleUrls: ['./customers.component.scss']
 })
@@ -26,8 +27,10 @@ export class CustomersComponent implements OnInit {
   searchTerm: string = '';
   
   showModal: boolean = false;
+  showToggleConfirm = false;
   isEditMode: boolean = false;
   selectedCustomerId: string | null = null;
+  pendingToggleCustomer: Customer | null = null;
   
   customerForm: FormGroup;
   error: ErrorDetail | null = null;
@@ -150,15 +153,40 @@ export class CustomersComponent implements OnInit {
 
   // Toggle active/inactive
   toggleActive(customer: Customer): void {
-    if (confirm(`Deseja ${customer.isActive ? 'desativar' : 'ativar'} o cliente ${customer.name}?`)) {
-      this.customerService.toggleActive(customer.id).subscribe(result => {
-        if (result.isSuccess) {
-          this.loadCustomers();
-        } else {
-          this.error = result.error || null;
-        }
-      });
-    }
+    this.pendingToggleCustomer = customer;
+    this.showToggleConfirm = true;
+  }
+
+  onToggleConfirm(): void {
+    if (!this.pendingToggleCustomer) return;
+    const targetIsActive = !this.pendingToggleCustomer.isActive;
+
+    this.customerService.toggleActive(this.pendingToggleCustomer.id, targetIsActive).subscribe(result => {
+      if (result.isSuccess) {
+        this.loadCustomers();
+      } else {
+        this.error = result.error || null;
+      }
+      this.closeToggleConfirm();
+    });
+  }
+
+  onToggleCancel(): void {
+    this.closeToggleConfirm();
+  }
+
+  get toggleConfirmTitle(): string {
+    return this.pendingToggleCustomer?.isActive ? 'Desativar Cliente' : 'Ativar Cliente';
+  }
+
+  get toggleConfirmMessage(): string {
+    if (!this.pendingToggleCustomer) return '';
+    return `Deseja ${this.pendingToggleCustomer.isActive ? 'desativar' : 'ativar'} o cliente ${this.pendingToggleCustomer.name}?`;
+  }
+
+  private closeToggleConfirm(): void {
+    this.showToggleConfirm = false;
+    this.pendingToggleCustomer = null;
   }
 
   // Pesquisar

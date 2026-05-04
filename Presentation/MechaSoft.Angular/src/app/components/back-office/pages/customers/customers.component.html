@@ -260,4 +260,15 @@
       </div>
     </div>
   }
+
+  <app-confirm-dialog
+    [visible]="showToggleConfirm"
+    [title]="toggleConfirmTitle"
+    [message]="toggleConfirmMessage"
+    [confirmLabel]="'Confirmar'"
+    [cancelLabel]="'Cancelar'"
+    [type]="pendingToggleCustomer?.isActive ? 'danger' : 'primary'"
+    (confirm)="onToggleConfirm()"
+    (cancel)="onToggleCancel()"
+  />
 </div>

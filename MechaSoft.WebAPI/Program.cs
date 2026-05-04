@@ -30,8 +30,23 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngularApp", policy =>
     {
-        policy.WithOrigins(allowedOrigins)
-              .AllowAnyHeader()
+        if (builder.Environment.IsDevelopment())
+        {
+            // ng serve / Vite podem usar portas dinâmicas (ex.: 57662) quando 4200 está ocupada
+            policy.SetIsOriginAllowed(static origin =>
+            {
+                if (string.IsNullOrEmpty(origin)) return false;
+                if (!Uri.TryCreate(origin, UriKind.Absolute, out var uri)) return false;
+                return uri.Host.Equals("localhost", StringComparison.OrdinalIgnoreCase)
+                    || uri.Host.Equals("127.0.0.1", StringComparison.OrdinalIgnoreCase);
+            });
+        }
+        else
+        {
+            policy.WithOrigins(allowedOrigins);
+        }
+
+        policy.AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();
     });

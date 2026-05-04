@@ -49,6 +49,14 @@ export class RequestServiceOrderComponent implements OnInit, OnDestroy {
     { value: 'Urgent', label: 'Urgente' },
   ];
 
+  // Regra de negócio: pedidos de serviço só podem ser agendados a partir de amanhã
+  readonly minBookingDate: Date = (() => {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    d.setDate(d.getDate() + 1);
+    return d;
+  })();
+
   constructor(
     private fb: FormBuilder,
     private auth: AuthService,
@@ -119,7 +127,9 @@ export class RequestServiceOrderComponent implements OnInit, OnDestroy {
     console.debug('[RequestServiceOrder] loadVehicles chamado, customerId:', customerId);
     this.loading = true;
     this.error = null;
-    this.vehicleService.getByCustomer(customerId).pipe(
+    // Usa o mesmo fluxo da página de veículos (getAll com customerId),
+    // evitando divergências de endpoint e comportamento.
+    this.vehicleService.getAll(1, 100, customerId).pipe(
       timeout(15000),
       takeUntil(this.destroy$),
       finalize(() => {
@@ -127,10 +137,15 @@ export class RequestServiceOrderComponent implements OnInit, OnDestroy {
         console.debug('[RequestServiceOrder] loadVehicles finalize (loading=false)');
       })
     ).subscribe({
-      next: (result: Result<Vehicle[]>) => {
-        console.debug('[RequestServiceOrder] getByCustomer next:', { isSuccess: result.isSuccess, count: result.value?.length ?? 0, error: result.error });
+      next: (result) => {
+        const vehicles = result.isSuccess && result.value?.items ? result.value.items : [];
+        console.debug('[RequestServiceOrder] getAll(customerId) next:', {
+          isSuccess: result.isSuccess,
+          count: vehicles.length,
+          error: result.error
+        });
         if (result.isSuccess) {
-          this.vehicles = Array.isArray(result.value) ? result.value : [];
+          this.vehicles = vehicles;
           if (this.vehicles.length === 0) {
             this.error = 'Não tem veículos registados. Registe um veículo primeiro.';
           }
@@ -139,7 +154,7 @@ export class RequestServiceOrderComponent implements OnInit, OnDestroy {
         }
       },
       error: (err: unknown) => {
-        console.error('[RequestServiceOrder] getByCustomer error:', err);
+        console.error('[RequestServiceOrder] getAll(customerId) error:', err);
         if (this.isSessionExpired()) {
           this.redirectToLoginWithMessage();
           return;
@@ -211,6 +226,20 @@ export class RequestServiceOrderComponent implements OnInit, OnDestroy {
       return;
     }
     const v = this.form.value;
+
+    // Segurança extra no submit: mesmo que o utilizador force a data por fora da UI,
+    // impedir marcações para hoje (ou passado).
+    if (v.preferredDate) {
+      const selected = new Date(v.preferredDate);
+      selected.setHours(0, 0, 0, 0);
+      const min = new Date(this.minBookingDate.getTime());
+      min.setHours(0, 0, 0, 0);
+      if (selected < min) {
+        this.error = 'Só é possível agendar serviços a partir de amanhã.';
+        return;
+      }
+    }
+
     this.submitting = true;
     this.error = null;
     const estimatedDelivery = v.preferredDate && v.preferredTime

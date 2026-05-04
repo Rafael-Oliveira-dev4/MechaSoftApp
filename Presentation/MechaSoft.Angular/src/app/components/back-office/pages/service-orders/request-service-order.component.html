@@ -75,15 +75,16 @@
           <app-booking-calendar
             [selectedDate]="form.get('preferredDate')?.value"
             [disableWeekends]="true"
+            [minDate]="minBookingDate"
             (dateSelected)="onDateSelected($event)"
           />
         </div>
-        <app-time-slots
-          [selectedDate]="form.get('preferredDate')?.value"
-          [selectedTime]="form.get('preferredTime')?.value"
-          (slotSelected)="onTimeSelected($event)"
-        />
       </div>
+      <app-time-slots
+        [selectedDate]="form.get('preferredDate')?.value"
+        [selectedTime]="form.get('preferredTime')?.value"
+        (slotSelected)="onTimeSelected($event)"
+      />
       <div class="form-group">
         <label for="observations">Observações (opcional)</label>
         <input id="observations" type="text" formControlName="observations" placeholder="Ex.: Preferência de manhã" />

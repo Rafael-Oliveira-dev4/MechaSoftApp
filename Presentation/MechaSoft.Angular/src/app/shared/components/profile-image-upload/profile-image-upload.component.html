@@ -3,7 +3,7 @@
   <div
     class="avatar-upload-block"
     [class.dragging]="isDragging"
-    [class.has-image]="displayImageUrl || hasPreview"
+    [class.has-image]="hasCurrentImage || hasPreview"
     (dragover)="onDragOver($event)"
     (dragleave)="onDragLeave($event)"
     (drop)="onDrop($event)"
@@ -20,12 +20,28 @@
     <!-- Avatar circle -->
     <div class="image-container">
       <div class="image-wrapper" [class.preview-mode]="hasPreview">
+        @if (hasPreview) {
         <img
-          [src]="hasPreview ? imagePreview : displayImageUrl"
-          [alt]="hasPreview ? 'Preview' : 'Foto de perfil'"
+          [src]="imagePreview"
+          alt="Preview"
           class="profile-image"
           [class.preview]="hasPreview"
         />
+        } @else if (hasCurrentImage) {
+        <img [src]="displayImageUrl" alt="Foto de perfil" class="profile-image" (error)="onImageError()" />
+        } @else {
+        <div class="profile-placeholder" aria-label="Sem foto de perfil">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+            />
+          </svg>
+          <span>Sem foto</span>
+        </div>
+        }
         @if (isUploading) {
         <div class="loading-overlay">
           <div class="spinner"></div>

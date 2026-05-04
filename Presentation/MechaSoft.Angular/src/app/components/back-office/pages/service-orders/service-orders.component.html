@@ -373,15 +373,24 @@
             <div class="form-grid">
               <!-- Serviço -->
               <div class="form-group col-span-2">
-                <label for="serviceId">Serviço *</label>
-                <select id="serviceId" formControlName="serviceId" class="form-input">
-                  <option value="">Selecione um serviço</option>
-                  @for (service of availableServices; track service.id) {
-                    <option [value]="service.id">
-                      {{ service.name }} - {{ formatCurrency(service.basePrice) }}
-                    </option>
+                <label for="serviceName">Serviço *</label>
+                <input
+                  id="serviceName"
+                  type="text"
+                  formControlName="serviceName"
+                  (input)="serviceSearchTerm = $any($event.target).value"
+                  list="service-suggestions"
+                  class="form-input mb-2"
+                  placeholder="Escreva o serviço (ex.: Revisão). Se não existir, será criado automaticamente."
+                />
+                <datalist id="service-suggestions">
+                  @for (service of filteredAvailableServices; track service.id) {
+                    <option [value]="service.name ?? service.serviceName"></option>
                   }
-                </select>
+                </datalist>
+                <small class="text-xs text-zinc-400">
+                  {{ filteredAvailableServices.length }} sugestão(ões) encontradas para o texto digitado.
+                </small>
               </div>
 
               <!-- Quantidade -->
@@ -452,9 +461,16 @@
               <!-- Peça -->
               <div class="form-group col-span-2">
                 <label for="partId">Peça *</label>
+                <input
+                  type="text"
+                  [(ngModel)]="partSearchTerm"
+                  [ngModelOptions]="{ standalone: true }"
+                  class="form-input mb-2"
+                  placeholder="Pesquisar peça por nome, código ou marca..."
+                />
                 <select id="partId" formControlName="partId" class="form-input">
-                  <option value="">Selecione uma peça</option>
-                  @for (part of availableParts; track part.id) {
+                  <option value="">{{ filteredAvailableParts.length > 0 ? 'Selecione uma peça' : 'Sem resultados para a pesquisa' }}</option>
+                  @for (part of filteredAvailableParts; track part.id) {
                     <option [value]="part.id">
                       {{ part.name }} ({{ part.code }}) - Stock: {{ part.stockQuantity }} - {{ formatCurrency(part.salePrice) }}
                     </option>

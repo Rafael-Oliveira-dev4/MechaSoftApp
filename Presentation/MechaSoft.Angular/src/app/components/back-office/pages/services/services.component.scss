@@ -206,3 +206,29 @@
     }
   }
 }
+
+// Select do modal em tema escuro (lista aberta + opções)
+.modal-content {
+  .form-input {
+    @apply bg-slate-900/90 text-zinc-100 border border-slate-700;
+  }
+
+  select.form-input {
+    color-scheme: dark;
+    @apply bg-slate-900 text-zinc-100 border-slate-700;
+
+    &:focus {
+      @apply border-teal-500 ring-2 ring-teal-500/20 outline-none;
+    }
+
+    option {
+      background-color: #0f172a; // slate-900
+      color: #e5e7eb; // zinc-200
+    }
+
+    option:checked {
+      background-color: #0f766e; // teal-700
+      color: #ffffff;
+    }
+  }
+}

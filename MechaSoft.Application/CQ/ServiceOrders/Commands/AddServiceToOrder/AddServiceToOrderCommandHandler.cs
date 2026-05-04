@@ -51,10 +51,6 @@ public class AddServiceToOrderCommandHandler : IRequestHandler<AddServiceToOrder
         // Add to service order
         serviceOrder.Services.Add(serviceItem);
 
-        // Recalculate estimated cost
-        serviceOrder.EstimatedCost = serviceOrder.CalculateTotalCost();
-
-        await _unitOfWork.ServiceOrderRepository.UpdateAsync(serviceOrder);
         await _unitOfWork.CommitAsync(cancellationToken);
 
         _logger.LogInformation("Service added to order: {OrderNumber}, Service: {ServiceName}", 

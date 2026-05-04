@@ -50,9 +50,12 @@ export class ServiceOrderService {
 
     return this.http.get<any>(this.apiUrl, { params }).pipe(
       map(response => {
+        const rawItems = Array.isArray(response?.serviceOrders) ? response.serviceOrders : [];
+        const items = rawItems.map((o: any) => this.normalizeOrderVehicleFields(o));
+
         // Transform backend response to match frontend interface
         const transformed = {
-          items: response.serviceOrders || [],
+          items,
           totalCount: response.totalCount || 0,
           pageNumber: response.pageNumber || 1,
           pageSize: response.pageSize || 10,
@@ -135,12 +138,7 @@ export class ServiceOrderService {
       map(response => {
         let items = response?.serviceOrders ?? response ?? [];
         if (!Array.isArray(items)) items = [];
-        // Compatibilidade: API pode devolver vehicleLicensePlate; a lista usa vehiclePlate e vehicleInfo
-        items = items.map((o: any) => ({
-          ...o,
-          vehiclePlate: o.vehiclePlate ?? o.vehicleLicensePlate,
-          vehicleInfo: o.vehicleInfo ?? (o.vehicleBrand && o.vehicleModel ? `${o.vehicleBrand} ${o.vehicleModel}` : o.vehicleLicensePlate ?? '-')
-        }));
+        items = items.map((o: any) => this.normalizeOrderVehicleFields(o));
         const totalCount = response?.totalCount ?? items.length;
         const totalPages = response?.totalPages ?? Math.ceil(totalCount / pageSize);
         return success({
@@ -153,5 +151,26 @@ export class ServiceOrderService {
       }),
       catchError(error => of(failure<any>(error)))
     );
+  }
+
+  private normalizeOrderVehicleFields(order: any): any {
+    const vehiclePlate =
+      order?.vehiclePlate ??
+      order?.vehicleLicensePlate ??
+      order?.licensePlate ??
+      '';
+
+    const vehicleInfo =
+      order?.vehicleInfo ??
+      order?.vehicle ??
+      ((order?.vehicleBrand && order?.vehicleModel)
+        ? `${order.vehicleBrand} ${order.vehicleModel} - ${vehiclePlate || 'Sem matrícula'}`
+        : (vehiclePlate || 'Veículo não identificado'));
+
+    return {
+      ...order,
+      vehiclePlate,
+      vehicleInfo
+    };
   }
 }

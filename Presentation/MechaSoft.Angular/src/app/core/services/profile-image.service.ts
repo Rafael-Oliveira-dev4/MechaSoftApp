@@ -54,16 +54,9 @@ export class ProfileImageService {
   }
 
   /**
-   * Get default avatar URL
-   */
-  getDefaultAvatarUrl(): string {
-    return 'assets/images/default_avatar.jpeg';
-  }
-
-  /**
-   * Get profile image URL or default
+   * Get profile image URL (returns empty when missing)
    */
   getProfileImageUrl(profileImageUrl?: string | null): string {
-    return profileImageUrl || this.getDefaultAvatarUrl();
+    return (profileImageUrl || '').trim();
   }
 }

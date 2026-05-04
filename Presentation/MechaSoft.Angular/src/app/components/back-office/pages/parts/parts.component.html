@@ -289,4 +289,15 @@
       </div>
     </div>
   }
+
+  <app-confirm-dialog
+    [visible]="showToggleConfirm"
+    [title]="toggleConfirmTitle"
+    [message]="toggleConfirmMessage"
+    [confirmLabel]="pendingTogglePart?.isActive ? 'Sim, desativar' : 'Sim, ativar'"
+    cancelLabel="Cancelar"
+    [type]="pendingTogglePart?.isActive ? 'danger' : 'primary'"
+    (confirm)="onToggleConfirm()"
+    (cancel)="onToggleCancel()"
+  />
 </div>

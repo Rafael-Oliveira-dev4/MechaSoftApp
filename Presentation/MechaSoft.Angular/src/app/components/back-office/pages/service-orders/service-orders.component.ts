@@ -10,6 +10,7 @@ import { AuthService } from '../../../../core/services/auth.service';
 import { MechanicServiceService } from '../../../../core/services/mechanic-service.service';
 import { PartService } from '../../../../core/services/part.service';
 import { ServiceOrder as BaseServiceOrder, Customer, Vehicle } from '../../../../core/models/api.models';
+import { CreateServiceRequest } from '../../../../core/models/service.model';
 import { Employee } from '../../../../core/models/employee.model';
 import { ErrorDetail } from '../../../../core/models/result.model';
 import { LoadingService } from '../../../../core/services/loading.service';
@@ -64,6 +65,8 @@ export class ServiceOrdersComponent implements OnInit {
   mechanics: Employee[] = [];
   availableServices: any[] = [];
   availableParts: any[] = [];
+  serviceSearchTerm = '';
+  partSearchTerm = '';
   
   totalCount: number = 0;
   currentPage: number = 1;
@@ -139,7 +142,7 @@ export class ServiceOrdersComponent implements OnInit {
 
   private createAddServiceForm(): FormGroup {
     return this.fb.group({
-      serviceId: ['', Validators.required],
+      serviceName: ['', [Validators.required, Validators.minLength(2)]],
       quantity: [1, [Validators.required, Validators.min(1)]],
       estimatedHours: [1, [Validators.required, Validators.min(0.1)]],
       discountPercentage: [0, [Validators.min(0), Validators.max(100)]],
@@ -213,9 +216,52 @@ export class ServiceOrdersComponent implements OnInit {
   loadServices(): void {
     this.mechanicServiceService.getAll(1, 100).subscribe(result => {
       if (result.isSuccess && result.value) {
-        this.availableServices = result.value.items.filter((s: any) => s.isActive);
+        const items = Array.isArray(result.value.items) ? result.value.items : [];
+        const activeServices = items.filter((s: any) => s?.isActive === true);
+        // Fallback: se não existir nenhum ativo, permitir usar os serviços devolvidos pela API
+        this.availableServices = activeServices.length > 0 ? activeServices : items;
       }
     });
+  }
+
+  get filteredAvailableServices(): any[] {
+    const term = this.normalizeSearchText(this.serviceSearchTerm || this.addServiceForm.get('serviceName')?.value || '');
+    if (!term) return this.availableServices;
+    return this.availableServices.filter(s =>
+      this.normalizeSearchText(`${s.name ?? s.serviceName ?? ''} ${s.category ?? ''} ${s.description ?? ''}`).includes(term)
+    );
+  }
+
+  onServiceSearchTermChange(term: string): void {
+    this.serviceSearchTerm = term ?? '';
+    const currentServiceId = this.addServiceForm.get('serviceId')?.value;
+    if (currentServiceId) return;
+
+    const firstMatch = this.filteredAvailableServices[0];
+    if (firstMatch?.id) {
+      this.addServiceForm.patchValue({ serviceId: firstMatch.id });
+    }
+  }
+
+  getServiceOptionLabel(service: any): string {
+    const name = service?.name ?? service?.serviceName ?? service?.description ?? `Serviço ${service?.id ?? ''}`;
+    const fixedPrice = typeof service?.fixedPrice === 'number' ? service.fixedPrice : null;
+    const hourlyPrice = typeof service?.pricePerHour === 'number' ? service.pricePerHour : null;
+    const estimatedHours = typeof service?.estimatedHours === 'number' ? service.estimatedHours : null;
+
+    if (fixedPrice != null) {
+      return `${name} - ${this.formatCurrency(fixedPrice)}`;
+    }
+
+    if (hourlyPrice != null && estimatedHours != null && estimatedHours > 0) {
+      return `${name} - ${this.formatCurrency(hourlyPrice * estimatedHours)} (${estimatedHours}h)`;
+    }
+
+    if (hourlyPrice != null) {
+      return `${name} - ${this.formatCurrency(hourlyPrice)}/h`;
+    }
+
+    return String(name);
   }
 
   // Carregar peças disponíveis
@@ -225,6 +271,14 @@ export class ServiceOrdersComponent implements OnInit {
         this.availableParts = result.value.items.filter((p: any) => p.isActive && p.stockQuantity > 0);
       }
     });
+  }
+
+  get filteredAvailableParts(): any[] {
+    const term = this.partSearchTerm.trim().toLowerCase();
+    if (!term) return this.availableParts;
+    return this.availableParts.filter(p =>
+      `${p.name} ${p.code} ${p.brand ?? ''}`.toLowerCase().includes(term)
+    );
   }
 
   // Carregar veículos do cliente selecionado
@@ -442,8 +496,9 @@ export class ServiceOrdersComponent implements OnInit {
     this.selectedOrder = order;
     this.loadServices();
     this.loadMechanics();
+    this.serviceSearchTerm = '';
     this.addServiceForm.reset({
-      serviceId: '',
+      serviceName: '',
       quantity: 1,
       estimatedHours: 1,
       discountPercentage: 0,
@@ -456,6 +511,7 @@ export class ServiceOrdersComponent implements OnInit {
   closeAddServiceModal(): void {
     this.showAddServiceModal = false;
     this.addServiceForm.reset();
+    this.serviceSearchTerm = '';
     this.selectedOrder = null;
   }
 
@@ -467,8 +523,44 @@ export class ServiceOrdersComponent implements OnInit {
     }
 
     const formValue = this.addServiceForm.value;
+    const serviceName = String(formValue.serviceName ?? '').trim();
+    if (!serviceName) {
+      this.toastService.error('Informe o nome do serviço.');
+      return;
+    }
+
+    const existingService = this.findServiceByName(serviceName);
+    if (existingService?.id) {
+      this.addServiceToOrder(existingService.id, formValue);
+      return;
+    }
+
+    const createRequest: CreateServiceRequest = {
+      name: serviceName,
+      description: `Serviço criado automaticamente na ordem ${this.selectedOrder.orderNumber}`,
+      category: 'Maintenance',
+      estimatedHours: Number(formValue.estimatedHours) || 1,
+      pricePerHour: 45,
+      requiresInspection: false
+    };
+
+    this.mechanicServiceService.create(createRequest).subscribe(createResult => {
+      if (!createResult.isSuccess || !createResult.value?.id) {
+        this.toastService.error('Não foi possível criar o serviço informado.');
+        this.setErrorSafe(createResult.error || null);
+        return;
+      }
+
+      this.availableServices = [...this.availableServices, createResult.value];
+      this.addServiceToOrder(createResult.value.id, formValue);
+    });
+  }
+
+  private addServiceToOrder(serviceId: string, formValue: any): void {
+    if (!this.selectedOrder) return;
+
     const request: AddServiceToOrderRequest = {
-      serviceId: formValue.serviceId,
+      serviceId,
       quantity: formValue.quantity,
       estimatedHours: formValue.estimatedHours,
       discountPercentage: formValue.discountPercentage || undefined,
@@ -478,16 +570,42 @@ export class ServiceOrdersComponent implements OnInit {
     this.serviceOrderService.addService(this.selectedOrder.id, request).subscribe(result => {
       if (result.isSuccess) {
         this.toastService.success('Serviço adicionado à ordem com sucesso!');
+        const orderToReopen = this.selectedOrder;
         this.closeAddServiceModal();
-        this.loadOrders(); // Refresh list
-        // Optionally reload order details if modal is open
-        if (this.showDetailsModal && this.selectedOrder) {
-          this.viewDetails(this.selectedOrder);
+        this.loadOrders();
+        if (this.showDetailsModal && orderToReopen) {
+          this.viewDetails(orderToReopen);
         }
       } else {
         this.toastService.error('Erro ao adicionar serviço à ordem.');
-        this.error = result.error || null;
+        this.setErrorSafe(result.error || null);
       }
+    });
+  }
+
+  private findServiceByName(serviceName: string): any | null {
+    const normalized = this.normalizeSearchText(serviceName);
+    if (!normalized) return null;
+
+    return this.availableServices.find(service => {
+      const candidate = this.normalizeSearchText(service?.name ?? service?.serviceName ?? '');
+      return candidate === normalized;
+    }) ?? this.filteredAvailableServices[0] ?? null;
+  }
+
+  private normalizeSearchText(value: string): string {
+    return (value ?? '')
+      .toString()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .trim();
+  }
+
+  private setErrorSafe(error: ErrorDetail | null): void {
+    queueMicrotask(() => {
+      this.error = error;
+      this.cdr.detectChanges();
     });
   }
 
@@ -495,6 +613,7 @@ export class ServiceOrdersComponent implements OnInit {
   openAddPartModal(order: ServiceOrder): void {
     this.selectedOrder = order;
     this.loadParts();
+    this.partSearchTerm = '';
     this.addPartForm.reset({
       partId: '',
       quantity: 1,
@@ -507,6 +626,7 @@ export class ServiceOrdersComponent implements OnInit {
   closeAddPartModal(): void {
     this.showAddPartModal = false;
     this.addPartForm.reset();
+    this.partSearchTerm = '';
     this.selectedOrder = null;
   }
 

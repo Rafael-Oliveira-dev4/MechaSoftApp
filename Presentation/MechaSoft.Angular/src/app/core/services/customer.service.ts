@@ -77,8 +77,8 @@ export class CustomerService {
   }
 
   // Soft-delete (ativar/desativar cliente)
-  toggleActive(id: string): Observable<Result<void>> {
-    return this.http.patch<void>(`${this.apiUrl}/${id}/toggle-active`, {}).pipe(
+  toggleActive(id: string, isActive: boolean, reason?: string): Observable<Result<void>> {
+    return this.http.patch<void>(`${this.apiUrl}/${id}/toggle-active`, { isActive, reason: reason ?? null }).pipe(
       map(() => success(undefined)),
       catchError(error => of(failure<void>(error)))
     );

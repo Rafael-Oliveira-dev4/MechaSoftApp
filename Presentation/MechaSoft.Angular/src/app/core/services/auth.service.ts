@@ -280,7 +280,23 @@ export class AuthService {
         isActive: true,
         emailConfirmed: false,
         createdAt: new Date(),
+        customerId: String(
+          decoded.CustomerId ||
+            decoded.customerId ||
+            decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/CustomerId'] ||
+            ''
+        ) || undefined,
+        employeeId: String(
+          decoded.EmployeeId ||
+            decoded.employeeId ||
+            decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/EmployeeId'] ||
+            ''
+        ) || undefined,
       };
+
+      // Claims podem vir como string vazia quando não existe associação
+      if (user.customerId === '') user.customerId = undefined;
+      if (user.employeeId === '') user.employeeId = undefined;
 
       // Validate required fields
       if (!user.id || !user.username || !user.email || !user.role) {

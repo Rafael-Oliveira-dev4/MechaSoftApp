@@ -7,11 +7,12 @@ import { ErrorDetail } from '../../../../core/models/result.model';
 import { LoadingService } from '../../../../core/services/loading.service';
 import { ToastService } from '../../../../core/services/toast.service';
 import { ErrorMessageComponent } from '../../../../shared/components/error-message/error-message.component';
+import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-parts',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, ErrorMessageComponent],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, ErrorMessageComponent, ConfirmDialogComponent],
   templateUrl: './parts.component.html',
   styleUrls: ['./parts.component.scss']
 })
@@ -28,6 +29,8 @@ export class PartsComponent implements OnInit {
   isEditMode: boolean = false;
   selectedPartId: string | null = null;
   selectedPart: Part | null = null;
+  showToggleConfirm = false;
+  pendingTogglePart: Part | null = null;
   
   partForm: FormGroup;
   stockForm: FormGroup;
@@ -187,15 +190,39 @@ export class PartsComponent implements OnInit {
 
   // Toggle active/inactive
   toggleActive(part: Part): void {
-    if (confirm(`Deseja ${part.isActive ? 'desativar' : 'ativar'} a peça ${part.name}?`)) {
-      this.partService.toggleActive(part.id).subscribe(result => {
-        if (result.isSuccess) {
-          this.loadParts();
-        } else {
-          this.error = result.error || null;
-        }
-      });
-    }
+    this.pendingTogglePart = part;
+    this.showToggleConfirm = true;
+  }
+
+  get toggleConfirmTitle(): string {
+    return this.pendingTogglePart?.isActive ? 'Desativar peça' : 'Ativar peça';
+  }
+
+  get toggleConfirmMessage(): string {
+    if (!this.pendingTogglePart) return '';
+    return `Deseja ${this.pendingTogglePart.isActive ? 'desativar' : 'ativar'} a peça ${this.pendingTogglePart.name}?`;
+  }
+
+  onToggleConfirm(): void {
+    if (!this.pendingTogglePart) return;
+
+    this.partService.toggleActive(this.pendingTogglePart.id).subscribe(result => {
+      if (result.isSuccess) {
+        this.loadParts();
+      } else {
+        this.error = result.error || null;
+      }
+      this.closeToggleConfirm();
+    });
+  }
+
+  onToggleCancel(): void {
+    this.closeToggleConfirm();
+  }
+
+  private closeToggleConfirm(): void {
+    this.showToggleConfirm = false;
+    this.pendingTogglePart = null;
   }
 
   // Toggle filtro de low stock

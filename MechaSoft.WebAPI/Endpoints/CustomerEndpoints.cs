@@ -2,6 +2,7 @@ using MechaSoft.Application.Common.Responses;
 using MechaSoft.Application.CQ.Customers.Commands.CreateCustomer;
 using MechaSoft.Application.CQ.Customers.Commands.UpdateCustomer;
 using MechaSoft.Application.CQ.Customers.Commands.CompleteCustomerProfile;
+using MechaSoft.Application.CQ.Customers.Commands.ToggleCustomerActive;
 using MechaSoft.Application.CQ.Customers.Queries.GetCustomers;
 using MechaSoft.Application.CQ.Customers.Queries.GetCustomerById;
 using MechaSoft.Application.CQ.Customers.Common;
@@ -41,6 +42,13 @@ public static class CustomerEndpoints
             .WithName("UpdateCustomer")
             .Produces<UpdateCustomerResponse>(200)
             .Produces<Error>(400);
+
+        // PATCH /api/customers/{id}/toggle-active - Ativar/Desativar cliente
+        customers.MapPatch("/{id:guid}/toggle-active", Commands.ToggleActive)
+            .WithName("ToggleCustomerActive")
+            .Produces<ToggleCustomerActiveResponse>(200)
+            .Produces<Error>(400)
+            .Produces<Error>(404);
 
         // POST /api/customers/complete-profile - Completar perfil de cliente
         customers.MapPost("/complete-profile", Commands.CompleteCustomerProfile)
@@ -140,6 +148,33 @@ public static class CustomerEndpoints
             return result.IsSuccess
                 ? TypedResults.Created($"/api/customers/{result.Value!.CustomerId}", result.Value!)
                 : TypedResults.BadRequest(result.Error!);
+        }
+
+        public static async Task<Results<Ok<ToggleCustomerActiveResponse>, BadRequest<Error>, NotFound<Error>>> ToggleActive(
+            [FromServices] ISender sender,
+            Guid id,
+            [FromBody] ToggleActiveRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            if (request == null)
+            {
+                return TypedResults.BadRequest(Error.InvalidInput);
+            }
+
+            var command = new ToggleCustomerActiveCommand(id, request.IsActive, request.Reason);
+            var result = await sender.Send(command, cancellationToken);
+
+            if (result.IsSuccess)
+            {
+                return TypedResults.Ok(result.Value!);
+            }
+
+            if (result.Error == Error.CustomerNotFound)
+            {
+                return TypedResults.NotFound(result.Error);
+            }
+
+            return TypedResults.BadRequest(result.Error!);
         }
     }
 

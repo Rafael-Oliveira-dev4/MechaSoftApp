@@ -176,17 +176,22 @@
               <div class="specialty-grid">
                 @for (specialty of specialtiesOptions; track specialty.value) {
                   <label class="specialty-item">
-                    <input type="checkbox" (change)="toggleSpecialty(specialty.value)" [checked]="isSpecialtySelected(specialty.value)" />
-                    <span>{{ specialty.label }}</span>
+                    <input
+                      type="checkbox"
+                      class="specialty-checkbox"
+                      (change)="toggleSpecialty(specialty.value)"
+                      [checked]="isSpecialtySelected(specialty.value)"
+                    />
+                    <span class="specialty-label">{{ specialty.label }}</span>
                   </label>
                 }
               </div>
             </div>
 
             <div class="form-group">
-              <label class="form-label flex items-center gap-2">
-                <input type="checkbox" formControlName="canPerformInspections" class="form-checkbox" />
-                <span>Pode realizar inspeções</span>
+              <label class="inspection-toggle">
+                <input type="checkbox" formControlName="canPerformInspections" class="specialty-checkbox" />
+                <span class="specialty-label">Pode realizar inspeções</span>
               </label>
             </div>
 

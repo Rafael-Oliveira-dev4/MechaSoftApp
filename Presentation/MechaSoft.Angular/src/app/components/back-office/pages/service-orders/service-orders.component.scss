@@ -346,6 +346,48 @@
   }
 }
 
+// Dropdowns no modal (estado, mecânico, adicionar serviço/peça)
+// Força tema escuro também na lista aberta de opções.
+select.form-input,
+.inline-select {
+  background-color: rgba(15, 23, 42, 0.95);
+  color: #e2e8f0;
+  border-color: rgba(45, 212, 191, 0.35);
+}
+
+select.form-input:focus,
+.inline-select:focus {
+  border-color: #2dd4bf;
+  box-shadow: 0 0 0 2px rgba(45, 212, 191, 0.2);
+}
+
+select.form-input option,
+.inline-select option {
+  background-color: #0f172a;
+  color: #e2e8f0;
+}
+
+select.form-input option:checked,
+.inline-select option:checked {
+  background: linear-gradient(0deg, rgba(45, 212, 191, 0.25), rgba(45, 212, 191, 0.25));
+  color: #ffffff;
+}
+
+// Melhor legibilidade nos modais de adicionar serviço/peça
+.modal-content .form-group label {
+  color: #d1d5db;
+  font-size: 0.84rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  margin-bottom: 0.35rem;
+  display: inline-block;
+}
+
+.modal-content .form-input {
+  font-size: 0.92rem;
+  line-height: 1.3rem;
+}
+
 // ===== MELHORIAS DE RESPONSIVIDADE =====
 
 // Melhorias na tabela
